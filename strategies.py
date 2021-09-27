@@ -8,7 +8,7 @@ class StateTransfer():
         raise NotImplementedError
 
     @staticmethod
-    def Names():
+    def Name():
         raise NotImplementedError
 
     @staticmethod
@@ -22,7 +22,7 @@ class StateTransfer():
     def __init__(self) -> None:
         self.set_action(0)
         self.set_state(1, 1, False, {})
-        # print('StateTransfer')
+        print('StateTransfer')
 
     def get_action(self):
         return self.__action__

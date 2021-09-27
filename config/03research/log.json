@@ -5,13 +5,9 @@
         "sinks":[
             {
                 "type":"basic_file_sink",
-                "filename":"BtLogs/Runner.log",
+                "filename":"outputs_bt/logs/runner.log",
                 "pattern":"[%Y.%m.%d %H:%M:%S,%f - %-5l] %v",
                 "truncate":true
-            },
-			{
-                "type":"ostream_sink",
-                "pattern":"[%m.%d %H:%M:%S - %-5l] %v"
             }
         ]
     },
@@ -22,7 +18,7 @@
             "sinks":[
                 {
                     "type":"basic_file_sink",
-                    "filename":"BtLogs/Strategy/%s.log",
+                    "filename":"outputs_bt/logs/strategy/%s.log",
                     "pattern":"[%Y.%m.%d %H:%M:%S,%f - %-5l] %v",
                     "truncate":true
                 }

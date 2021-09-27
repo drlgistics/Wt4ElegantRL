@@ -13,7 +13,10 @@ class EnvWt(Env):
         self._et_ = self.__cls__.EngineType()
 
         # 创建一个运行环境
-        self._engine_:WtBtEngine = WtBtEngine(self._et_)
+        self._engine_:WtBtEngine = WtBtEngine(
+            eType=self._et_,
+            logCfg='./config/03research/log.json'
+            )
         if self._et_ == EngineType.ET_CTA:
             self._engine_.init(
                 './config/01commom/', 

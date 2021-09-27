@@ -17,7 +17,7 @@ def debug():
         while not done:
             action += 1 #模拟智能体产生动作
             obs, reward, done, info = env.step(action)
-            print('obs%s'%obs, 'reward%s'%reward, done, info)
+            # print('obs%s'%obs, 'reward%s'%reward, done, info)
     env.close()
 
 @command()

@@ -1,7 +1,6 @@
-import numpy as np
 from gym import Env
-from wtpy.WtBtEngine import WtBtEngine, EngineType
-from strategies import StateTransfer
+from wtpy.WtBtEngine import WtBtEngine
+from strategies import StateTransfer, EngineType
 
 class EnvWt(Env):
     def __init__(self, cls):

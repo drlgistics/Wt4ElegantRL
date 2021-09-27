@@ -52,7 +52,7 @@ class StateTransfer():
         raise NotImplementedError
 
     @abstractmethod
-    def calculate_done(self, obs, done):
+    def calculate_done(self, obs, reward):
         raise NotImplementedError
 
 class TrainCTA(BaseCtaStrategy, StateTransfer):
@@ -75,7 +75,7 @@ class TrainCTA(BaseCtaStrategy, StateTransfer):
     
     def on_calculate(self, context: CtaContext):
         obs = self.calculate_obs(
-            context.stra_get_bars(
+            bars=context.stra_get_bars(
                 stdCode='DCE.c.HOT',
                 period='m1',
                 count=60
@@ -85,7 +85,7 @@ class TrainCTA(BaseCtaStrategy, StateTransfer):
             best=context.stra_get_detail_profit(stdCode='DCE.c.HOT', usertag='', flag=1),
             worst=context.stra_get_detail_profit(stdCode='DCE.c.HOT', usertag='', flag=-1),
             )
-        done = self.calculate_done(obs, reward)
+        done = self.calculate_done(obs=obs, reward=reward)
         self.set_state(obs, reward, done, {})
 
 class TrainHFT(BaseHftStrategy, StateTransfer):
@@ -104,8 +104,11 @@ class DemoCTA(TrainCTA):
     def calculate_reward(self, curr:int, best:int, worst:int):
         return 1
 
-    def calculate_done(self, obs, done):
+    def calculate_done(self, obs, reward):
         return True if np.random.randint(1, 100)==99 else False #是否结束
+
+    def on_backtest_end(self, context: CtaContext):
+        print('on_backtest_end')
 
 
 class DemoHFT(TrainHFT):

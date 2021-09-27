@@ -1,16 +1,17 @@
 import numpy as np
+from abc import abstractmethod
 from wtpy.WtBtEngine import EngineType
 from wtpy.WtDataDefs import WtKlineData
 from wtpy.StrategyDefs import BaseCtaStrategy, CtaContext, BaseHftStrategy, HftContext
 
 class StateTransfer():
     @staticmethod
-    # @abstractmethod
+    @abstractmethod
     def EngineType():
         raise NotImplementedError
 
     @staticmethod
-    # @abstractmethod
+    @abstractmethod
     def Name():
         raise NotImplementedError
 
@@ -42,18 +43,15 @@ class StateTransfer():
         self.__done__ = done
         self.__info__ = info
 
-    @staticmethod
-    # @abstractmethod
+    @abstractmethod
     def calculate_obs(self, bars:WtKlineData):
         raise NotImplementedError
 
-    @staticmethod
-    # @abstractmethod
+    @abstractmethod
     def calculate_reward(self, curr:int, best:int, worst:int):
         raise NotImplementedError
 
-    @staticmethod
-    # @abstractmethod
+    @abstractmethod
     def calculate_done(self, obs, done):
         raise NotImplementedError
 

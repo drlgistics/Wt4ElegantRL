@@ -128,4 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-output_bt/
+outputs_bt/

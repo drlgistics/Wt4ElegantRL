@@ -99,12 +99,13 @@ class DemoCTA(TrainCTA):
         return __class__.__name__
 
     def calculate_obs(self, bars:WtKlineData):
-        return bars.closes
+        return bars.bartimes[-1]
 
     def calculate_reward(self, curr:int, best:int, worst:int):
         return 1
 
     def calculate_done(self, obs, reward):
+        return False
         return True if np.random.randint(1, 100)==99 else False #是否结束
 
     def on_backtest_end(self, context: CtaContext):

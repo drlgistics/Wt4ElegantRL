@@ -54,14 +54,17 @@ class EnvWt(Env):
     def step(self, action):
         assert self._iter_>0
         self._cls_.set_action(action)
-        self._cb_step_()
-        obs, reward, done, info = self._cls_.get_state()
-        return obs, reward, done, info
+        if self._cb_step_():
+            obs, reward, done, info = self._cls_.get_state()
+            return obs, reward, done, info
+        else:
+            return (1,2), 2, 3, 4
 
     def close(self):
         if self._iter_>0:
             self._engine_.stop_backtest()
             self._engine_.clear_cache()
+            pass
 
     def __del__(self):
         self._engine_.release_backtest()

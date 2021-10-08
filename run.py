@@ -9,16 +9,18 @@ def run():
 @command()
 def debug():
     env = EnvWt(cls=DemoCTA)
-    for i in range(10): #模拟训练10次
-        print('第%s次训练'%i)
+    for i in range(1000): #模拟训练10次
         obs = env.reset()
         done = False
         action = 0
         while not done:
             action += 1 #模拟智能体产生动作
             obs, reward, done, info = env.step(action)
-            print(obs, done)
+            # len(obs)
+            # print(action)
+            # print(obs)
             # print('obs%s'%obs, 'reward%s'%reward, done, info)
+        print('第%s次训练完成'%i)
     env.close()
 
 @command()

@@ -1,7 +1,7 @@
 {
     "replayer":{
         "mode":"bin",
-        "path":"D:/Github/test/Storage/",
+        "path":"./dataset/",
         "tick":true,
         "basefiles":{
             "session":"./config/01commom/sessions.json",

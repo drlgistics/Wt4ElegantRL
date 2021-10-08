@@ -1,8 +1,8 @@
-from gym import Env
+#from gym import Env
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
 
-class EnvWt(Env):
+class EnvWt():#Env
     def __init__(self, cls):
         self._iter_ = 0
 

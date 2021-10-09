@@ -67,22 +67,23 @@ class TrainCTA(BaseCtaStrategy, StateTransfer):
         print('TrainCTA')
 
     def on_init(self, context: CtaContext):
-        print('on_init 1')
+        # print('on_init 1')
         context.stra_get_bars(
             stdCode='CFFEX.IF.HOT',
             period='m5',
             count=200,
             isMain=True
             )
-        print('on_init 2')
+        # print('on_init 2')
     
     def on_session_begin(self, context: CtaContext, curTDate: int):
-        print('on_session_begin')
+        # print('on_session_begin')
+        pass
     
     def on_calculate(self, context: CtaContext):
-        print('on_calculate 1')
+        # print('on_calculate 1')
         context.stra_log_text('%s%s'%(context.stra_get_date(), context.stra_get_time()))
-        print('on_calculate 2')
+        # print('on_calculate 2')
         # obs = 'obs'
         # reward = 1
         # done = False
@@ -99,7 +100,7 @@ class TrainCTA(BaseCtaStrategy, StateTransfer):
             )
         done = self.calculate_done(obs=obs, reward=reward)
         self.set_state(obs, reward, done, {})
-        print('on_calculate 3')
+        # print('on_calculate 3')
 
 class TrainHFT(BaseHftStrategy, StateTransfer):
     @staticmethod

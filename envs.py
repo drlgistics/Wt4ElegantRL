@@ -37,7 +37,7 @@ class EnvWt():#Env
         self._iter_ += 1
 
         # 创建一个策略并加入运行环境
-        self._cls_:StateTransfer = self.__cls__(name='%s_%s'%(self.__cls__.Name(), self._iter_))
+        self._cls_:StateTransfer = self.__cls__(name='%s_%s'%(__class__.__name__, self.__cls__.Name()))
 
         # 设置策略的时候一定要安装钩子
         if self._et_ == EngineType.ET_CTA:
@@ -63,8 +63,6 @@ class EnvWt():#Env
     def close(self):
         if self._iter_>0:
             self._engine_.stop_backtest()
-            self._engine_.clear_cache()
-            pass
 
     def __del__(self):
         self._engine_.release_backtest()

@@ -1,6 +1,6 @@
 {
     "root":{
-        "level":"debug",
+        "level":"info",
         "async":false,
         "sinks":[
             {
@@ -13,7 +13,7 @@
     },
     "dyn_pattern":{
         "strategy":{
-            "level":"debug",
+            "level":"info",
             "async":false,
             "sinks":[
                 {

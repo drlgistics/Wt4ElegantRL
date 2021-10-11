@@ -1,6 +1,6 @@
 from click import command, group
-from envs import EnvWt
-from strategies import DemoCTA, DemoHFT
+from envs import EvaluatorWt, TrainWt
+from strategies import SimpleCTADemo, DemoHFT
 
 @group()
 def run():
@@ -8,8 +8,8 @@ def run():
 
 @command()
 def debug():
-    env = EnvWt(cls=DemoCTA)
-    for i in range(1000): #模拟训练10次
+    env = EvaluatorWt(cls=SimpleCTADemo)
+    for i in range(10): #模拟训练10次
         obs = env.reset()
         done = False
         action = 0
@@ -25,7 +25,7 @@ def debug():
 
 @command()
 def train():
-    env = EnvWt(cls=DemoCTA)
+    env = TrainWt(cls=SimpleCTADemo)
     for i in range(10): #模拟训练10次
         print('第%s次训练'%i)
         obs = env.reset()

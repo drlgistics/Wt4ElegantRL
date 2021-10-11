@@ -10,21 +10,21 @@ def run():
 @command()
 def debug():
     # 多因子看板
-    factor = FactorsKanban(code='CFFEX.IF.HOT', period='m5', count=200, roll=3)
+    kanban = FactorsKanban(code='CFFEX.IF.HOT', period='m5', count=200, roll=3)
 
     # 双均线因子
-    factor.add(period='m5', cb=TalibFactor.SMA, timeperiod=6)
-    factor.add(period='m5', cb=TalibFactor.SMA, timeperiod=12)
+    kanban.add(period='m5', cb=TalibFactor.SMA, timeperiod=6)
+    kanban.add(period='m5', cb=TalibFactor.SMA, timeperiod=12)
 
     # 环境
     env = TrainWt(
         cls=SimpleCTADemo, 
-        factor=factor,
+        kanban=kanban,
         time_start=201909100930, 
         time_end=201912011500
         )
  
-    for i in range(1000): #模拟训练10次
+    for i in range(10): #模拟训练10次
         obs = env.reset()
         done = False
         action = 0

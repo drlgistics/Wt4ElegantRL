@@ -15,15 +15,6 @@ class StateTransfer():
     def Name() -> str:
         raise NotImplementedError
 
-    @staticmethod
-    def TrainStartTime() -> int:
-        return 202108311600
-        return 202105201600
-
-    @staticmethod
-    def TrainEndTime() -> int:
-        return 202109091600
-
     def __init__(self):
         self.set_action(0)
         self.set_state(None, None, False, {})
@@ -130,15 +121,6 @@ class SimpleCTADemo(SimpleCTA):
     def calculate_done(self, obs, reward) -> bool:
         return False
         return True if np.random.randint(1, 100)==99 else False #是否结束
-
-    @staticmethod
-    def TrainStartTime():
-        return 201909100930
-        return 202105201600
-
-    @staticmethod
-    def TrainEndTime():
-        return 201912011500
 
 
 class SimpleHFTDemo(SimpleHFT):

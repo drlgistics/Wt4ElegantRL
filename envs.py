@@ -1,24 +1,18 @@
-#from gym import Env
+from gym import Env
+from kanbans import FactorsKanban
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
 
-class EvaluatorWt():#Env
+#一个进程只能有一个env
+class EvaluatorWt(Env):
     _log_:str = './config/03research/log_evaluator.json'
 
-    def __init__(self, cls:StateTransfer, id:int=1):
+    def __init__(self, factor:FactorsKanban, cls:StateTransfer, time_start:int, time_end:int, id:int=1):
         self._id_:int = id
         self._iter_:int = 0
 
         self.__cls__ = cls
-        self._cls_:StateTransfer = None
-
         self._et_ = self.__cls__.EngineType()
-
-        self._obs_ = None
-        self._reward_:float = 0.
-        self._done_:bool = False 
-        self._info_:dict = {}
-
         self._run_:bool = False 
 
         # 创建一个运行环境
@@ -39,7 +33,7 @@ class EvaluatorWt():#Env
         else:
             raise AttributeError
         
-        self._engine_.configBacktest(self.__cls__.TrainStartTime(), self.__cls__.TrainEndTime())
+        self._engine_.configBacktest(time_start, time_end)
         self._engine_.commitBTConfig()
         
     def reset(self):
@@ -84,11 +78,11 @@ class EvaluatorWt():#Env
             self._engine_.stop_backtest()
             self._run_ = False
 
-    def __del__(self):
-        self._engine_.release_backtest()
-
     def _name_(self):
         return '%s%s_%s%s'%(__class__.__name__, self._id_, self.__cls__.Name(), self._iter_)
+
+    def __del__(self):
+        self._engine_.release_backtest()
 
 
 class TrainWt(EvaluatorWt):

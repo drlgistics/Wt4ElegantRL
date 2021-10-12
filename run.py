@@ -1,5 +1,4 @@
 from click import command, group
-from kanbans import FactorsKanban, TalibFactor
 from envs import EvaluatorWt, TrainWt
 from strategies import SimpleCTADemo
 
@@ -9,17 +8,9 @@ def run():
 
 @command()
 def debug():
-    # 多因子看板
-    kanban = FactorsKanban(code='CFFEX.IF.HOT', period='m5', count=200, roll=3)
-
-    # 双均线因子
-    kanban.add(period='m5', cb=TalibFactor.SMA, timeperiod=6)
-    kanban.add(period='m5', cb=TalibFactor.SMA, timeperiod=12)
-
     # 环境
     env = TrainWt(
         cls=SimpleCTADemo, 
-        kanban=kanban,
         time_start=201909100930, 
         time_end=201912011500
         )

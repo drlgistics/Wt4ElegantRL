@@ -1,5 +1,4 @@
 from gym import Env
-from kanbans import FactorsKanban
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
 
@@ -7,7 +6,7 @@ from strategies import StateTransfer, EngineType
 class EvaluatorWt(Env):
     _log_:str = './config/03research/log_evaluator.json'
 
-    def __init__(self, kanban:FactorsKanban, cls:StateTransfer, time_start:int, time_end:int, id:int=1):
+    def __init__(self, cls:StateTransfer, time_start:int, time_end:int, id:int=1):
         self._id_:int = id
         self._iter_:int = 0
 

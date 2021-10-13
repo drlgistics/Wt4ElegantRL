@@ -1,4 +1,7 @@
 from gym import Env
+from kanbans import Kanban
+from rewards import Reward
+from stoppers import Stopper
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
 
@@ -6,12 +9,16 @@ from strategies import StateTransfer, EngineType
 class EvaluatorWt(Env):
     _log_:str = './config/03research/log_evaluator.json'
 
-    def __init__(self, cls:StateTransfer, time_start:int, time_end:int, id:int=1):
+    def __init__(self, strategy:StateTransfer, kanban:Kanban, reward:Reward, stopper:Stopper, time_start:int, time_end:int, id:int=1):
         self._id_:int = id
         self._iter_:int = 0
 
-        self.__cls__ = cls
-        self._et_ = self.__cls__.EngineType()
+        self.__strategy__ = strategy
+        self.__kanban__:Kanban = kanban
+        self.__reward__:Reward = reward
+        self.__stopper__:Stopper = stopper
+
+        self._et_ = self.__strategy__.EngineType()
         self._run_:bool = False 
 
         # 创建一个运行环境
@@ -45,13 +52,18 @@ class EvaluatorWt(Env):
         self._info_:dict = {}
 
         # 创建一个策略并加入运行环境
-        self._cls_:StateTransfer = self.__cls__(name=self._name_())
+        self._strategy_:StateTransfer = self.__strategy__(
+            name=self._name_(),
+            kanban=self.__kanban__,
+            stopper=self.__stopper__,
+            reward=self.__reward__,
+            )
 
         # 设置策略的时候一定要安装钩子
         if self._et_ == EngineType.ET_CTA:
-            self._engine_.set_cta_strategy(self._cls_, hook=True, slippage=1)#
+            self._engine_.set_cta_strategy(self._strategy_, hook=True, slippage=1)#
         elif self._et_ == EngineType.ET_HFT:
-            self._engine_.set_hft_strategy(self._cls_, hook=True)#
+            self._engine_.set_hft_strategy(self._strategy_, hook=True)#
         else:
             raise AttributeError
 
@@ -63,9 +75,9 @@ class EvaluatorWt(Env):
     
     def step(self, action):
         assert self._iter_>0
-        self._cls_.set_action(action)
+        self._strategy_.set_action(action)
         if self._cb_step_():
-            self._obs_, self._reward_, self._done_, self._info_ = self._cls_.get_state()
+            self._obs_, self._reward_, self._done_, self._info_ = self._strategy_.get_state()
         else:
             self._done_ = True
         if self._done_:
@@ -78,7 +90,7 @@ class EvaluatorWt(Env):
             self._run_ = False
 
     def _name_(self):
-        return '%s%s_%s%s'%(__class__.__name__, self._id_, self.__cls__.Name(), self._iter_)
+        return '%s%s_%s%s'%(__class__.__name__, self._id_, self.__strategy__.Name(), self._iter_)
 
     def __del__(self):
         self._engine_.release_backtest()
@@ -87,4 +99,4 @@ class EvaluatorWt(Env):
 class TrainWt(EvaluatorWt):
     _log_:str = './config/03research/log_train.json'
     def _name_(self):
-        return '%s%s_%s'%(__class__.__name__, self._id_, self.__cls__.Name())
+        return '%s%s_%s'%(__class__.__name__, self._id_, self.__strategy__.Name())

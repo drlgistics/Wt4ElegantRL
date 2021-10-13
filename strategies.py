@@ -1,4 +1,7 @@
 import numpy as np
+from kanbans import Kanban
+from rewards import Reward
+from stoppers import Stopper
 from abc import abstractmethod
 from wtpy.WtBtEngine import EngineType
 from wtpy.WtDataDefs import WtKlineData
@@ -15,9 +18,13 @@ class StateTransfer():
     def Name() -> str:
         raise NotImplementedError
 
-    def __init__(self):
-        self.set_action(0)
-        self.set_state(None, None, False, {})
+    def __init__(self, kanban:Kanban, reward:Reward, stopper:Stopper):
+        self._kanban_:Kanban = kanban
+        self._reward_:Reward = reward
+        self._stopper_:Stopper = stopper
+
+        # self.set_action(0)
+        # self.set_state(None, None, False, {})
         print('StateTransfer')
 
     def get_action(self) -> int:
@@ -56,8 +63,8 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
     def EngineType() -> int:
         return EngineType.ET_CTA
 
-    def __init__(self, name: str):
-        super(BaseCtaStrategy, self).__init__()
+    def __init__(self, name: str, kanban:Kanban, reward:Reward, stopper:Stopper):
+        super(BaseCtaStrategy, self).__init__(kanban=kanban, reward=reward, stopper=stopper)
         super().__init__(name)
         print('TrainCTA')
 

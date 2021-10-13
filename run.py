@@ -1,6 +1,9 @@
 from click import command, group
-from envs import EvaluatorWt, TrainWt
+from kanbans import Indicator
+from rewards import SimpleReward
+from stoppers import SimpleStopper
 from strategies import SimpleCTADemo
+from envs import EvaluatorWt, TrainWt
 
 @group()
 def run():
@@ -8,9 +11,22 @@ def run():
 
 @command()
 def debug():
-    # 环境
+    # 看板组件
+    kanban = Indicator('CFFEX.IF.HOT', 'm5', 200, 3)
+    kanban.addSecurity('CFFEX.IH.HOT', 'm5', 200)
+
+    # 止盈止损组件
+    stopper = SimpleStopper()
+
+    # 奖励组件
+    reward = SimpleReward()
+
+    # 环境组装
     env = TrainWt(
-        cls=SimpleCTADemo, 
+        strategy=SimpleCTADemo,
+        kanban=kanban,
+        reward=reward,
+        stopper=stopper,
         time_start=201909100930, 
         time_end=201912011500
         )

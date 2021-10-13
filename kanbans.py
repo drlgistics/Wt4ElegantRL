@@ -1,4 +1,5 @@
 import talib as ta
+from wtpy.WtDataDefs import WtKlineData
 
 class Kanban():
     M1 = 'm1'
@@ -10,26 +11,41 @@ class Kanban():
     D1 = 'd1'
 
     @property
-    def security(self):
+    def security(self) -> list:
         return self._securities_
 
-    def __init__(self, code:str, period:str, roll:int) -> None:
-        self._securities_:list = []
+    @property
+    def subscribe(self) -> dict:
+        return self._subscribies_
+
+    def __init__(self, code: str, period: str, roll: int) -> None:
+        self._securities_: list = []
         self.addSecurity(code=code)
 
-        self._period_:list = [period]
-        self._main_:str = period
-        self._count_:dict = {period:1}
+        self._main_: str = period
+        self._subscribies_: dict = {self._main_: 1}
 
-
-    def addSecurity(self, code:str):
+    def addSecurity(self, code: str):
         if code not in self._securities_:
             self._securities_.append(code)
-    
-    def _calculate_(self, period:str, callback, **kwargs):
+
+    def _subscribe_(self, period:str, count:int):
+        self._subscribies_[period] = max(
+            self._subscribies_.get(period, 0),
+            count
+            )
+
+
+    def _calculate_(self, period: str, callback, **kwargs):
         print(kwargs)
         pass
 
+
 class Indicator(Kanban):
-    def macd(self, period:str, fastperiod:int=12, slowperiod:int=26, signalperiod:int=9):
-        self._calculate_(period=period, callback=ta.MACD, fastperiod=12, slowperiod=26, signalperiod=9)
+    def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9):
+        def _macd_(data:WtKlineData, args):
+            return ta.MACD(data.closes, **args)
+            
+        self._subscribe_(period=period, count=slowperiod+signalperiod)
+        self._calculate_(period=period, callback=_macd_,
+                         fastperiod=12, slowperiod=26, signalperiod=9)

@@ -24,6 +24,7 @@ class StateTransfer():
         self._stopper_:Stopper = stopper
 
         print(self._kanban_.security)
+        print(self._kanban_.subscribe)
 
         # self.set_action(0)
         # self.set_state(None, None, False, {})

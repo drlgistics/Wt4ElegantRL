@@ -8,6 +8,7 @@ from strategies import StateTransfer, EngineType
 #一个进程只能有一个env
 class EvaluatorWt(Env):
     _log_:str = './config/03research/log_evaluator.json'
+    _dump_:bool = True
 
     def __init__(self, strategy:StateTransfer, kanban:Kanban, reward:Reward, stopper:Stopper, time_start:int, time_end:int, id:int=1):
         self._id_:int = id
@@ -61,14 +62,14 @@ class EvaluatorWt(Env):
 
         # 设置策略的时候一定要安装钩子
         if self._et_ == EngineType.ET_CTA:
-            self._engine_.set_cta_strategy(self._strategy_, hook=True, slippage=1)#
+            self._engine_.set_cta_strategy(self._strategy_, slippage=1, hook=True, persistData=self._dump_)#
         elif self._et_ == EngineType.ET_HFT:
             self._engine_.set_hft_strategy(self._strategy_, hook=True)#
         else:
             raise AttributeError
 
         # 回测一定要异步运行
-        self._engine_.run_backtest(bAsync=True)
+        self._engine_.run_backtest(bAsync=True, bNeedDump=self._dump_)
         self._run_ = True
 
         return self.step(0)[0]
@@ -98,5 +99,6 @@ class EvaluatorWt(Env):
 
 class TrainWt(EvaluatorWt):
     _log_:str = './config/03research/log_train.json'
+    _dump_:bool = False
     def _name_(self):
         return '%s%s_%s'%(__class__.__name__, self._id_, self.__strategy__.Name())

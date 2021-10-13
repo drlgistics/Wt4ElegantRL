@@ -1,0 +1,5 @@
+pytorch
+torchvision
+torchaudio
+cudatoolkit
+gym

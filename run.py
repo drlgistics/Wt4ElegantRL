@@ -31,7 +31,7 @@ def debug():
         time_end=201912011500
         )
  
-    for i in range(10): #模拟训练10次
+    for i in range(5000): #模拟训练10次
         obs = env.reset()
         done = False
         action = 0

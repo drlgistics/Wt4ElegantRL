@@ -1,5 +1,5 @@
 # Wt4ElegantRL
-Wt4ElegantRL = WonderTrader(https://github.com/wondertrader/wtpy) + ElegantRL(https://github.com/AI4Finance-Foundation/ElegantRL)
+Wt4ElegantRL = [WonderTrader](https://github.com/wondertrader/wtpy) + [ElegantRL](https://github.com/AI4Finance-Foundation/ElegantRL)
 
 ## INSTALL
 clone

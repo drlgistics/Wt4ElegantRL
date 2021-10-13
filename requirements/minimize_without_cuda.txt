@@ -1,7 +1,7 @@
 pytorch
 torchvision
 torchaudio
-cudatoolkit
+cpuonly
 gym
 
 pandas

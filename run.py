@@ -12,9 +12,10 @@ def run():
 @command()
 def debug():
     # 看板组件
-    kanban:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M1, roll=3)
+    kanban:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M5, roll=3)
     kanban.addSecurity(code='CFFEX.IH.HOT')
     kanban.macd(kanban.M5)
+    kanban.macd(kanban.M1)
 
     # 止盈止损组件
     stopper:SimpleStopper = SimpleStopper()

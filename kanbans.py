@@ -1,5 +1,6 @@
 import talib as ta
-from wtpy.WtDataDefs import WtKlineData
+from wtpy.WtDataDefs import WtKlineData, WtHftData
+from wtpy.StrategyDefs import CtaContext, HftContext
 
 class Kanban():
     M1 = 'm1'
@@ -10,20 +11,15 @@ class Kanban():
     M60 = 'm60'
     D1 = 'd1'
 
-    @property
-    def security(self) -> list:
-        return self._securities_
-
-    @property
-    def subscribe(self) -> dict:
-        return self._subscribies_
-
     def __init__(self, code: str, period: str, roll: int) -> None:
         self._securities_: list = []
         self.addSecurity(code=code)
 
-        self._main_: str = period
-        self._subscribies_: dict = {self._main_: 1}
+        self._main_: tuple = (code, period)
+        self._subscribies_: dict = {}
+        self._subscribe_(period=period, count=1)
+
+        self._roll_:int = roll
 
     def addSecurity(self, code: str):
         if code not in self._securities_:
@@ -35,10 +31,24 @@ class Kanban():
             count
             )
 
+    def subscribe(self, context:CtaContext):
+        '''
+        根据看板订阅数据
+        '''
+        for code in self._securities_:
+            for period, count in self._subscribies_.items():
+                context.stra_get_bars(
+                    stdCode=code,
+                    period=period,
+                    count=count,
+                    isMain=(code==self._main_[0] and period==self._main_[1])
+                )
 
-    def _calculate_(self, period: str, callback, **kwargs):
-        print(kwargs)
+    def _callback_(self, period: str, callback, **kwargs):
         pass
+
+    def calculate(self, context:CtaContext):
+        print(context.stra_get_date(), context.stra_get_time())
 
 
 class Indicator(Kanban):
@@ -47,5 +57,5 @@ class Indicator(Kanban):
             return ta.MACD(data.closes, **args)
             
         self._subscribe_(period=period, count=slowperiod+signalperiod)
-        self._calculate_(period=period, callback=_macd_,
-                         fastperiod=12, slowperiod=26, signalperiod=9)
+        self._callback_(period=period, callback=_macd_,
+                         fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)

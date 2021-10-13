@@ -14,18 +14,17 @@ class Kanban():
         return self._securities_
 
     def __init__(self, code:str, period:str, roll:int) -> None:
-        self._securities_:dict = {}
-        self._period_:dict = {}
-        self._main_:str = None
-        self._count_:dict = {}
-
+        self._securities_:list = []
         self.addSecurity(code=code)
 
+        self._period_:list = [period]
+        self._main_:str = period
+        self._count_:dict = {period:1}
+
+
     def addSecurity(self, code:str):
-        # security:dict = self._securities_.get(code, {})
-        # security[period] = count
-        # self._securities_[code] = security
-        pass
+        if code not in self._securities_:
+            self._securities_.append(code)
     
     def _calculate_(self, period:str, callback, **kwargs):
         print(kwargs)

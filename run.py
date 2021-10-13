@@ -12,17 +12,18 @@ def run():
 @command()
 def debug():
     # 看板组件
-    kanban = Indicator('CFFEX.IF.HOT', 'm5', 200, 3)
-    kanban.addSecurity('CFFEX.IH.HOT', 'm5', 200)
+    kanban:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M1, roll=3)
+    kanban.addSecurity(code='CFFEX.IH.HOT')
+    kanban.macd(kanban.M5)
 
     # 止盈止损组件
-    stopper = SimpleStopper()
+    stopper:SimpleStopper = SimpleStopper()
 
     # 奖励组件
-    reward = SimpleReward()
+    reward:SimpleReward = SimpleReward()
 
     # 环境组装
-    env = TrainWt(
+    env:TrainWt = TrainWt(
         strategy=SimpleCTADemo,
         kanban=kanban,
         reward=reward,
@@ -31,7 +32,7 @@ def debug():
         time_end=201912011500
         )
  
-    for i in range(5000): #模拟训练10次
+    for i in range(1): #模拟训练10次
         obs = env.reset()
         done = False
         action = 0

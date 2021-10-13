@@ -23,6 +23,8 @@ class StateTransfer():
         self._reward_:Reward = reward
         self._stopper_:Stopper = stopper
 
+        print(enumerate(self._kanban_.security))
+
         # self.set_action(0)
         # self.set_state(None, None, False, {})
         print('StateTransfer')

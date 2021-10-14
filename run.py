@@ -12,23 +12,29 @@ def run():
 @command()
 def debug():
     # 特征工程组件
-    feature:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M5, roll=3)
-    feature.addSecurity(code='CFFEX.IH.HOT')
+    feature:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M5, roll=3) # 每一个特征工程必须指定一个主要标的
+    
+    # 按需添加其他合约
+    feature.addSecurity(code='CFFEX.IH.HOT') 
     feature.addSecurity(code='CFFEX.IC.HOT')
+    
+    # 使用5分钟线建立特征
     feature.macd(feature.M5)
+    
+    # 使用1分钟线建立特征
     feature.macd(feature.M1)
 
-    # 止盈止损组件
+    # 止盈止损组件，暂时是个摆设
     stopper:SimpleStopper = SimpleStopper()
 
     # 奖励组件
     reward:SimpleReward = SimpleReward()
 
-    # 环境组装
+    # 环境组装，每一个进程只能有一个环境
     env:TrainWt = TrainWt(
-        strategy=SimpleCTA,
-        feature=feature,
-        reward=reward,
+        strategy=SimpleCTA,  # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和奖励计算
+        feature=feature, # 特征计算
+        reward=reward, # 奖励计算
         stopper=stopper,
         time_start=201909100930, 
         time_end=201912011500

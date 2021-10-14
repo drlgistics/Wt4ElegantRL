@@ -11,7 +11,7 @@ def run():
 
 @command()
 def debug():
-    # 看板组件
+    # 特征工程组件
     feature:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M5, roll=3)
     feature.addSecurity(code='CFFEX.IH.HOT')
     feature.macd(feature.M5)
@@ -33,14 +33,14 @@ def debug():
         time_end=201912011500
         )
  
-    for i in range(1): #模拟训练10次
+    for i in range(10): #模拟训练10次
         obs = env.reset()
         done = False
         action = 0
         while not done:
             action += 1 #模拟智能体产生动作
             obs, reward, done, info = env.step(action)
-            # print('obs%s'%obs, 'reward%s'%reward, done, info)
+            print('obs%s'%obs, 'reward%s'%reward, done, info)
         print('第%s次训练完成'%i)
     env.close()
 

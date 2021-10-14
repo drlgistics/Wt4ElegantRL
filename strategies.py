@@ -47,18 +47,6 @@ class StateTransfer():
     def calculate_action(self, action) -> int:
         raise NotImplementedError
 
-    @abstractmethod
-    def calculate_obs(self, bars: WtKlineData):
-        raise NotImplementedError
-
-    @abstractmethod
-    def calculate_reward(self, curr: float, best: float, worst: float) -> float:
-        raise NotImplementedError
-
-    @abstractmethod
-    def calculate_done(self, obs, reward) -> bool:
-        raise NotImplementedError
-
 
 class SimpleCTA(BaseCtaStrategy, StateTransfer):
     @staticmethod
@@ -86,22 +74,8 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
 
     def on_calculate(self, context: CtaContext):
         # context.stra_log_text('on_calculate 1')
-        self._feature_.calculate(context)
-        obs = self.calculate_obs(
-            bars=context.stra_get_bars(
-                stdCode='CFFEX.IF.HOT',
-                period='m5',
-                count=200
-            ))
-        reward = self.calculate_reward(
-            curr=context.stra_get_detail_profit(
-                stdCode='CFFEX.IF.HOT', usertag='', flag=0),
-            best=context.stra_get_detail_profit(
-                stdCode='CFFEX.IF.HOT', usertag='', flag=1),
-            worst=context.stra_get_detail_profit(
-                stdCode='CFFEX.IF.HOT', usertag='', flag=-1),
-        )
-        done = self.calculate_done(obs=obs, reward=reward)
+        obs = self._feature_.calculate(context)
+        reward, done = self._reward_.calculate(context)
         self.set_state(obs, reward, done, {})
         # context.stra_log_text('on_calculate 2')
 
@@ -123,28 +97,8 @@ class SimpleCTADemo(SimpleCTA):
     def calculate_action(self, action) -> int:
         return int(action)
 
-    def calculate_obs(self, bars: WtKlineData):
-        return bars.closes
-
-    def calculate_reward(self, curr: float, best: float, worst: float) -> float:
-        return 1
-
-    def calculate_done(self, obs, reward) -> bool:
-        return False
-        return True if np.random.randint(1, 100) == 99 else False  # 是否结束
-
 
 class SimpleHFTDemo(SimpleHFT):
     @staticmethod
     def Name() -> str:
         return __class__.__name__
-
-    def calculate_obs(self, tick: dict):
-        pass
-
-    def calculate_reward(self, curr: float, best: float, worst: float) -> float:
-        return 1
-
-    def calculate_done(self, obs, reward) -> bool:
-        return False
-        return True if np.random.randint(1, 100) == 99 else False  # 是否结束

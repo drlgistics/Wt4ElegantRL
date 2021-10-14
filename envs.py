@@ -47,11 +47,6 @@ class EvaluatorWt(Env):
         self.close()
         self._iter_ += 1
 
-        self._obs_ = None
-        self._reward_:float = 0.
-        self._done_:bool = False 
-        self._info_:dict = {}
-
         # 创建一个策略并加入运行环境
         self._strategy_:StateTransfer = self.__strategy__(
             name=self._name_(),
@@ -77,13 +72,12 @@ class EvaluatorWt(Env):
     def step(self, action):
         assert self._iter_>0
         self._strategy_.set_action(action)
-        if self._cb_step_():
-            self._obs_, self._reward_, self._done_, self._info_ = self._strategy_.get_state()
-        else:
-            self._done_ = True
-        if self._done_:
+        finished = not self._cb_step_()
+        obs, reward, done, info = self._strategy_.get_state()
+        if done or finished:
+            done = True
             self.close()
-        return self._obs_, self._reward_, self._done_, self._info_
+        return obs, reward, done, info
 
     def close(self):
         if self._run_:

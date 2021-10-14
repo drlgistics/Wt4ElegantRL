@@ -33,7 +33,7 @@ class Feature():
 
     def subscribe(self, context:CtaContext):
         '''
-        根据看板订阅数据
+        根据特征订阅数据
         '''
         for code in self._securities_:
             for period, count in self._subscribies_.items():
@@ -48,7 +48,7 @@ class Feature():
         pass
 
     def calculate(self, context:CtaContext):
-        print(context.stra_get_date(), context.stra_get_time())
+        return '%s%s'%(context.stra_get_date(), context.stra_get_time())
 
 
 class Indicator(Feature):

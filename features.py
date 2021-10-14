@@ -14,70 +14,114 @@ class Feature():
     D1 = 'd1'
 
     def __init__(self, code: str, period: str, roll: int) -> None:
-        self.__commited__: bool = False
+        self.__shape__: tuple = tuple()
+        self._roll_: int = int(roll)
 
-        self._securities_: list = []
+        self.__cb__: dict = {}
+
+        self.__obs__:dict = {}
+        self.__time__:int = 0
+
+        self.__securities__: list = []
         self.addSecurity(code=code)
 
-        self._main_: tuple = (code, period)
-        self._subscribies_: dict = {}
+        self.__main__: tuple = (code, period)
+        self.__subscribies__: dict = {}
         self._subscribe_(period=period, count=1)
-
-        self._roll_: int = roll
     
     @property
     def securities(self):
-        return self._securities_
+        return self.__securities__
 
     def addSecurity(self, code: str):
-        if not self.__commited__ and code not in self._securities_:
-            self._securities_.append(code)
+        if self.__shape__ or code in self.__securities__:
+            return
+        self.__securities__.append(code)
 
     def _subscribe_(self, period: str, count: int):
-        self._subscribies_[period] = max(
-            self._subscribies_.get(period, 0),
-            count
+        self.__subscribies__[period] = max(
+            self.__subscribies__.get(period, 0),
+            count+self._roll_
         )
 
     def subscribe(self, context: CtaContext):
         '''
         根据特征需求订阅数据
         '''
-        for code in self._securities_:
-            for period, count in self._subscribies_.items():
+        for code in self.__securities__:
+            for period, count in self.__subscribies__.items():
                 context.stra_get_bars(
                     stdCode=code,
                     period=period,
                     count=count,
-                    isMain=(code == self._main_[0]
-                            and period == self._main_[1])
+                    isMain=(code == self.__main__[0]
+                            and period == self.__main__[1])
                 )
 
-    def _callback_(self, period: str, callback, space: int, **kwargs):
-        if not self.__commited__:
-            print(callback.__name__)
-
-    def calculate(self, context: CtaContext):
-        self.__obs__ = context.stra_get_date()*10000+context.stra_get_time()
-
-    @property
-    def obs(self):
-        return self.__obs__
+    def _callback_(self, space: int, period: str, callback, **kwargs):
+        if self.__shape__ or space<1:
+            return
+        if period not in self.__cb__:
+            self.__cb__[period] = {}
+        self.__cb__[period][callback.__name__] = (space, callback, kwargs)
 
     @property
     def observation(self) -> dict:
         '''
         根据特征需求生成observation
         '''
-        self._commited_ = True
-        return dict(low=-np.inf, high=np.inf, shape=(len(self.securities), 5), dtype=float)
+        self.__shape__ = (
+            len(self.securities), 
+            sum(c[0] for v in self.__cb__.values() for c in v.values())*self._roll_+1
+            )
+        return dict(low=-np.inf, high=np.inf, shape=self.__shape__, dtype=float)
+
+    def calculate(self, context: CtaContext):
+        self.__time__ = context.stra_get_date()*10000+context.stra_get_time()
+        if self.__time__  not in  self.__obs__:
+            obs = np.full(shape=self.__shape__, fill_value=np.nan, dtype=float)
+            for i, code in enumerate(self.securities): # 处理每一个标的
+                n = 0
+                for period, v in self.__cb__.items(): # 处理每一个周期
+                    for space, callback, args in v.values(): # 处理每一个特征
+                        features = callback(context=context, code=code, period=period, args=args) # 通过回调函数计算特征
+                        if space == 1:
+                            features = (features, )
+                        for feature in features: # 处理每一个返回值
+                            obs[i][n:n+self._roll_] = feature[-self._roll_:]
+                            n += self._roll_
+            self.__obs__[self.__time__] = obs
+
+        # 持仓数
+        self.__obs__[self.__time__][:, -1] = tuple(context.stra_get_position(stdCode=code) for code in self.securities)
+
+    @property
+    def obs(self):
+        return self.__obs__.get(self.__time__)
 
 
 class Indicator(Feature):
+    def atr(self, period: str, timeperiod=14):
+        def atr(context:CtaContext, code:str, period:str, args:dict):
+            bars = context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period])
+            return ta.ATR(bars.highs, bars.lows, bars.closes, **args)
+
+        self._subscribe_(period=period, count=timeperiod)
+        self._callback_(space=1, period=period, callback=atr,
+                        timeperiod=timeperiod)
+
     def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9):
-        def macd(data: WtKlineData, args):
-            return ta.MACD(data.closes, **args)
+        def macd(context:CtaContext, code:str, period:str, args:dict):
+            return ta.MACD(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes, **args)
 
         self._subscribe_(period=period, count=slowperiod+signalperiod)
-        self._callback_(period=period, callback=macd, space=3,
+        self._callback_(space=3, period=period, callback=macd,
                         fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
+
+    def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2):
+        def bollinger(context:CtaContext, code:str, period:str, args:dict):
+            return ta.BBANDS(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes, **args)
+
+        self._subscribe_(period=period, count=timeperiod)
+        self._callback_(space=3, period=period, callback=bollinger,
+                        timeperiod=timeperiod, nbdevup=nbdevup, nbdevdn=nbdevdn)

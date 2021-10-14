@@ -11,18 +11,18 @@ def run():
 
 @command()
 def debug():
-    # 特征工程组件
-    feature:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M5, roll=3) # 每一个特征工程必须指定一个主要标的
+    # 特征工程组件, 滚动窗口=2
+    feature:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M1, roll=2) # 每一个特征工程必须指定一个主要标的
     
-    # 按需添加其他合约
+    # 按需添加其他标的
     feature.addSecurity(code='CFFEX.IH.HOT') 
     feature.addSecurity(code='CFFEX.IC.HOT')
     
-    # 使用5分钟线建立特征
-    feature.macd(feature.M5)
-    
-    # 使用1分钟线建立特征
-    feature.macd(feature.M1)
+    # 分别使用1分钟、5分钟线建立特征
+    for period in (feature.M1, feature.M5):
+        feature.atr(period)
+        feature.macd(period)
+        feature.bollinger(period)
 
     # 止盈止损组件，暂时是个摆设
     stopper:SimpleStopper = SimpleStopper()
@@ -39,11 +39,8 @@ def debug():
         time_start=201909100930, 
         time_end=201912011500
         )
-
-    print(env.observation_space.sample())
-    print(env.action_space.sample())
  
-    for i in range(1): #模拟训练10次
+    for i in range(5): #模拟训练10次
         obs = env.reset()
         done = False
         while not done:

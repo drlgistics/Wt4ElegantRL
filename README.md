@@ -20,3 +20,8 @@ without cuda
 ```
 conda install -n wt4elegantrl -c conda-forge -c pytorch --file ./requirements/minimize_without_cuda.txt
 ```
+
+## DEBUG
+```
+python .\run_simple_cta.py debug
+```

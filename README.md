@@ -23,5 +23,5 @@ conda install -n wt4elegantrl -c conda-forge -c pytorch --file ./requirements/mi
 
 ## DEBUG
 ```
-python .\run_simple_cta.py debug
+python ./run_simple_cta.py debug
 ```

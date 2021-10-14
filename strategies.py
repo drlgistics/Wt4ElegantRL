@@ -48,10 +48,6 @@ class StateTransfer():
         self.__done__: bool = done
         self.__info__: dict = info
 
-    @abstractmethod
-    def calculate_action(self, action) -> int:
-        raise NotImplementedError
-
 
 class SimpleCTA(BaseCtaStrategy, StateTransfer):
     @staticmethod

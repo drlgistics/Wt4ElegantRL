@@ -28,6 +28,5 @@ class SimpleReward(Reward):
                                * 10000+context.stra_get_time())
         return self.__reward__[-1], False
 
-    @abstractmethod
     def finish(self) -> float:
         return self.__reward__[-1]

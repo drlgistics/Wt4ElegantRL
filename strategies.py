@@ -35,6 +35,8 @@ class StateTransfer():
         return self.__action__
 
     def setAction(self, action):
+        # if action is not None:
+        #     print([v for i, v in enumerate(action)])
         self.__action__ = action
 
     def getState(self):
@@ -71,25 +73,24 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         print('TrainCTA')
 
     def on_init(self, context: CtaContext):
-        # context.stra_log_text('on_init 1')
+        # print('on_init 1')
         self._feature_.subscribe(context)
-        # context.stra_log_text('on_init 2')
+        # print('on_init 2')
 
     def on_session_begin(self, context: CtaContext, curTDate: int):
-        # context.stra_log_text('on_session_begin')
+        # print('on_session_begin')
         pass
 
     def on_backtest_end(self, context: CtaContext):
-        # context.stra_log_text('on_backtest_end')
+        # print('on_backtest_end')
         pass
 
     def on_calculate(self, context: CtaContext):
-        # context.stra_log_text('on_calculate 1')
+        # print('on_calculate 1')
         obs = self._feature_.calculate(context)
-        reward, done = self._reward_.calculate(
-            lastAction=self.__action__, context=context)
+        reward, done = self._reward_.calculate(context=context)
         self.setState(obs, reward, done, {})
-        # context.stra_log_text('on_calculate 2')
+        # print('on_calculate 2')
 
 
 class SimpleHFT(BaseHftStrategy, StateTransfer):

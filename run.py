@@ -41,7 +41,7 @@ def debug():
         while not done:
             action = env.action_space.sample() #模拟智能体产生动作
             obs, reward, done, info = env.step(action)
-            print(action, obs, reward, done, info)
+            # print(action, obs, reward, done, info)
         print('第%s次训练完成'%i)
     env.close()
 

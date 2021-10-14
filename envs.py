@@ -21,7 +21,7 @@ class EvaluatorWt(Env):
 
         self.__feature__:Feature = feature
         self.observation_space:Box = self.__feature__.observation()
-        self.action_space:Box = self.__strategy__.Action(self.__feature__.shape[0])
+        self.action_space:Box = self.__strategy__.Action(len(self.__feature__.securities))
         
         self.__reward__:Reward = reward
         self.__stopper__:Stopper = stopper
@@ -52,6 +52,9 @@ class EvaluatorWt(Env):
         self.close()
         self._iter_ += 1
 
+        # 重置奖励
+        self.__reward__.reset()
+
         # 创建一个策略并加入运行环境
         self._strategy_:StateTransfer = self.__strategy__(
             name=self._name_(),
@@ -72,7 +75,7 @@ class EvaluatorWt(Env):
         self._engine_.run_backtest(bAsync=True, bNeedDump=self._dump_)
         self._run_ = True
 
-        return self.step(0)[0]
+        return self.step(None)[0]
     
     def step(self, action):
         assert self._iter_>0
@@ -81,6 +84,7 @@ class EvaluatorWt(Env):
         obs, reward, done, info = self._strategy_.getState()
         if done or finished:
             done = True
+            reward = self.__reward__.finish()
             self.close()
         return obs, reward, done, info
 

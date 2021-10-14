@@ -23,6 +23,10 @@ class Feature():
         self._subscribe_(period=period, count=1)
 
         self._roll_: int = roll
+    
+    @property
+    def securities(self):
+        return self._securities_
 
     def addSecurity(self, code: str):
         if code not in self._securities_:
@@ -53,11 +57,11 @@ class Feature():
         pass
 
     def calculate(self, context: CtaContext):
-        return '%s%s' % (context.stra_get_date(), context.stra_get_time())
+        return context.stra_get_date()*10000+context.stra_get_time()
 
     @property
     def shape(self):
-        return (len(self._securities_), 5)
+        return (len(self.securities), 5)
 
     def observation(self) -> Box:
         '''

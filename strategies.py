@@ -1,6 +1,6 @@
 import numpy as np
-from kanbans import Kanban
 from rewards import Reward
+from features import Feature
 from stoppers import Stopper
 from abc import abstractmethod
 from wtpy.WtBtEngine import EngineType
@@ -19,8 +19,8 @@ class StateTransfer():
     def Name() -> str:
         raise NotImplementedError
 
-    def __init__(self, kanban: Kanban, reward: Reward, stopper: Stopper):
-        self._kanban_: Kanban = kanban
+    def __init__(self, feature: Feature, reward: Reward, stopper: Stopper):
+        self._feature_: Feature = feature
         self._reward_: Reward = reward
         self._stopper_: Stopper = stopper
 
@@ -65,15 +65,15 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
     def EngineType() -> int:
         return EngineType.ET_CTA
 
-    def __init__(self, name: str, kanban: Kanban, reward: Reward, stopper: Stopper):
+    def __init__(self, name: str, feature: Feature, reward: Reward, stopper: Stopper):
         super(BaseCtaStrategy, self).__init__(
-            kanban=kanban, reward=reward, stopper=stopper)
+            feature=feature, reward=reward, stopper=stopper)
         super().__init__(name)
         print('TrainCTA')
 
     def on_init(self, context: CtaContext):
         # context.stra_log_text('on_init 1')
-        self._kanban_.subscribe(context)
+        self._feature_.subscribe(context)
         # context.stra_log_text('on_init 2')
 
     def on_session_begin(self, context: CtaContext, curTDate: int):
@@ -86,7 +86,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
 
     def on_calculate(self, context: CtaContext):
         # context.stra_log_text('on_calculate 1')
-        self._kanban_.calculate(context)
+        self._feature_.calculate(context)
         obs = self.calculate_obs(
             bars=context.stra_get_bars(
                 stdCode='CFFEX.IF.HOT',

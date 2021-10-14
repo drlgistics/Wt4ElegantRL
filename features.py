@@ -2,7 +2,7 @@ import talib as ta
 from wtpy.WtDataDefs import WtKlineData, WtHftData
 from wtpy.StrategyDefs import CtaContext, HftContext
 
-class Kanban():
+class Feature():
     M1 = 'm1'
     M3 = 'm3'
     M5 = 'm5'
@@ -51,7 +51,7 @@ class Kanban():
         print(context.stra_get_date(), context.stra_get_time())
 
 
-class Indicator(Kanban):
+class Indicator(Feature):
     def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9):
         def _macd_(data:WtKlineData, args):
             return ta.MACD(data.closes, **args)

@@ -1,6 +1,6 @@
 from gym import Env
-from kanbans import Kanban
 from rewards import Reward
+from features import Feature
 from stoppers import Stopper
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
@@ -10,12 +10,12 @@ class EvaluatorWt(Env):
     _log_:str = './config/03research/log_evaluator.json'
     _dump_:bool = True
 
-    def __init__(self, strategy:StateTransfer, kanban:Kanban, reward:Reward, stopper:Stopper, time_start:int, time_end:int, id:int=1):
+    def __init__(self, strategy:StateTransfer, feature:Feature, reward:Reward, stopper:Stopper, time_start:int, time_end:int, id:int=1):
         self._id_:int = id
         self._iter_:int = 0
 
         self.__strategy__ = strategy
-        self.__kanban__:Kanban = kanban
+        self.__feature__:Feature = feature
         self.__reward__:Reward = reward
         self.__stopper__:Stopper = stopper
 
@@ -55,7 +55,7 @@ class EvaluatorWt(Env):
         # 创建一个策略并加入运行环境
         self._strategy_:StateTransfer = self.__strategy__(
             name=self._name_(),
-            kanban=self.__kanban__,
+            feature=self.__feature__,
             stopper=self.__stopper__,
             reward=self.__reward__,
             )

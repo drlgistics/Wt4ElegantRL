@@ -1,5 +1,5 @@
 from click import command, group
-from kanbans import Indicator
+from features import Indicator
 from rewards import SimpleReward
 from stoppers import SimpleStopper
 from strategies import SimpleCTADemo
@@ -12,10 +12,10 @@ def run():
 @command()
 def debug():
     # 看板组件
-    kanban:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M5, roll=3)
-    kanban.addSecurity(code='CFFEX.IH.HOT')
-    kanban.macd(kanban.M5)
-    kanban.macd(kanban.M1)
+    feature:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M5, roll=3)
+    feature.addSecurity(code='CFFEX.IH.HOT')
+    feature.macd(feature.M5)
+    feature.macd(feature.M1)
 
     # 止盈止损组件
     stopper:SimpleStopper = SimpleStopper()
@@ -26,7 +26,7 @@ def debug():
     # 环境组装
     env:TrainWt = TrainWt(
         strategy=SimpleCTADemo,
-        kanban=kanban,
+        feature=feature,
         reward=reward,
         stopper=stopper,
         time_start=201909100930, 

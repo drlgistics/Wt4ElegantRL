@@ -1,4 +1,5 @@
 from gym import Env
+from gym.spaces import Box
 from rewards import Reward
 from features import Feature
 from stoppers import Stopper
@@ -13,14 +14,18 @@ class EvaluatorWt(Env):
     def __init__(self, strategy:StateTransfer, feature:Feature, reward:Reward, stopper:Stopper, time_start:int, time_end:int, id:int=1):
         self._id_:int = id
         self._iter_:int = 0
+        self._run_:bool = False 
 
         self.__strategy__ = strategy
+        self._et_ = self.__strategy__.EngineType()
+
         self.__feature__:Feature = feature
+        self.observation_space:Box = self.__feature__.observation()
+        self.action_space:Box = self.__strategy__.Action(self.__feature__.shape[0])
+        
         self.__reward__:Reward = reward
         self.__stopper__:Stopper = stopper
 
-        self._et_ = self.__strategy__.EngineType()
-        self._run_:bool = False 
 
         # 创建一个运行环境
         self._engine_:WtBtEngine = WtBtEngine(
@@ -71,9 +76,9 @@ class EvaluatorWt(Env):
     
     def step(self, action):
         assert self._iter_>0
-        self._strategy_.set_action(action)
+        self._strategy_.setAction(action)
         finished = not self._cb_step_()
-        obs, reward, done, info = self._strategy_.get_state()
+        obs, reward, done, info = self._strategy_.getState()
         if done or finished:
             done = True
             self.close()

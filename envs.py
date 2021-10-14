@@ -1,8 +1,8 @@
 from gym import Env
 from gym.spaces import Box
-from rewards import Reward
 from features import Feature
 from stoppers import Stopper
+from assessments import Assessment
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
 
@@ -11,7 +11,7 @@ class EvaluatorWt(Env):
     _log_:str = './config/03research/log_evaluator.json'
     _dump_:bool = True
 
-    def __init__(self, strategy:StateTransfer, feature:Feature, reward:Reward, stopper:Stopper, time_start:int, time_end:int, id:int=1):
+    def __init__(self, strategy:StateTransfer, feature:Feature, assessment:Assessment, stopper:Stopper, time_start:int, time_end:int, id:int=1):
         self._id_:int = id
         self._iter_:int = 0
         self._run_:bool = False 
@@ -20,10 +20,10 @@ class EvaluatorWt(Env):
         self._et_ = self.__strategy__.EngineType()
 
         self.__feature__:Feature = feature
-        self.observation_space:Box = self.__feature__.observation()
-        self.action_space:Box = self.__strategy__.Action(len(self.__feature__.securities))
+        self.observation_space:Box = Box(**self.__feature__.observation)
+        self.action_space:Box = Box(**self.__strategy__.Action(len(self.__feature__.securities)))
         
-        self.__reward__:Reward = reward
+        self.__assessment__:Assessment = assessment
         self.__stopper__:Stopper = stopper
 
 
@@ -53,14 +53,14 @@ class EvaluatorWt(Env):
         self._iter_ += 1
 
         # 重置奖励
-        self.__reward__.reset()
+        self.__assessment__.reset()
 
         # 创建一个策略并加入运行环境
         self._strategy_:StateTransfer = self.__strategy__(
             name=self._name_(),
             feature=self.__feature__,
             stopper=self.__stopper__,
-            reward=self.__reward__,
+            assessment=self.__assessment__,
             )
 
         # 设置策略的时候一定要安装钩子
@@ -81,12 +81,10 @@ class EvaluatorWt(Env):
         assert self._iter_>0
         self._strategy_.setAction(action)
         finished = not self._cb_step_()
-        obs, reward, done, info = self._strategy_.getState()
-        if done or finished:
-            done = True
-            reward = self.__reward__.finish()
+        if self.__assessment__.done or finished:
+            self.__assessment__.finish()
             self.close()
-        return obs, reward, done, info
+        return self.__feature__.obs, self.__assessment__.reward, self.__assessment__.done, {}
 
     def close(self):
         if self._run_:

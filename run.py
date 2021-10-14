@@ -1,6 +1,6 @@
 from click import command, group
 from features import Indicator
-from rewards import SimpleReward
+from assessments import SimpleAssessment
 from stoppers import SimpleStopper
 from strategies import SimpleCTA
 from envs import EvaluatorWt, TrainWt
@@ -27,14 +27,14 @@ def debug():
     # 止盈止损组件，暂时是个摆设
     stopper:SimpleStopper = SimpleStopper()
 
-    # 奖励组件
-    reward:SimpleReward = SimpleReward()
+    # 评估组件
+    assessment:SimpleAssessment = SimpleAssessment()
 
     # 环境组装，每一个进程只能有一个环境
     env:TrainWt = TrainWt(
-        strategy=SimpleCTA,  # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和奖励计算
+        strategy=SimpleCTA,  # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和评估
         feature=feature, # 特征计算
-        reward=reward, # 奖励计算
+        assessment=assessment, # 评估计算
         stopper=stopper,
         time_start=201909100930, 
         time_end=201912011500

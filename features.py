@@ -1,6 +1,5 @@
 import numpy as np
 import talib as ta
-from gym.spaces import Box
 from wtpy.WtDataDefs import WtKlineData, WtHftData
 from wtpy.StrategyDefs import CtaContext, HftContext
 
@@ -15,6 +14,8 @@ class Feature():
     D1 = 'd1'
 
     def __init__(self, code: str, period: str, roll: int) -> None:
+        self.__commited__: bool = False
+
         self._securities_: list = []
         self.addSecurity(code=code)
 
@@ -29,7 +30,7 @@ class Feature():
         return self._securities_
 
     def addSecurity(self, code: str):
-        if code not in self._securities_:
+        if not self.__commited__ and code not in self._securities_:
             self._securities_.append(code)
 
     def _subscribe_(self, period: str, count: int):
@@ -53,21 +54,23 @@ class Feature():
                 )
 
     def _callback_(self, period: str, callback, space: int, **kwargs):
-        print(callback.__name__)
-        pass
+        if not self.__commited__:
+            print(callback.__name__)
 
     def calculate(self, context: CtaContext):
-        return context.stra_get_date()*10000+context.stra_get_time()
+        self.__obs__ = context.stra_get_date()*10000+context.stra_get_time()
 
     @property
-    def shape(self):
-        return (len(self.securities), 5)
+    def obs(self):
+        return self.__obs__
 
-    def observation(self) -> Box:
+    @property
+    def observation(self) -> dict:
         '''
         根据特征需求生成observation
         '''
-        return Box(low=-np.inf, high=np.inf, shape=self.shape, dtype=float)
+        self._commited_ = True
+        return dict(low=-np.inf, high=np.inf, shape=(len(self.securities), 5), dtype=float)
 
 
 class Indicator(Feature):

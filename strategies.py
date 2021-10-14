@@ -1,11 +1,8 @@
-from numpy import ndarray
-from gym.spaces import Box
-from rewards import Reward
 from features import Feature
 from stoppers import Stopper
 from abc import abstractmethod
+from assessments import Assessment
 from wtpy.WtBtEngine import EngineType
-from wtpy.WtDataDefs import WtKlineData
 from wtpy.StrategyDefs import BaseCtaStrategy, CtaContext, BaseHftStrategy, HftContext
 
 
@@ -22,31 +19,19 @@ class StateTransfer():
 
     @staticmethod
     @abstractmethod
-    def Action(size: int) -> Box:
+    def Action(size: int) -> dict:
         raise NotImplementedError
 
-    def __init__(self, feature: Feature, reward: Reward, stopper: Stopper):
-        self._feature_: Feature = feature
-        self._reward_: Reward = reward
-        self._stopper_: Stopper = stopper
-        print('StateTransfer')
-
-    def getAction(self):
-        return self.__action__
-
+    @staticmethod
     def setAction(self, action):
-        # if action is not None:
-        #     print([v for i, v in enumerate(action)])
-        self.__action__ = action
+        raise NotImplementedError
 
-    def getState(self):
-        return self.__obs__, self.__reward__, self.__done__, self.__info__
+    def __init__(self, feature: Feature, assessment: Assessment, stopper: Stopper):
+        self._feature_: Feature = feature
+        self._assessment_: Assessment = assessment
+        self._stopper_: Stopper = stopper
 
-    def setState(self, obs: ndarray, reward: float, done: bool, info: dict):
-        self.__obs__: ndarray = obs
-        self.__reward__: float = reward
-        self.__done__: bool = done
-        self.__info__: dict = info
+        # print('StateTransfer')
 
 
 class SimpleCTA(BaseCtaStrategy, StateTransfer):
@@ -59,14 +44,21 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         return EngineType.ET_CTA
 
     @staticmethod
-    def Action(size: int) -> Box:
-        return Box(low=-1, high=1, shape=(1, size), dtype=int)
+    def Action(size: int) -> dict:
+        return dict(low=-1, high=1, shape=(size, ), dtype=int)
 
-    def __init__(self, name: str, feature: Feature, reward: Reward, stopper: Stopper):
+    def setAction(self, action):
+        # print('setAction 1')
+        if action is not None:
+            self._action_ = dict(zip(self._feature_.securities, action))
+        # print('setAction 2')
+
+    def __init__(self, name: str, feature: Feature, assessment: Assessment, stopper: Stopper):
         super(BaseCtaStrategy, self).__init__(
-            feature=feature, reward=reward, stopper=stopper)
+            feature=feature, assessment=assessment, stopper=stopper)
         super().__init__(name)
-        print('TrainCTA')
+        self._action_:dict = {}
+        # print('TrainCTA')
 
     def on_init(self, context: CtaContext):
         # print('on_init 1')
@@ -82,21 +74,32 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         pass
 
     def on_calculate(self, context: CtaContext):
+        # for code in tuple(self._action_.keys()):
+        #     context.stra_set_position(stdCode=code, qty=self._action_.pop(code))
+        #     print('stra_set_position %s'%code)
+
         # print('on_calculate 1')
-        obs = self._feature_.calculate(context)
-        reward, done = self._reward_.calculate(context=context)
-        self.setState(obs, reward, done, {})
+        self._feature_.calculate(context=context)
+        self._assessment_.calculate(context=context)
         # print('on_calculate 2')
 
-
-class SimpleHFT(BaseHftStrategy, StateTransfer):
-    @staticmethod
-    def Name() -> str:
-        return __class__.__name__
-
-    @staticmethod
-    def EngineType() -> int:
-        return EngineType.ET_HFT
-
-    def on_tick(self, context: HftContext, stdCode: str, newTick: dict):
+    def on_tick(self, context: CtaContext, stdCode: str, newTick: dict):
+        if stdCode not in self._action_:
+            return
+        # print('on_tick 1')
+        context.stra_set_position(stdCode=stdCode, qty=self._action_.pop(stdCode))
+        # print('on_tick 2')
         pass
+
+
+# class SimpleHFT(BaseHftStrategy, StateTransfer):
+#     @staticmethod
+#     def Name() -> str:
+#         return __class__.__name__
+
+#     @staticmethod
+#     def EngineType() -> int:
+#         return EngineType.ET_HFT
+
+#     def on_tick(self, context: HftContext, stdCode: str, newTick: dict):
+#         pass

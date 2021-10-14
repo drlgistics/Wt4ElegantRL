@@ -64,7 +64,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
 
     @staticmethod
     def Action(size: int) -> Box:
-        return Box(low=-100, high=100, shape=(size, 1), dtype=int)
+        return Box(low=-1, high=1, shape=(1, size), dtype=int)
 
     def __init__(self, name: str, feature: Feature, reward: Reward, stopper: Stopper):
         super(BaseCtaStrategy, self).__init__(

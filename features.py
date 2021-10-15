@@ -93,13 +93,13 @@ class Feature():
                             n += self._roll_
             self.__obs__[self.__time__] = obs
 
-        # 标的浮动盈亏
+        # 开仓浮动盈亏
         self.__obs__[self.__time__][:, -4] = tuple(
             context.stra_get_detail_profit(stdCode=code, usertag='', flag=0) for code in self.securities)
-        # 标的最大浮盈
+        # 开仓最大浮盈
         self.__obs__[self.__time__][:, -3] = tuple(
             context.stra_get_detail_profit(stdCode=code, usertag='', flag=1) for code in self.securities)
-        # 标的最大亏损
+        # 开仓最大亏损
         self.__obs__[self.__time__][:, -2] = tuple(
             context.stra_get_detail_profit(stdCode=code, usertag='', flag=-1) for code in self.securities)
         # 持仓数

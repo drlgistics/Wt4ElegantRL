@@ -57,7 +57,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         super(BaseCtaStrategy, self).__init__(
             feature=feature, assessment=assessment, stopper=stopper)
         super().__init__(name)
-        self._action_:dict = {}
+        self._action_: dict = {}
         # print('TrainCTA')
 
     def on_init(self, context: CtaContext):
@@ -87,7 +87,8 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         if stdCode not in self._action_:
             return
         # print('on_tick 1')
-        context.stra_set_position(stdCode=stdCode, qty=self._action_.pop(stdCode))
+        context.stra_set_position(
+            stdCode=stdCode, qty=self._action_.pop(stdCode))
         # print('on_tick 2')
         pass
 

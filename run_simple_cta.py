@@ -5,19 +5,22 @@ from stoppers import SimpleStopper
 from strategies import SimpleCTA
 from envs import EvaluatorWt, TrainWt
 
+
 @group()
 def run():
     pass
 
+
 @command()
 def debug():
     # 特征工程组件, 滚动窗口=2
-    feature:Indicator = Indicator(code='CFFEX.IF.HOT', period=Indicator.M1, roll=2) # 每一个特征工程必须指定一个主要标的
-    
+    feature: Indicator = Indicator(
+        code='CFFEX.IF.HOT', period=Indicator.M1, roll=2)  # 每一个特征工程必须指定一个主要标的
+
     # 按需添加其他标的
-    feature.addSecurity(code='CFFEX.IH.HOT') 
+    feature.addSecurity(code='CFFEX.IH.HOT')
     feature.addSecurity(code='CFFEX.IC.HOT')
-    
+
     # 分别使用1分钟、5分钟线建立特征
     for period in (feature.M1, feature.M5):
         feature.atr(period)
@@ -25,29 +28,29 @@ def debug():
         feature.bollinger(period)
 
     # 止盈止损组件，暂时是个摆设
-    stopper:SimpleStopper = SimpleStopper()
+    stopper: SimpleStopper = SimpleStopper()
 
     # 评估组件
-    assessment:SimpleAssessment = SimpleAssessment()
+    assessment: SimpleAssessment = SimpleAssessment()
 
     # 环境组装，每一个进程只能有一个环境
-    env:TrainWt = TrainWt(
+    env: TrainWt = TrainWt(
         strategy=SimpleCTA,  # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和评估
-        feature=feature, # 特征计算
-        assessment=assessment, # 评估计算
+        feature=feature,  # 特征计算
+        assessment=assessment,  # 评估计算
         stopper=stopper,
-        time_start=201909100930, 
+        time_start=201909100930,
         time_end=201912011500
-        )
- 
-    for i in range(5): #模拟训练10次
+    )
+
+    for i in range(5):  # 模拟训练10次
         obs = env.reset()
         done = False
         while not done:
-            action = env.action_space.sample() #模拟智能体产生动作
+            action = env.action_space.sample()  # 模拟智能体产生动作
             obs, reward, done, info = env.step(action)
             print(action, obs, reward, done, info)
-        print('第%s次训练完成'%i)
+        print('第%s次训练完成' % i)
     env.close()
 
 # @command()
@@ -63,6 +66,7 @@ def debug():
 #             obs, reward, done, info = env.step(action)
 #             # print('obs%s'%obs, 'reward%s'%reward, done, info)
 #     env.close()
+
 
 # run.add_command(train)
 run.add_command(debug)

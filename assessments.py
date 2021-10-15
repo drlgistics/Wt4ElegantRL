@@ -3,7 +3,7 @@ from wtpy.StrategyDefs import CtaContext, HftContext
 
 
 class Assessment():
-    def __init__(self) -> None:
+    def __init__(self):
         self.reset()
 
     @abstractmethod
@@ -11,11 +11,11 @@ class Assessment():
         raise NotImplementedError
 
     @abstractmethod
-    def calculate(self, context: CtaContext) -> tuple:
+    def calculate(self, context: CtaContext):
         raise NotImplementedError
 
     @abstractmethod
-    def finish(self) -> float:
+    def finish(self):
         raise NotImplementedError
 
     @property
@@ -34,14 +34,13 @@ class SimpleAssessment(Assessment):
         self.__reward__: list = []
         self.__done__: bool = False
 
-    def calculate(self, context: CtaContext) -> tuple:
+    def calculate(self, context: CtaContext):
         self.__reward__.append(context.stra_get_date()
                                * 10000+context.stra_get_time())
         self.__done__ = False
 
-    def finish(self) -> float:
+    def finish(self):
         self.__done__ = True
-        return self.__reward__[-1]
 
     @property
     def reward(self) -> float:

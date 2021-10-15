@@ -72,7 +72,7 @@ class Feature():
         self.__shape__ = (
             len(self.securities),
             sum(c[0] for v in self.__cb__.values()
-                for c in v.values())*self._roll_+1
+                for c in v.values())*self._roll_+4
         )
         return dict(low=-np.inf, high=np.inf, shape=self.__shape__, dtype=float)
 
@@ -93,6 +93,15 @@ class Feature():
                             n += self._roll_
             self.__obs__[self.__time__] = obs
 
+        # 标的浮动盈亏
+        self.__obs__[self.__time__][:, -4] = tuple(
+            context.stra_get_detail_profit(stdCode=code, usertag='', flag=0) for code in self.securities)
+        # 标的最大浮盈
+        self.__obs__[self.__time__][:, -3] = tuple(
+            context.stra_get_detail_profit(stdCode=code, usertag='', flag=1) for code in self.securities)
+        # 标的最大亏损
+        self.__obs__[self.__time__][:, -2] = tuple(
+            context.stra_get_detail_profit(stdCode=code, usertag='', flag=-1) for code in self.securities)
         # 持仓数
         self.__obs__[self.__time__][:, -1] = tuple(
             context.stra_get_position(stdCode=code) for code in self.securities)

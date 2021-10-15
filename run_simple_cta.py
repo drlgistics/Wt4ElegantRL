@@ -43,13 +43,13 @@ def debug():
         time_end=201912011500
     )
 
-    for i in range(5):  # 模拟训练10次
+    for i in range(1):  # 模拟训练10次
         obs = env.reset()
         done = False
         while not done:
             action = env.action_space.sample()  # 模拟智能体产生动作
             obs, reward, done, info = env.step(action)
-            print(action, obs, reward, done, info)
+            print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
         print('第%s次训练完成' % i)
     env.close()
 

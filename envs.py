@@ -50,6 +50,12 @@ class EvaluatorWt(Env):
         self._engine_.configBacktest(time_start, time_end)
         self._engine_.commitBTConfig()
 
+    def __step__(self):
+        finished = not self._cb_step_()
+        if self.__assessment__.done or finished:
+            self.__assessment__.finish()
+            self.close()
+
     def reset(self):
         self.close()
         self._iter_ += 1
@@ -78,15 +84,15 @@ class EvaluatorWt(Env):
         self._engine_.run_backtest(bAsync=True, bNeedDump=self._dump_)
         self._run_ = True
 
-        return self.step(None)[0]
+        self.__step__()
+        return self.__feature__.obs
 
     def step(self, action):
         assert self._iter_ > 0
         self._strategy_.setAction(action)
-        finished = not self._cb_step_()
-        if self.__assessment__.done or finished:
-            self.__assessment__.finish()
-            self.close()
+        self._cb_step_()
+
+        self.__step__()
         return self.__feature__.obs, self.__assessment__.reward, self.__assessment__.done, {}
 
     def close(self):

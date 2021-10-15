@@ -49,8 +49,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
 
     def setAction(self, action):
         # print('setAction 1')
-        if action is not None:
-            self._action_ = dict(zip(self._feature_.securities, action))
+        self._action_ = dict(zip(self._feature_.securities, action))
         # print('setAction 2')
 
     def __init__(self, name: str, feature: Feature, assessment: Assessment, stopper: Stopper):
@@ -74,23 +73,17 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         pass
 
     def on_calculate(self, context: CtaContext):
-        # for code in tuple(self._action_.keys()):
-        #     context.stra_set_position(stdCode=code, qty=self._action_.pop(code))
-        #     print('stra_set_position %s'%code)
-
         # print('on_calculate 1')
         self._feature_.calculate(context=context)
         self._assessment_.calculate(context=context)
         # print('on_calculate 2')
 
-    def on_tick(self, context: CtaContext, stdCode: str, newTick: dict):
-        if stdCode not in self._action_:
-            return
-        # print('on_tick 1')
-        context.stra_set_position(
-            stdCode=stdCode, qty=self._action_.pop(stdCode))
-        # print('on_tick 2')
-        pass
+    def on_calculate_done(self, context: CtaContext):
+        # print('on_calculate_done 1')
+        for code in tuple(self._action_.keys()):
+            context.stra_set_position(stdCode=code, qty=self._action_.pop(code))
+            # print('stra_set_position %s'%code)
+        # print('on_calculate_done 2')
 
 
 # class SimpleHFT(BaseHftStrategy, StateTransfer):

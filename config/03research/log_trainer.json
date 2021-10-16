@@ -2,14 +2,7 @@
     "root":{
         "level":"info",
         "async":false,
-        "sinks":[
-            {
-                "type":"basic_file_sink",
-                "filename":"outputs_bt/logs/runner.log",
-                "pattern":"[%Y.%m.%d %H:%M:%S,%f - %-5l] %v",
-                "truncate":true
-            }
-        ]
+        "sinks":[]
     },
     "dyn_pattern":{
         "strategy":{

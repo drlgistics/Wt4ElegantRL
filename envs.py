@@ -9,17 +9,19 @@ from strategies import StateTransfer, EngineType
 # 一个进程只能有一个env
 
 
-class EvaluatorWt(Env):
-    _log_: str = './config/03research/log_evaluator.json'
+
+class WtDebugger(Env):
+    _log_: str = './config/03research/log_debugger.json'
     _dump_: bool = True
 
-    def __init__(self, strategy: StateTransfer, feature: Feature, assessment: Assessment, stopper: Stopper, time_start: int, time_end: int, id: int = 1):
+    def __init__(self, strategy: StateTransfer, stopper: Stopper, feature: Feature, assessment: Assessment, time_start: int, time_end: int, id: int = 1):
         self._id_: int = id
         self._iter_: int = 0
         self._run_: bool = False
 
         self.__strategy__ = strategy
         self._et_ = self.__strategy__.EngineType()
+        self.__stopper__: Stopper = stopper
 
         self.__feature__: Feature = feature
         self.observation_space: Box = Box(**self.__feature__.observation)
@@ -27,7 +29,6 @@ class EvaluatorWt(Env):
             **self.__strategy__.Action(len(self.__feature__.securities)))
 
         self.__assessment__: Assessment = assessment
-        self.__stopper__: Stopper = stopper
 
         # 创建一个运行环境
         self._engine_: WtBtEngine = WtBtEngine(
@@ -100,15 +101,24 @@ class EvaluatorWt(Env):
             self._engine_.stop_backtest()
             self._run_ = False
 
+    @property
+    def assets(self):
+        return self.__assessment__.assets
+
     def _name_(self):
         return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), self._iter_)
 
     def __del__(self):
-        self._engine_.release_backtest()
+        if hasattr(self, '_engine_'):
+            self._engine_.release_backtest()
 
 
-class TrainWt(EvaluatorWt):
-    _log_: str = './config/03research/log_train.json'
+class WtEvaluator(WtDebugger):
+    _log_: str = './config/03research/log_evaluator.json'
+    _dump_: bool = True
+
+class WtTrainer(WtEvaluator):
+    _log_: str = './config/03research/log_trainer.json'
     _dump_: bool = False
 
     def _name_(self):

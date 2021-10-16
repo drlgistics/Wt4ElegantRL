@@ -25,16 +25,16 @@ def debug():
         code='CFFEX.IF.HOT', period=Indicator.M1, roll=2)  # 每一个特征工程必须指定一个主要标的
 
     # 按需添加其他标的
-    feature.addSecurity(code='CFFEX.IH.HOT')
-    feature.addSecurity(code='CFFEX.IC.HOT')
+    # feature.addSecurity(code='CFFEX.IH.HOT')
+    # feature.addSecurity(code='CFFEX.IC.HOT')
 
     # 分别使用1分钟、5分钟线建立多周期因子
     for period in (feature.M1, feature.M5):
-        feature.atr(period)
-        feature.macd(period)
-        feature.bollinger(period)
+        feature.trange(period) # 波动率
+        feature.macd(period) # 双均线强度
+        feature.bollinger(period) # 标准差通道
 
-    # 除上述特征，特征工程组件会自动加上 "开仓的浮动盈亏、开仓的最大浮盈、开仓的最大亏损、当前持仓数"4列，如果没有持仓则全部为0
+    # 除上述特征，特征工程组件会自动加上 "开仓的最大浮盈、开仓的最大亏损、开仓的浮动盈亏、当前持仓数"4列，如果没有持仓则全部为0
 
     # 止盈止损组件，暂时是个摆设
     # 止盈止损组件的主要使用者是策略研究人员
@@ -54,7 +54,7 @@ def debug():
         time_end=201912011500
     )
 
-    for i in range(5000):  # 模拟训练10次
+    for i in range(1):  # 模拟训练10次
         obs = env.reset()
         done = False
         n = 0
@@ -62,7 +62,7 @@ def debug():
             action = env.action_space.sample()  # 模拟智能体产生动作
             obs, reward, done, info = env.step(action)
             n += 1
-            # print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
+            print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
         print('第%s次训练完成，执行%s步。' % (i+1, n))
     env.close()
 

@@ -50,7 +50,7 @@ class Feature():
         根据特征需求订阅数据
         '''
         for code in self.__securities__:
-            comminfo = context.stra_get_comminfo(code)
+            comminfo = context.stra_get_comminfo(code) # 品种信息数据
             self.__comminfo__[code] = (comminfo.pricetick, comminfo.volscale)
             for period, count in self.__subscribies__.items():
                 context.stra_get_bars(
@@ -117,6 +117,15 @@ class Feature():
 
 
 class Indicator(Feature):
+    def trange(self, period: str, reprocess:REPROCESS =ZSCORE):
+        def trange(context: CtaContext, code: str, period: str, args: dict):
+            bars = context.stra_get_bars(
+                stdCode=code, period=period, count=self.__subscribies__[period])
+            return ta.TRANGE(high=bars.highs, low=bars.lows, close=bars.closes)
+        self._subscribe_(period=period, count=2+reprocess.n())
+        self._callback_(space=1, period=period, callback=trange, reprocess=reprocess)
+
+    # atr跟zscore处理后的tr在效用上重合了，不建议使用
     def atr(self, period: str, timeperiod:int=14, reprocess:REPROCESS =ZSCORE):
         def atr(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(

@@ -17,7 +17,7 @@ __BACKTEST_END_ = 202110131600
 
 
 gpu_nums = 1
-worker_nums = 2
+worker_nums = 1
 
 def env_creator(env_config):
     return SimpleTrainer(

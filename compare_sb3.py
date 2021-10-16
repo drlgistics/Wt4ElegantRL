@@ -76,11 +76,11 @@ if __name__ == '__main__':
             time_start=__TRAINER_START__,
             time_end=__TRAINER_END__,
             )
-        model = SAC('MlpPolicy', env, 
+        model:SAC = SAC('MlpPolicy', env, 
                     learning_rate=0.0001, 
-                    learning_starts=100,
+                    # learning_starts=100,
                     batch_size=128, 
-                    ent_coef='auto_0.1', 
+                    # ent_coef='auto_0.1', 
                     gamma=0.99,
                     verbose=1
                     )
@@ -103,14 +103,14 @@ if __name__ == '__main__':
         #     callback_on_new_best=callback_on_best, 
         #     verbose=1)
         checkpoint_callback:CheckpointCallback = CheckpointCallback(
-            save_freq=10000*100, 
+            save_freq=10000*10, 
             save_path='./outputs_bt/saved/',
             name_prefix='SimpleTrainer'
             )
 
         model:SAC = SAC('MlpPolicy', env, 
                     learning_rate=0.0001, 
-                    learning_starts=100,
+                    # learning_starts=100,
                     batch_size=128, 
                     ent_coef='auto_0.1', 
                     gamma=0.99,

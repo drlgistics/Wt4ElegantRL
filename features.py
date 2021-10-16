@@ -37,7 +37,7 @@ class Feature():
             return
         self.__securities__.append(code)
 
-    def _subscribe_(self, period: str, count: int):
+    def _subscribe_(self, period: str, count: int=1):
         self.__subscribies__[period] = max(
             self.__subscribies__.get(period, 0),
             count+self._roll_
@@ -137,3 +137,20 @@ class Indicator(Feature):
         self._subscribe_(period=period, count=timeperiod)
         self._callback_(space=3, period=period, callback=bollinger,
                         timeperiod=timeperiod, nbdevup=nbdevup, nbdevdn=nbdevdn)
+
+    # def weights(self, period: str, timeperiod:int=1, index:str='000300'):
+    #     def example(context: CtaContext, code: str, period: str, args: dict):
+    #         # 标的代码 code
+    #         # 标的周期 period
+    #         # 自定义参数 args['index']
+    #         # 日期int context.stra_get_date()
+    #         # 时间int context.stra_get_time()
+    #         return 查询代码(code, context.stra_get_date(), args['index'])
+
+    #     self._subscribe_(period=period, count=1)  # 在什么周期的event触发，需要几根bar
+    #     self._callback_(
+    #         space=1, #查询代码有几个值，自动生成obs的占位空间
+    #         period=period, 
+    #         callback=example, 
+    #         timeperiod=timeperiod,
+    #         index=index)

@@ -10,8 +10,8 @@ from strategies import StateTransfer, EngineType
 
 
 
-class WtDebugger(Env):
-    _log_: str = './config/03research/log_debugger.json'
+class WtEvaluator(Env):
+    _log_: str = './config/03research/log_evaluator.json'
     _dump_: bool = True
 
     def __init__(self, strategy: StateTransfer, stopper: Stopper, feature: Feature, assessment: Assessment, time_start: int, time_end: int, id: int = 1):
@@ -113,9 +113,12 @@ class WtDebugger(Env):
             self._engine_.release_backtest()
 
 
-class WtEvaluator(WtDebugger):
-    _log_: str = './config/03research/log_evaluator.json'
+class WtDebugger(WtEvaluator):
+    _log_: str = './config/03research/log_debugger.json'
     _dump_: bool = True
+
+    def _name_(self):
+        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), self._iter_)
 
 class WtTrainer(WtEvaluator):
     _log_: str = './config/03research/log_trainer.json'

@@ -12,3 +12,4 @@ flask-compress
 
 click
 ta-lib
+autpopep8

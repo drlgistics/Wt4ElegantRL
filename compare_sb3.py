@@ -1,11 +1,11 @@
 from click import command, group, option
-from stable_baselines3 import SAC as Trainer
+from stable_baselines3 import PPO as Trainer
 from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback, StopTrainingOnRewardThreshold
 from envs_simple_cta import SimpleTrainer, SimpleEvaluator
 
 __TRAINER_START__ = 202008311600
 __TRAINER_END__ = 202108311600
-__TRAINER_STEP__ = 16692
+__TRAINER_STEP__ = 9540
 
 __EVALUATIR_STATR__ = 202005291600
 __EVALUATIR_END__ = 202008311600
@@ -13,37 +13,6 @@ __EVALUATIR_END__ = 202008311600
 __BACKTEST_STATR__ = 202108311600
 __BACKTEST_END__ = 202110131600
 
-# env = SimpleTrainer(
-#     time_start=201909100930,
-#     time_end=201912011500,
-#     )
-
-# # for i in range(1):  # 模拟训练10次
-# #     obs = env.reset()
-# #     done = False
-# #     n = 0
-# #     while not done:
-# #         action = env.action_space.sample()  # 模拟智能体产生动作
-# #         obs, reward, done, info = env.step(action)
-# #         n += 1
-# #         print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
-# #     print('第%s次训练完成，执行%s步, 盈亏%s。' % (i+1, n, env.assets))
-# # env.close()
-
-# model = SAC("MlpPolicy", env, verbose=1)
-# model.save("Sac_SimpleCTA")
-
-# del model # remove to demonstrate saving and loading
-
-# model = SAC.load("sac_pendulum")
-
-# obs = env.reset()
-# while True:
-#     action, _states = model.predict(obs, deterministic=True)
-#     obs, reward, done, info = env.step(action)
-#     env.render()
-#     if done:
-#       obs = env.reset()
 if __name__ == '__main__':
     @group()
     def run():
@@ -110,7 +79,7 @@ if __name__ == '__main__':
                                  learning_rate=0.0001,
                                  # learning_starts=100,
                                  batch_size=128,
-                                 ent_coef='auto_0.1',
+                                #  ent_coef='auto_0.1',
                                  gamma=0.99,
                                 #  policy_kwargs=dict(net_arch=[128, 128, 128]),
                                  verbose=1

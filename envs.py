@@ -80,7 +80,7 @@ class WtTrainer(Env):
         # 设置策略的时候一定要安装钩子
         if self._et_ == EngineType.ET_CTA:
             self._engine_.set_cta_strategy(
-                self._strategy_, slippage=1, hook=True, persistData=self._dump_)
+                self._strategy_, slippage=0, hook=True, persistData=self._dump_)
         elif self._et_ == EngineType.ET_HFT:
             self._engine_.set_hft_strategy(self._strategy_, hook=True)
         else:

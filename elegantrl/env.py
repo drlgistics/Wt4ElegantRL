@@ -68,6 +68,9 @@ def build_env(env, if_print=False, device_id=None, env_num=1):
     #                  }[env_name[:10]]
     #     env = env_class(if_eval=if_eval, gamma=gamma)
 
+    if env_name[:5]=='wt4rl':
+        env = gym.make(env_name)
+
     if env is None:
         raise ValueError("| build_env(): register your custom env in here.")
     return env

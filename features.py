@@ -77,8 +77,9 @@ class Feature():
             len(self.securities),
             sum(c[0] for v in self.__cb__.values()
                 for c in v.values())*self._roll_+4
-        )
-        return dict(low=-np.inf, high=np.inf, shape=self.__shape__, dtype=float)
+            )
+        self.__flatten__ = (self.__shape__[0]*self.__shape__[1],)
+        return dict(low=-np.inf, high=np.inf, shape=self.__flatten__, dtype=float)
 
     def calculate(self, context: CtaContext):
         self.__time__ = context.stra_get_date()*10000+context.stra_get_time()
@@ -113,7 +114,7 @@ class Feature():
 
     @property
     def obs(self):
-        return self.__obs__.get(self.__time__)
+        return self.__obs__.get(self.__time__).reshape(self.__flatten__)
 
 
 class Indicator(Feature):

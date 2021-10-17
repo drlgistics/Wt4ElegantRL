@@ -1,5 +1,5 @@
 from elegantrl.agent import AgentPPO
-from elegantrl.run import Arguments, train_and_evaluate
+from elegantrl.run import Arguments, train_and_evaluate, train_and_evaluate_mp
 from envs_simple_cta import SimpleTrainer, SimpleEvaluator
 
 

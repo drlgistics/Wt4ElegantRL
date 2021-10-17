@@ -1,5 +1,5 @@
 from click import command, group
-from stable_baselines3 import SAC
+from stable_baselines3 import SAC as Trainer
 from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback, StopTrainingOnRewardThreshold
 from envs_simple_cta import SimpleTrainer, SimpleEvaluator
 
@@ -76,7 +76,7 @@ if __name__ == '__main__':
             time_start=__TRAINER_START__,
             time_end=__TRAINER_END__,
             )
-        model:SAC = SAC('MlpPolicy', env, 
+        model:Trainer = Trainer('MlpPolicy', env, 
                     learning_rate=0.0001, 
                     # learning_starts=100,
                     batch_size=128, 
@@ -103,12 +103,12 @@ if __name__ == '__main__':
         #     callback_on_new_best=callback_on_best, 
         #     verbose=1)
         checkpoint_callback:CheckpointCallback = CheckpointCallback(
-            save_freq=10000*10, 
+            save_freq=100000, 
             save_path='./outputs_bt/saved/',
             name_prefix='SimpleTrainer'
             )
 
-        model:SAC = SAC('MlpPolicy', env, 
+        model:Trainer = Trainer('MlpPolicy', env, 
                     learning_rate=0.0001, 
                     # learning_starts=100,
                     batch_size=128, 

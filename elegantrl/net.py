@@ -1,6 +1,6 @@
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
 
 """[ElegantRL.2021.09.01](https://github.com/AI4Finance-LLC/ElegantRL)"""
 
@@ -170,7 +170,7 @@ class ActorSAC(nn.Module):
         return a_tan, log_prob.sum(1, keepdim=True)
 
 
-class ActorPPO(nn.Module):
+class ActorAdv(nn.Module):
     def __init__(self, mid_dim, state_dim, action_dim):
         super().__init__()
         if isinstance(state_dim, int):
@@ -214,7 +214,7 @@ class ActorPPO(nn.Module):
         return -(self.a_std_log + self.sqrt_2pi_log + delta).sum(1)  # old_logprob
 
 
-class ActorDiscretePPO(nn.Module):
+class ActorAdvDiscrete(nn.Module):
     def __init__(self, mid_dim, state_dim, action_dim):
         super().__init__()
         if isinstance(state_dim, int):
@@ -238,10 +238,11 @@ class ActorDiscretePPO(nn.Module):
     def get_action(self, state):
         a_prob = self.soft_max(self.net(state))
         # dist = Categorical(a_prob)
-        # action = dist.sample()
-        samples_2d = torch.multinomial(a_prob, num_samples=1, replacement=True)
-        action = samples_2d.reshape(state.size(0))
-        return action, a_prob
+        # a_int = dist.sample()
+        a_int = torch.multinomial(a_prob, num_samples=1, replacement=True)[:, 0]
+        # samples_2d = torch.multinomial(a_prob, num_samples=1, replacement=True)
+        # samples_2d.shape == (batch_size, num_samples)
+        return a_int, a_prob
 
     def get_logprob_entropy(self, state, a_int):
         a_prob = self.soft_max(self.net(state))
@@ -674,7 +675,7 @@ def check_actor_network():
 
     if_check_actor_net = 0
     if if_check_actor_net:
-        net = ActorPPO(mid_dim, state_dim, action_dim)
+        net = ActorAdv(mid_dim, state_dim, action_dim)
 
         inp = torch.ones((batch_size, state_dim), dtype=torch.float32)
         out = net(inp)
@@ -689,7 +690,7 @@ def check_actor_network():
         state_dim = (img_size, img_size, img_channel)
         action_dim = 4
 
-        net = ActorPPO(mid_dim, state_dim, action_dim)
+        net = ActorAdv(mid_dim, state_dim, action_dim)
 
         inp = torch.ones((batch_size, img_size, img_size, img_channel), dtype=torch.int8)
         out = net(inp)

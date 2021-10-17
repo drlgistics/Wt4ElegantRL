@@ -3,22 +3,21 @@ import time
 import torch
 import numpy as np
 
-"""[ElegantRL.2021.09.01](https://github.com/AI4Finance-LLC/ElegantRL)"""
+"""[ElegantRL.2021.10.10](https://github.com/AI4Finance-LLC/ElegantRL)"""
 
 
-class Evaluator:
-    def __init__(self, cwd, agent_id, device, eval_env, eval_gap, eval_times1, eval_times2, ):
+class Evaluator:  # [ElegantRL.2021.10.13]
+    def __init__(self, cwd, agent_id, eval_env, eval_gap, eval_times1, eval_times2, target_return):
         self.recorder = list()  # total_step, r_avg, r_std, obj_c, ...
         self.recorder_path = f'{cwd}/recorder.npy'
 
         self.cwd = cwd
-        self.device = device
         self.agent_id = agent_id
         self.eval_env = eval_env
         self.eval_gap = eval_gap
         self.eval_times1 = eval_times1
         self.eval_times2 = eval_times2
-        self.target_return = eval_env.target_return
+        self.target_return = target_return
 
         self.r_max = -np.inf
         self.eval_time = 0
@@ -30,51 +29,54 @@ class Evaluator:
               f"{'avgR':>8}{'stdR':>7}{'avgS':>7}{'stdS':>6} |"
               f"{'expR':>8}{'objC':>7}{'etc.':>7}")
 
-    def evaluate_and_save(self, act, steps, r_exp, log_tuple) -> bool:
+    def evaluate_and_save(self, act, steps, r_exp, log_tuple) -> (bool, bool):  # 2021-09-09
         self.total_step += steps  # update total training steps
 
         if time.time() - self.eval_time < self.eval_gap:
-            return False  # if_reach_goal
-        self.eval_time = time.time()
+            if_reach_goal = False
+            if_save = False
+        else:
+            self.eval_time = time.time()
 
-        '''evaluate first time'''
-        rewards_steps_list = [get_episode_return_and_step(self.eval_env, act, self.device) for _ in
-                              range(self.eval_times1)]
-        r_avg, r_std, s_avg, s_std = self.get_r_avg_std_s_avg_std(rewards_steps_list)
-
-        '''evaluate second time'''
-        if r_avg > self.r_max:  # evaluate actor twice to save CPU Usage and keep precision
-            rewards_steps_list += [get_episode_return_and_step(self.eval_env, act, self.device)
-                                   for _ in range(self.eval_times2 - self.eval_times1)]
+            '''evaluate first time'''
+            rewards_steps_list = [get_episode_return_and_step(self.eval_env, act)
+                                  for _ in range(self.eval_times1)]
             r_avg, r_std, s_avg, s_std = self.get_r_avg_std_s_avg_std(rewards_steps_list)
 
-        '''save the policy network'''
-        if r_avg > self.r_max:  # save checkpoint with highest episode return
-            self.r_max = r_avg  # update max reward (episode return)
+            '''evaluate second time'''
+            if r_avg > self.r_max:  # evaluate actor twice to save CPU Usage and keep precision
+                rewards_steps_list += [get_episode_return_and_step(self.eval_env, act)
+                                       for _ in range(self.eval_times2 - self.eval_times1)]
+                r_avg, r_std, s_avg, s_std = self.get_r_avg_std_s_avg_std(rewards_steps_list)
 
-            act_save_path = f'{self.cwd}/actor.pth'
-            torch.save(act.state_dict(), act_save_path)  # save policy network in *.pth
+            '''save the policy network'''
+            if_save = r_avg > self.r_max
+            if if_save:  # save checkpoint with highest episode return
+                self.r_max = r_avg  # update max reward (episode return)
 
-            print(f"{self.agent_id:<3}{self.total_step:8.2e}{self.r_max:8.2f} |")  # save policy and print
+                act_save_path = f'{self.cwd}/actor.pth'
+                torch.save(act.state_dict(), act_save_path)  # save policy network in *.pth
 
-        self.recorder.append((self.total_step, r_avg, r_std, r_exp, *log_tuple))  # update recorder
+                print(f"{self.agent_id:<3}{self.total_step:8.2e}{self.r_max:8.2f} |")  # save policy and print
 
-        '''print some information to Terminal'''
-        if_reach_goal = bool(self.r_max > self.target_return)  # check if_reach_goal
-        if if_reach_goal and self.used_time is None:
-            self.used_time = int(time.time() - self.start_time)
-            print(f"{'ID':<3}{'Step':>8}{'TargetR':>8} |"
-                  f"{'avgR':>8}{'stdR':>7}{'avgS':>7}{'stdS':>6} |"
-                  f"{'UsedTime':>8}  ########\n"
-                  f"{self.agent_id:<3}{self.total_step:8.2e}{self.target_return:8.2f} |"
+            self.recorder.append((self.total_step, r_avg, r_std, r_exp, *log_tuple))  # update recorder
+
+            '''print some information to Terminal'''
+            if_reach_goal = bool(self.r_max > self.target_return)  # check if_reach_goal
+            if if_reach_goal and self.used_time is None:
+                self.used_time = int(time.time() - self.start_time)
+                print(f"{'ID':<3}{'Step':>8}{'TargetR':>8} |"
+                      f"{'avgR':>8}{'stdR':>7}{'avgS':>7}{'stdS':>6} |"
+                      f"{'UsedTime':>8}  ########\n"
+                      f"{self.agent_id:<3}{self.total_step:8.2e}{self.target_return:8.2f} |"
+                      f"{r_avg:8.2f}{r_std:7.1f}{s_avg:7.0f}{s_std:6.0f} |"
+                      f"{self.used_time:>8}  ########")
+
+            print(f"{self.agent_id:<3}{self.total_step:8.2e}{self.r_max:8.2f} |"
                   f"{r_avg:8.2f}{r_std:7.1f}{s_avg:7.0f}{s_std:6.0f} |"
-                  f"{self.used_time:>8}  ########")
-
-        print(f"{self.agent_id:<3}{self.total_step:8.2e}{self.r_max:8.2f} |"
-              f"{r_avg:8.2f}{r_std:7.1f}{s_avg:7.0f}{s_std:6.0f} |"
-              f"{r_exp:8.2f}{''.join(f'{n:7.2f}' for n in log_tuple)}")
-        self.draw_plot()
-        return if_reach_goal
+                  f"{r_exp:8.2f}{''.join(f'{n:7.2f}' for n in log_tuple)}")
+            self.draw_plot()
+        return if_reach_goal, if_save
 
     @staticmethod
     def get_r_avg_std_s_avg_std(rewards_steps_list):
@@ -106,22 +108,33 @@ class Evaluator:
         save_learning_curve(self.recorder, self.cwd, save_title)
 
 
-def get_episode_return_and_step(env, act, device) -> (float, int):
+def get_episode_return_and_step(env, act) -> (float, int):  # [ElegantRL.2021.10.13]
+    device_id = next(act.parameters()).get_device()  # net.parameters() is a python generator.
+    device = torch.device('cpu' if device_id == -1 else f'cuda:{device_id}')
+
     episode_step = 1
     episode_return = 0.0  # sum of rewards in an episode
 
     max_step = env.max_step
     if_discrete = env.if_discrete
+    if if_discrete:
+        def get_action(_state):
+            _state = torch.as_tensor(_state, dtype=torch.float32, device=device)
+            _action = act(_state.unsqueeze(0))
+            _action = _action.argmax(dim=1)[0]
+            return _action.detach().cpu().numpy()
+    else:
+        def get_action(_state):
+            _state = torch.as_tensor(_state, dtype=torch.float32, device=device)
+            _action = act(_state.unsqueeze(0))[0]
+            return _action.detach().cpu().numpy()
 
     state = env.reset()
     for episode_step in range(max_step):
-        s_tensor = torch.as_tensor((state,), device=device)
-        a_tensor = act(s_tensor)
-        if if_discrete:
-            a_tensor = a_tensor.argmax(dim=1)
-        action = a_tensor.detach().cpu().numpy()[0]  # not need detach(), because with torch.no_grad() outside
+        action = get_action(state)
         state, reward, done, _ = env.step(action)
         episode_return += reward
+
         if done:
             break
     episode_return = getattr(env, 'episode_return', episode_return)

@@ -55,7 +55,7 @@ class SimpleEvaluator(WtEvaluator):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='SHFE.rb.HOT', period=Indicator.M5, roll=2)  # 每一个特征工程必须指定一个主要标的
+            code='SHFE.rb.HOT', period=Indicator.M5, roll=3)  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
         feature.addSecurity(code='SHFE.hc.HOT')

@@ -3,6 +3,7 @@ from gym.spaces import Box
 from features import Feature
 from stoppers import Stopper
 from assessments import Assessment
+from wtpy.apps import WtBtAnalyst
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
 
@@ -66,7 +67,7 @@ class WtEvaluator(Env):
 
         # 创建一个策略并加入运行环境
         self._strategy_: StateTransfer = self.__strategy__(
-            name=self._name_(),
+            name=self._name_(self._iter_),
             feature=self.__feature__,
             stopper=self.__stopper__,
             assessment=self.__assessment__,
@@ -75,7 +76,7 @@ class WtEvaluator(Env):
         # 设置策略的时候一定要安装钩子
         if self._et_ == EngineType.ET_CTA:
             self._engine_.set_cta_strategy(
-                self._strategy_, slippage=0, hook=True, persistData=self._dump_)
+                self._strategy_, slippage=1, hook=True, persistData=self._dump_)
         elif self._et_ == EngineType.ET_HFT:
             self._engine_.set_hft_strategy(self._strategy_, hook=True)
         else:
@@ -105,8 +106,18 @@ class WtEvaluator(Env):
     def assets(self):
         return self.__assessment__.assets
 
-    def _name_(self):
-        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), self._iter_)
+    def analysis(self):
+        for iter in range(self._iter_, 0, -1):
+            name = self._name_(iter)
+            analyst = WtBtAnalyst()
+            analyst.add_strategy(name, folder="./outputs_bt/%s/"%name, init_capital=1000000, rf=0.02, annual_trading_days=240) 
+            try:
+                analyst.run_new()
+            except:
+                analyst.run()
+
+    def _name_(self, iter):
+        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), iter)
 
     def __del__(self):
         if hasattr(self, '_engine_'):
@@ -117,12 +128,12 @@ class WtDebugger(WtEvaluator):
     _log_: str = './config/03research/log_debugger.json'
     _dump_: bool = True
 
-    def _name_(self):
-        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), self._iter_)
+    def _name_(self, iter):
+        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), iter)
 
 class WtTrainer(WtEvaluator):
     _log_: str = './config/03research/log_trainer.json'
     _dump_: bool = False
 
-    def _name_(self):
+    def _name_(self, iter):
         return '%s%s_%s' % (__class__.__name__, self._id_, self.__strategy__.Name())

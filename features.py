@@ -3,6 +3,7 @@ import talib as ta
 from reprocess import REPROCESS, ZSCORE
 from wtpy.StrategyDefs import CtaContext, HftContext
 
+
 class Feature():
     M1 = 'm1'
     M3 = 'm3'
@@ -27,7 +28,7 @@ class Feature():
         self.__main__: tuple = (code, period)
         self.__subscribies__: dict = {}
         self._subscribe_(period=period, count=1)
-        
+
         self.__comminfo__: dict = {}
 
     @property
@@ -39,7 +40,7 @@ class Feature():
             return
         self.__securities__.append(code)
 
-    def _subscribe_(self, period: str, count: int=1):
+    def _subscribe_(self, period: str, count: int = 1):
         self.__subscribies__[period] = max(
             self.__subscribies__.get(period, 0),
             count+self._roll_
@@ -50,7 +51,7 @@ class Feature():
         根据特征需求订阅数据
         '''
         for code in self.__securities__:
-            comminfo = context.stra_get_comminfo(code) # 品种信息数据
+            comminfo = context.stra_get_comminfo(code)  # 品种信息数据
             self.__comminfo__[code] = (comminfo.pricetick, comminfo.volscale)
             for period, count in self.__subscribies__.items():
                 context.stra_get_bars(
@@ -61,12 +62,13 @@ class Feature():
                             and period == self.__main__[1])
                 )
 
-    def _callback_(self, space: int, period: str, callback, reprocess:REPROCESS , **kwargs):
+    def _callback_(self, space: int, period: str, callback, reprocess: REPROCESS, **kwargs):
         if self.__shape__ or space < 1:
             return
         if period not in self.__cb__:
             self.__cb__[period] = {}
-        self.__cb__[period][callback.__name__] = (space, callback, reprocess, kwargs)
+        self.__cb__[period][callback.__name__] = (
+            space, callback, reprocess, kwargs)
 
     @property
     def observation(self) -> dict:
@@ -77,7 +79,7 @@ class Feature():
             len(self.securities),
             sum(c[0] for v in self.__cb__.values()
                 for c in v.values())*self._roll_+4
-            )
+        )
         self.__flatten__ = (self.__shape__[0]*self.__shape__[1],)
         return dict(low=-np.inf, high=np.inf, shape=self.__flatten__, dtype=float)
 
@@ -95,7 +97,8 @@ class Feature():
                             features = (features, )
                         for feature in features:  # 处理每一个返回值
                             # print(p.calculate(feature))
-                            obs[i][n:n+self._roll_] = p.calculate(feature)[-self._roll_:]
+                            obs[i][n:n +
+                                   self._roll_] = p.calculate(feature)[-self._roll_:]
                             n += self._roll_
             self.__obs__[self.__time__] = obs
 
@@ -118,16 +121,17 @@ class Feature():
 
 
 class Indicator(Feature):
-    def trange(self, period: str, reprocess:REPROCESS =ZSCORE):
+    def trange(self, period: str, reprocess: REPROCESS = ZSCORE):
         def trange(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
             return ta.TRANGE(high=bars.highs, low=bars.lows, close=bars.closes)
         self._subscribe_(period=period, count=2+reprocess.n())
-        self._callback_(space=1, period=period, callback=trange, reprocess=reprocess)
+        self._callback_(space=1, period=period,
+                        callback=trange, reprocess=reprocess)
 
     # atr跟zscore处理后的tr在效用上重合了，不建议使用
-    def atr(self, period: str, timeperiod:int=14, reprocess:REPROCESS =ZSCORE):
+    def atr(self, period: str, timeperiod: int = 14, reprocess: REPROCESS = ZSCORE):
         def atr(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
@@ -136,15 +140,16 @@ class Indicator(Feature):
         self._callback_(space=1, period=period, callback=atr, reprocess=reprocess,
                         timeperiod=timeperiod)
 
-    def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9, reprocess:REPROCESS =ZSCORE):
+    def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9, reprocess: REPROCESS = ZSCORE):
         def macd(context: CtaContext, code: str, period: str, args: dict):
             return ta.MACD(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes, **args)
 
-        self._subscribe_(period=period, count=slowperiod+signalperiod+reprocess.n())
+        self._subscribe_(period=period, count=slowperiod +
+                         signalperiod+reprocess.n())
         self._callback_(space=3, period=period, callback=macd, reprocess=reprocess,
                         fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
 
-    def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2, reprocess:REPROCESS =ZSCORE):
+    def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2, reprocess: REPROCESS = ZSCORE):
         def bollinger(context: CtaContext, code: str, period: str, args: dict):
             return ta.BBANDS(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes, **args)
 
@@ -165,7 +170,7 @@ class Indicator(Feature):
     #     self._callback_(
     #         space=1, #查询代码有几个值，自动生成obs的占位空间
     #         period=period,
-    #         callback=example, 
-    #         reprocess=reprocess 
+    #         callback=example,
+    #         reprocess=reprocess
     #         timeperiod=timeperiod,
     #         index=index)

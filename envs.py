@@ -10,10 +10,9 @@ from strategies import StateTransfer, EngineType
 # 一个进程只能有一个env
 
 
-
-class WtEvaluator(Env):
-    _log_: str = './config/03research/log_evaluator.json'
-    _dump_: bool = True
+class WtTrainer(Env):
+    _log_: str = './config/03research/log_trainer.json'
+    _dump_: bool = False
 
     def __init__(self, strategy: StateTransfer, stopper: Stopper, feature: Feature, assessment: Assessment, time_start: int, time_end: int, id: int = 1):
         self._id_: int = id
@@ -31,26 +30,8 @@ class WtEvaluator(Env):
 
         self.__assessment__: Assessment = assessment
 
-        # 创建一个运行环境
-        self._engine_: WtBtEngine = WtBtEngine(
-            eType=self._et_,
-            logCfg=self._log_,
-        )
-        if self._et_ == EngineType.ET_CTA:
-            self._engine_.init(
-                './config/01commom/',
-                './config/03research/cta.json')
-            self._cb_step_ = self._engine_.cta_step
-        elif self._et_ == EngineType.ET_HFT:
-            self._engine_.init(
-                './config/01commom/',
-                './config/03research/hft.json')
-            self._cb_step_ = self._engine_.hft_step
-        else:
-            raise AttributeError
-
-        self._engine_.configBacktest(time_start, time_end)
-        self._engine_.commitBTConfig()
+        self.__time_start__ = time_start
+        self.__time_end__ = time_end
 
     def __step__(self):
         finished = not self._cb_step_()
@@ -61,6 +42,29 @@ class WtEvaluator(Env):
     def reset(self):
         self.close()
         self._iter_ += 1
+
+        if not hasattr(self, '_engine_'):
+            # 创建一个运行环境
+            self._engine_: WtBtEngine = WtBtEngine(
+                eType=self._et_,
+                logCfg=self._log_,
+            )
+            if self._et_ == EngineType.ET_CTA:
+                self._engine_.init(
+                    './config/01commom/',
+                    './config/03research/cta.json')
+                self._cb_step_ = self._engine_.cta_step
+            elif self._et_ == EngineType.ET_HFT:
+                self._engine_.init(
+                    './config/01commom/',
+                    './config/03research/hft.json')
+                self._cb_step_ = self._engine_.hft_step
+            else:
+                raise AttributeError
+
+            self._engine_.configBacktest(
+                self.__time_start__, self.__time_end__)
+            self._engine_.commitBTConfig()
 
         # 重置奖励
         self.__assessment__.reset()
@@ -90,7 +94,7 @@ class WtEvaluator(Env):
         return self.__feature__.obs
 
     def step(self, action):
-        assert self._iter_ > 0
+        assert hasattr(self, '_engine_')
         self._strategy_.setAction(action)
         self._cb_step_()
 
@@ -98,7 +102,7 @@ class WtEvaluator(Env):
         return self.__feature__.obs, self.__assessment__.reward, self.__assessment__.done, {}
 
     def close(self):
-        if self._run_:
+        if self._run_ and hasattr(self, '_engine_'):
             self._engine_.stop_backtest()
             self._run_ = False
 
@@ -107,33 +111,37 @@ class WtEvaluator(Env):
         return self.__assessment__.assets
 
     def analysis(self):
-        for iter in range(self._iter_, 0, -1):
+        for iter in range(1, self._iter_+1):
             name = self._name_(iter)
             analyst = WtBtAnalyst()
-            analyst.add_strategy(name, folder="./outputs_bt/%s/"%name, init_capital=1000000, rf=0.02, annual_trading_days=240) 
+            analyst.add_strategy(name, folder="./outputs_bt/%s/" %
+                                 name, init_capital=1000000, rf=0.02, annual_trading_days=240)
             try:
                 analyst.run_new()
             except:
                 analyst.run()
 
     def _name_(self, iter):
-        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), iter)
+        return '%s%s_%s' % (__class__.__name__, self._id_, self.__strategy__.Name())
 
     def __del__(self):
         if hasattr(self, '_engine_'):
             self._engine_.release_backtest()
 
 
-class WtDebugger(WtEvaluator):
+
+
+class WtDebugger(WtTrainer):
     _log_: str = './config/03research/log_debugger.json'
     _dump_: bool = True
 
     def _name_(self, iter):
         return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), iter)
 
-class WtTrainer(WtEvaluator):
-    _log_: str = './config/03research/log_trainer.json'
-    _dump_: bool = False
+
+class WtEvaluator(WtTrainer):
+    _log_: str = './config/03research/log_evaluator.json'
+    _dump_: bool = True
 
     def _name_(self, iter):
-        return '%s%s_%s' % (__class__.__name__, self._id_, self.__strategy__.Name())
+        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), iter)

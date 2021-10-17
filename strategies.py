@@ -82,7 +82,9 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
     def on_calculate_done(self, context: CtaContext):
         # print('on_calculate_done 1')
         for code in tuple(self._action_.keys()):
-            context.stra_set_position(stdCode=code, qty=self._action_.pop(code))
+            qty = self._action_.pop(code)
+            if qty != context.stra_get_position(stdCode=code):
+                context.stra_set_position(stdCode=code, qty=qty)
             # print('stra_set_position %s'%code)
         # print('on_calculate_done 2')
 

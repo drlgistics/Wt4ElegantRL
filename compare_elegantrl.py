@@ -3,6 +3,7 @@ from elegantrl.agent import AgentPPO as Agent
 from elegantrl.run import Arguments, train_and_evaluate, train_and_evaluate_mp
 from envs_simple_cta import SimpleTrainer, SimpleEvaluator, WtDebugger
 from gym import make, register
+from numpy import inf
 
 
 class Wt4RLSimpleTrainer(SimpleTrainer):
@@ -15,8 +16,14 @@ class Wt4RLSimpleTrainer(SimpleTrainer):
         return self.observation_space.shape[0]
 
 
-class Wt4RLSimpleEvaluator(Wt4RLSimpleTrainer):
+class Wt4RLSimpleEvaluator(SimpleEvaluator):
+    env_num = 1
     max_step = 15195
+    if_discrete = False
+
+    @property
+    def state_dim(self):
+        return self.observation_space.shape[0]
 
 
 register('wt4rl-simplecta-trainer-v0', entry_point=Wt4RLSimpleTrainer)
@@ -57,7 +64,7 @@ if __name__ == '__main__':
         # arguments.eval_env = 'wt4rl-simplecta-trainer-v0'
         arguments.env_num = 1
         arguments.max_step = 9540
-        arguments.target_step = arguments.max_step * 1
+        arguments.target_step = arguments.max_step * 2
         arguments.state_dim = 460
         arguments.action_dim = 10
         arguments.if_discrete = False
@@ -69,7 +76,9 @@ if __name__ == '__main__':
         arguments.net_dim = 2**9
         # arguments.net_dim = 2 ** 8
         # arguments.max_memo = 2 ** 22
-        arguments.break_step = arguments.max_step*1000
+        # arguments.break_step = arguments.max_step*1000
+        arguments.break_step = inf
+        arguments.if_allow_break = False
         arguments.batch_size = 2 ** 11  # arguments.net_dim * 2
         # arguments.repeat_times = 1.5
         arguments.learning_rate = 2 ** -15

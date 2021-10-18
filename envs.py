@@ -129,8 +129,6 @@ class WtTrainer(Env):
             self._engine_.release_backtest()
 
 
-
-
 class WtDebugger(WtTrainer):
     _log_: str = './config/03research/log_debugger.json'
     _dump_: bool = True

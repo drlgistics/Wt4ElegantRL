@@ -49,7 +49,7 @@ if __name__ == '__main__':
         model: Trainer = Trainer('MlpPolicy', env,
                                  learning_rate=0.0001,
                                  # learning_starts=100,
-                                #  batch_size=128,
+                                 #  batch_size=128,
                                  ent_coef='auto_0.1',
                                  gamma=0.99,
                                  verbose=1

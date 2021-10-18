@@ -61,18 +61,16 @@ if __name__ == '__main__':
         arguments.state_dim = 460
         arguments.action_dim = 10
         arguments.if_discrete = False
-        arguments.target_return = 100 #inf
+        arguments.target_return = 100  # inf
         arguments.learner_gpus = (0,)
         arguments.workers_gpus = arguments.learner_gpus
 
-
-        
         arguments.gamma = 0.99
         arguments.net_dim = 2**9
         # arguments.net_dim = 2 ** 8
         # arguments.max_memo = 2 ** 22
         arguments.break_step = arguments.max_step*1000
-        arguments.batch_size = 2 ** 11 #arguments.net_dim * 2
+        arguments.batch_size = 2 ** 11  # arguments.net_dim * 2
         # arguments.repeat_times = 1.5
         arguments.learning_rate = 2 ** -15
 
@@ -84,7 +82,7 @@ if __name__ == '__main__':
         # arguments.worker_num = 4
         # arguments.target_step = arguments.env.max_step * 1
         # train_and_evaluate(arguments)
-        
+
         train_and_evaluate_mp(arguments)
 
     run.add_command(debug)

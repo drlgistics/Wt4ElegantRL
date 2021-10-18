@@ -126,6 +126,7 @@ if __name__ == '__main__':
             action = env.action_space.sample()  # 模拟智能体产生动作
             obs, reward, done, info = env.step(action)
             n += 1
-            print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
+            print('action:', action, 'obs:', obs,
+                  'reward:', reward, 'done:', done)
         print('第%s次训练完成，执行%s步, 盈亏%s。' % (i+1, n, env.assets))
     env.close()

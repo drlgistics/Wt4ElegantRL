@@ -1,9 +1,8 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO
+from elegantrl.agent import AgentPPO as Agent
 from elegantrl.run import Arguments, train_and_evaluate, train_and_evaluate_mp
 from envs_simple_cta import SimpleTrainer, SimpleEvaluator, WtDebugger
 from gym import make, register
-from numpy import inf
 
 
 class Wt4RLSimpleTrainer(SimpleTrainer):
@@ -50,19 +49,19 @@ if __name__ == '__main__':
     @command()
     def train():
         arguments = Arguments(
-            # env='wt4rl-simplecta-trainer-v0',
-            env='wt4rl-simplecta-evaluator-v0',
-            agent=AgentPPO()
+            env='wt4rl-simplecta-trainer-v0',
+            # env='wt4rl-simplecta-evaluator-v0',
+            agent=Agent()
         )
-        # arguments.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        arguments.eval_env = 'wt4rl-simplecta-trainer-v0'
+        arguments.eval_env = 'wt4rl-simplecta-evaluator-v0'
+        # arguments.eval_env = 'wt4rl-simplecta-trainer-v0'
         arguments.env_num = 1
         arguments.max_step = 9540
         arguments.target_step = arguments.max_step * 1
         arguments.state_dim = 460
         arguments.action_dim = 10
         arguments.if_discrete = False
-        arguments.target_return = inf
+        arguments.target_return = 100 #inf
         arguments.learner_gpus = (0,)
         arguments.workers_gpus = arguments.learner_gpus
 

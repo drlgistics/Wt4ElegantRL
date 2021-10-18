@@ -47,7 +47,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
 
 
 class SimpleTrainer(WtTrainer):
-    def __init__(self, time_start: int=202101031600, time_end: int=202107301600, id: int = 1):
+    def __init__(self, time_start: int = 202101031600, time_end: int = 202107301600, id: int = 1):
         # 角色：数据研究人员、强化学习研究人员、策略研究人员
         # 原则：每个角色的分工模拟交易机构做隔离
 
@@ -56,7 +56,7 @@ class SimpleTrainer(WtTrainer):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='SHFE.rb.HOT', period=Indicator.M5, roll=3)  # 每一个特征工程必须指定一个主要标的
+            code='SHFE.rb.HOT', period=Indicator.M5, roll=2)  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
         feature.addSecurity(code='SHFE.hc.HOT')
@@ -97,12 +97,26 @@ class SimpleTrainer(WtTrainer):
 
 
 class SimpleEvaluator(SimpleTrainer, WtEvaluator):
-    def __init__(self, time_start: int=202001011600, time_end: int=202101031600, id: int = 1):
+    def __init__(self, time_start: int = 202001011600, time_end: int = 202101031600, id: int = 1):
         super().__init__(time_start=time_start, time_end=time_end, id=id)
 
 
+class WtSubprocess():
+    def __init__(self, env: WtTrainer):
+        self.__env__: WtTrainer = env
+
+    def reset(self):
+        return self.__env__.reset()
+
+    def step(self, action):
+        return self.__env__.action(action)
+
+    def close(self):
+        return self.__env__.close()
+
+
 if __name__ == '__main__':
-    env: WtTrainer = SimpleEvaluator()
+    env: WtTrainer = SimpleTrainer()
 
     for i in range(1):  # 模拟训练10次
         obs = env.reset()
@@ -112,6 +126,6 @@ if __name__ == '__main__':
             action = env.action_space.sample()  # 模拟智能体产生动作
             obs, reward, done, info = env.step(action)
             n += 1
-            # print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
+            print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
         print('第%s次训练完成，执行%s步, 盈亏%s。' % (i+1, n, env.assets))
     env.close()

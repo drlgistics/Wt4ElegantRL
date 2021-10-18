@@ -51,6 +51,11 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
     def setAction(self, action):
         # print('setAction 1')
         self._action_ = dict(zip(self._feature_.securities, around(action, 0)))
+        # try:
+        #     self._action_ = dict(zip(self._feature_.securities, around(action, 0)))
+        #     print(self.name(), action, type(action))
+        # except:
+        #     print(self.name(), action, type(action))
         # print('setAction 2')
 
     def __init__(self, name: str, feature: Feature, assessment: Assessment, stopper: Stopper):

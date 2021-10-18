@@ -9,7 +9,9 @@ gym
 pandas
 flask
 flask-compress
+xlsxwriter
+pyquery
 
 click
 ta-lib
-autpopep8
+autopep8

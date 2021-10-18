@@ -63,9 +63,10 @@ if __name__ == '__main__':
         arguments.eval_env = 'wt4rl-simplecta-evaluator-v0'
         # arguments.eval_env = 'wt4rl-simplecta-trainer-v0'
         arguments.env_num = 1
+        arguments.worker_num = 1 # 内存小的注意别爆内存
         arguments.max_step = 9540
         arguments.target_step = arguments.max_step * 2
-        arguments.state_dim = 460
+        arguments.state_dim = 1000
         arguments.action_dim = 10
         arguments.if_discrete = False
         arguments.target_return = 100  # inf
@@ -75,15 +76,15 @@ if __name__ == '__main__':
         arguments.gamma = 0.99
         arguments.net_dim = 2**9
         # arguments.net_dim = 2 ** 8
-        # arguments.max_memo = 2 ** 22
+        arguments.max_memo = 2 ** 22
         # arguments.break_step = arguments.max_step*1000
         arguments.break_step = inf
-        arguments.if_allow_break = False
+        arguments.if_allow_break = True
         arguments.batch_size = 2 ** 11  # arguments.net_dim * 2
         # arguments.repeat_times = 1.5
         arguments.learning_rate = 2 ** -15
 
-        arguments.eval_gpu_id = -1
+        arguments.eval_gpu_id = 0
         # arguments.eval_gap = 2 ** 9
         # arguments.eval_times1 = 2 ** 2
         # arguments.eval_times2 = 2 ** 5

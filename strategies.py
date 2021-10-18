@@ -4,7 +4,7 @@ from abc import abstractmethod
 from assessments import Assessment
 from wtpy.WtBtEngine import EngineType
 from wtpy.StrategyDefs import BaseCtaStrategy, CtaContext, BaseHftStrategy, HftContext
-from numpy import around
+from numpy import around, float64
 
 
 class StateTransfer():
@@ -46,7 +46,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
 
     @staticmethod
     def Action(size: int) -> dict:
-        return dict(low=-1., high=1., shape=(size, ), dtype=float)
+        return dict(low=-1, high=1, shape=(size, ), dtype=int)
 
     def setAction(self, action):
         # print('setAction 1')

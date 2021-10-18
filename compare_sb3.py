@@ -1,5 +1,7 @@
 from click import command, group, option
-from stable_baselines3 import PPO as Trainer
+from stable_baselines3 import SAC as Trainer
+# from stable_baselines3 import TD3 as Trainer
+# from stable_baselines3 import PPO as Trainer
 from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback, StopTrainingOnRewardThreshold
 from envs_simple_cta import SimpleTrainer, SimpleEvaluator
 
@@ -47,8 +49,8 @@ if __name__ == '__main__':
         model: Trainer = Trainer('MlpPolicy', env,
                                  learning_rate=0.0001,
                                  # learning_starts=100,
-                                 batch_size=128,
-                                 # ent_coef='auto_0.1',
+                                #  batch_size=128,
+                                 ent_coef='auto_0.1',
                                  gamma=0.99,
                                  verbose=1
                                  )

@@ -62,9 +62,9 @@ if __name__ == '__main__':
         arguments.action_dim = 10
         arguments.if_discrete = True
         arguments.target_return = inf
-        arguments.eval_gpu_id = 0
         arguments.learner_gpus = (0,)
         arguments.workers_gpus = arguments.learner_gpus
+        arguments.eval_gpu_id = -1
         # train_and_evaluate(arguments)
         train_and_evaluate_mp(arguments)
 

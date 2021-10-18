@@ -81,7 +81,7 @@ if __name__ == '__main__':
                                  batch_size=128,
                                 #  ent_coef='auto_0.1',
                                  gamma=0.99,
-                                #  policy_kwargs=dict(net_arch=[128, 128, 128]),
+                                 policy_kwargs=dict(net_arch=[128, 128, 128]),
                                  verbose=1
                                  )
         model.learn(

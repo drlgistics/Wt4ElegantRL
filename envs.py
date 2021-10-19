@@ -10,11 +10,36 @@ from strategies import StateTransfer, EngineType
 # 一个进程只能有一个env
 
 
-class WtTrainer(Env):
-    _log_: str = './config/03research/log_trainer.json'
-    _dump_: bool = False
+class WtEnv(Env):
+    TRAINER = 1
+    EVALUATOR = 2
+    DEBUGGER = 3
 
-    def __init__(self, strategy: StateTransfer, stopper: Stopper, feature: Feature, assessment: Assessment, time_start: int, time_end: int, id: int = 1):
+    def __init__(self,
+                 strategy: StateTransfer,
+                 stopper: Stopper,
+                 feature: Feature,
+                 assessment: Assessment,
+                 time_start: int,
+                 time_end: int,
+                 slippage: int = 0,
+                 id: int = 1,
+                 mode=1,
+                 ):
+
+        if mode == 3:  # 调试模式
+            self._log_: str = './config/03research/log_debugger.json'
+            self._dump_: bool = True
+            self._mode_: str = 'WtDebugger'
+        elif mode == 2:  # 评估模式
+            self._log_: str = './config/03research/log_evaluator.json'
+            self._dump_: bool = True
+            self._mode_: str = 'WtEvaluator'
+        else:  # 训练模式
+            self._log_: str = './config/03research/log_trainer.json'
+            self._dump_: bool = False
+            self._mode_: str = 'WtTrainer'
+
         self._id_: int = id
         self._iter_: int = 0
         self._run_: bool = False
@@ -22,6 +47,7 @@ class WtTrainer(Env):
         self.__strategy__ = strategy
         self._et_ = self.__strategy__.EngineType()
         self.__stopper__: Stopper = stopper
+        self.__slippage__: int = slippage
 
         self.__feature__: Feature = feature
         self.observation_space: Box = Box(**self.__feature__.observation)
@@ -80,7 +106,7 @@ class WtTrainer(Env):
         # 设置策略的时候一定要安装钩子
         if self._et_ == EngineType.ET_CTA:
             self._engine_.set_cta_strategy(
-                self._strategy_, slippage=0, hook=True, persistData=self._dump_)
+                self._strategy_, slippage=self.__slippage__, hook=True, persistData=self._dump_)
         elif self._et_ == EngineType.ET_HFT:
             self._engine_.set_hft_strategy(self._strategy_, hook=True)
         else:
@@ -122,24 +148,8 @@ class WtTrainer(Env):
                 analyst.run()
 
     def _name_(self, iter):
-        return '%s%s_%s' % (__class__.__name__, self._id_, self.__strategy__.Name())
+        return '%s%s_%s%s' % (self._mode_, self._id_, self.__strategy__.Name(), iter)
 
     def __del__(self):
         if hasattr(self, '_engine_'):
             self._engine_.release_backtest()
-
-
-class WtDebugger(WtTrainer):
-    _log_: str = './config/03research/log_debugger.json'
-    _dump_: bool = True
-
-    def _name_(self, iter):
-        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), iter)
-
-
-class WtEvaluator(WtTrainer):
-    _log_: str = './config/03research/log_evaluator.json'
-    _dump_: bool = True
-
-    def _name_(self, iter):
-        return '%s%s_%s%s' % (__class__.__name__, self._id_, self.__strategy__.Name(), iter)

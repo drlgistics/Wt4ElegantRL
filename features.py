@@ -126,9 +126,11 @@ class Feature():
 
 
 class Indicator(Feature):
-    def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2, reprocess: REPROCESS = ZSCORE):
+    def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2, reprocess: REPROCESS = REPROCESS):
         def bollinger(context: CtaContext, code: str, period: str, args: dict):
-            return ta.BBANDS(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes, **args)
+            closes = context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes
+            upperband, middleband, lowerband = ta.BBANDS(closes, **args)
+            return upperband/closes, middleband/closes, lowerband/closes
 
         self._subscribe_(period=period, count=timeperiod+reprocess.n())
         self._callback_(space=3, period=period, callback=bollinger, reprocess=reprocess,

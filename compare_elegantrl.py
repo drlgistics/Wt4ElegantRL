@@ -81,16 +81,20 @@ if __name__ == '__main__':
 
 
         #
-        args.gamma = 0.98
+        args.gamma = 0.99
         args.learning_rate = 2 ** -15
         args.worker_num = 1 # 内存小的注意别爆内存
 
-        # args.eval_env = 'wt4rl-simplecta-trainer-v0'
-        #args.env_num = 1
-        #args.target_step = args.max_step * 2
+        args.env_num = 1
+        args.target_step = args.max_step * 2
         args.learner_gpus = (0,)
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0
+        
+        args.net_dim = 2 ** 8
+        args.batch_size = args.net_dim * 2
+        args.max_memo = 2 ** 21
+        args.repeat_times = 1.5
 
         #args.net_dim = 2**9
         # args.net_dim = 2 ** 8

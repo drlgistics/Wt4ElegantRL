@@ -93,7 +93,7 @@ if __name__ == '__main__':
         
         args.net_dim = 2 ** 8
         args.batch_size = args.net_dim * 2
-        args.max_memo = 2 ** 21
+        args.max_memo = 2 ** 20
         args.repeat_times = 1.5
 
         #args.net_dim = 2**9

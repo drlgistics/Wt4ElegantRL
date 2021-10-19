@@ -93,7 +93,7 @@ securities: tuple = (
     'SHFE.zn.HOT',
 )
 
-for period, name in {'d1': 'day', 'm5': 'min5', 'm1': 'min1', }.items():
+for period, name in {'d1': 'day', 'm5': 'min5', }.items():#, 'm1': 'min1'
     for code in securities:
         print(period, code)
         path = './dataset/his/%s/%s' % (name, code.split('.')[0])

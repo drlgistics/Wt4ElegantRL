@@ -1,6 +1,7 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO as Agent
-from elegantrl.run import Arguments, train_and_evaluate, train_and_evaluate_mp
+from elegantrl.agent import AgentPPO, AgentModSAC
+from elegantrl.env import PreprocessEnv
+from elegantrl.run import Arguments, build_env, train_and_evaluate_mp
 from envs_simple_cta import SimpleTrainer, SimpleEvaluator, WtDebugger
 from gym import make, register
 from numpy import inf
@@ -58,7 +59,7 @@ if __name__ == '__main__':
         arguments = Arguments(
             env='wt4rl-simplecta-trainer-v0',
             # env='wt4rl-simplecta-evaluator-v0',
-            agent=Agent()
+            agent=AgentPPO()
         )
         arguments.eval_env = 'wt4rl-simplecta-evaluator-v0'
         # arguments.eval_env = 'wt4rl-simplecta-trainer-v0'
@@ -95,8 +96,59 @@ if __name__ == '__main__':
 
         train_and_evaluate_mp(arguments)
 
+    @command()
+    def test():
+        args = Arguments(env=build_env('BipedalWalkerHardcore-v3'), agent=AgentModSAC())
+        # args.if_discrete = False
+        args.gamma = 0.98
+        args.net_dim = 2 ** 8
+        args.max_memo = 2 ** 22
+        args.break_step = int(80e6)
+        args.batch_size = args.net_dim * 2
+        args.repeat_times = 1.5
+        args.learning_rate = 2 ** -15
+
+        args.eval_gap = 2 ** 9
+        args.eval_times1 = 2 ** 2
+        args.eval_times2 = 2 ** 5
+
+        args.worker_num = 1
+        args.target_step = args.env.max_step * 1
+        args.learner_gpus = (0, )  # single GPU
+        train_and_evaluate_mp(args)  # multiple process
+        # args = Arguments(
+        #     env=build_env('BipedalWalkerHardcore-v3'),
+        #     # env='wt4rl-simplecta-evaluator-v0',
+        #     agent=AgentModSAC()
+        # )
+        # #args.eval_env = 'wt4rl-simplecta-evaluator-v0'
+        # args.target_step = args.env.max_step
+        # args.gamma = 0.98
+        # args.net_dim = 2 ** 8
+        # args.batch_size = args.net_dim * 2
+        # args.learning_rate = 2 ** -15
+        # args.repeat_times = 1.5
+
+        # args.max_memo = 2 ** 22
+        # args.break_step = 2 ** 24
+
+        # args.eval_gap = 2 ** 8
+        # args.eval_times1 = 2 ** 2
+        # args.eval_times2 = 2 ** 5
+
+        # args.target_step = args.env.max_step * 1
+        # args.worker_num = 1
+
+        # args.learner_gpus = (0,)
+        # args.workers_gpus = args.learner_gpus
+        # args.visible_gpu = 0
+        # args.eval_gpu_id = 0
+
+        # train_and_evaluate_mp(args)
+
     run.add_command(debug)
     run.add_command(train)
+    run.add_command(test)
     # run.add_command(eval)
 
     run()

@@ -103,13 +103,19 @@ class Feature():
 
         # 开仓最大浮盈
         self.__obs__[self.__time__][:, -4] = tuple(
-            context.stra_get_detail_profit(stdCode=code, usertag='', flag=1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities)
+            context.stra_get_detail_profit(
+                stdCode=code, usertag='', flag=1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
+                )
         # 开仓最大亏损
         self.__obs__[self.__time__][:, -3] = tuple(
-            context.stra_get_detail_profit(stdCode=code, usertag='', flag=-1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities)
+            context.stra_get_detail_profit(
+                stdCode=code, usertag='', flag=-1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
+                )
         # 开仓浮动盈亏
         self.__obs__[self.__time__][:, -2] = tuple(
-            context.stra_get_detail_profit(stdCode=code, usertag='', flag=0)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities)
+            context.stra_get_detail_profit(
+                stdCode=code, usertag='', flag=0)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
+                )
         # 持仓数
         self.__obs__[self.__time__][:, -1] = tuple(
             context.stra_get_position(stdCode=code) for code in self.securities)

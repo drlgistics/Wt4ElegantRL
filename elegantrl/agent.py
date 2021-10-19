@@ -633,7 +633,7 @@ class AgentSAC(AgentBase):
 
 class AgentModSAC(AgentSAC):  # Modified SAC using reliable_lambda and TTUR (Two Time-scale Update Rule)
     def __init__(self):
-        AgentBase.__init__(self)
+        super().__init__()
         self.if_use_act_target = True
         self.if_use_cri_target = True
         self.obj_critic = (-np.log(0.5)) ** 0.5  # for reliable_lambda

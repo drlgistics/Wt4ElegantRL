@@ -124,6 +124,13 @@ class Feature():
     def obs(self):
         return self.__obs__.get(self.__time__).reshape(self.__flatten__)
 
+    def volume(self, period: str, reprocess: REPROCESS = ZSCORE):
+        def volume(context: CtaContext, code: str, period: str, args: dict):
+            return np.diff(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).volumes)
+
+        self._subscribe_(period=period, count=2+reprocess.n())
+        self._callback_(space=1, period=period, callback=volume, reprocess=reprocess)
+
 
 class Indicator(Feature):
     def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2, reprocess: REPROCESS = REPROCESS):

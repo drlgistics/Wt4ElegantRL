@@ -69,7 +69,7 @@ if __name__ == '__main__':
         
         #args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        args.max_step = 8739
+        args.max_step = 26217
         args.state_dim = 550
         args.action_dim = 10
         args.if_discrete = False

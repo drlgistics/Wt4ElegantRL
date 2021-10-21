@@ -18,7 +18,7 @@ class SimpleCTAEnv(WtEnv):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='SHFE.rb.HOT', period=Indicator.M15, roll=2)  # 每一个特征工程必须指定一个主要标的
+            code='SHFE.rb.HOT', period=Indicator.M5, roll=1)  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
         feature.addSecurity(code='SHFE.hc.HOT')
@@ -32,7 +32,7 @@ class SimpleCTAEnv(WtEnv):
         feature.addSecurity(code='DCE.jd.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M15, feature.M60, feature.D1):
+        for period in (feature.M5, feature.M15, feature.M60):
             feature.volume(period)
             feature.bollinger(period)  # 标准差通道
             feature.sar(period)
@@ -63,7 +63,6 @@ class SimpleCTAEnv(WtEnv):
             id=id
         )
 
-
 if __name__ == '__main__':
     env: WtEnv = SimpleCTAEnv(time_start=202109311600, time_end=202110131600)
 
@@ -77,5 +76,7 @@ if __name__ == '__main__':
             n += 1
             print('action:', action, 'obs:', obs,
                   'reward:', reward, 'done:', done)
+            break
+        break
         print('第%s次训练完成，执行%s步, 盈亏%s。' % (i+1, n, env.assets))
     env.close()

@@ -169,8 +169,16 @@ class ActorSAC(nn.Module):
         # log_prob = log_prob_noise - (1 - a_noise_tanh.pow(2) + epsilon).log()
         return a_tan, log_prob.sum(1, keepdim=True)
 
+    # def log_abs_det_jacobian(self, x, y):
+    #     # https://github.com/denisyarats/pytorch_sac/blob/81c5b536d3a1c5616b2531e446450df412a064fb/agent/actor.py#L37
+    #     # ↑ MIT License， Thanks for https://www.zhihu.com/people/Z_WXCY 2ez4U
+    #     # We use a formula that is more numerically stable, see details in the following link
+    #     # https://pytorch.org/docs/stable/_modules/torch/distributions/transforms.html#TanhTransform
+    #     # https://github.com/tensorflow/probability/commit/ef6bb176e0ebd1cf6e25c6b5cecdd2428c22963f#diff-e120f70e92e6741bca649f04fcd907b7
+    #     return 2. * (math.log(2.) - x - F.softplus(-2. * x))
 
-class ActorAdv(nn.Module):
+
+class ActorPPO(nn.Module):
     def __init__(self, mid_dim, state_dim, action_dim):
         super().__init__()
         if isinstance(state_dim, int):
@@ -214,7 +222,7 @@ class ActorAdv(nn.Module):
         return -(self.a_std_log + self.sqrt_2pi_log + delta).sum(1)  # old_logprob
 
 
-class ActorAdvDiscrete(nn.Module):
+class ActorDiscretePPO(nn.Module):
     def __init__(self, mid_dim, state_dim, action_dim):
         super().__init__()
         if isinstance(state_dim, int):
@@ -298,7 +306,7 @@ class CriticTwin(nn.Module):  # shared parameter
         return self.net_q1(tmp), self.net_q2(tmp)  # two Q values
 
 
-class CriticAdv(nn.Module):
+class CriticPPO(nn.Module):
     def __init__(self, mid_dim, state_dim, _action_dim):
         super().__init__()
         if isinstance(state_dim, int):
@@ -316,7 +324,7 @@ class CriticAdv(nn.Module):
         return self.net(state)  # advantage value
 
 
-class CriticAdvTwin(nn.Module):
+class CriticTwinPPO(nn.Module):
     def __init__(self, mid_dim, state_dim, _action_dim):
         super().__init__()
         if isinstance(state_dim, int):
@@ -345,7 +353,7 @@ class CriticAdvTwin(nn.Module):
 '''Parameter sharing Network'''
 
 
-class SharedDPG(nn.Module):  # DPG means deterministic policy gradient
+class ShareDPG(nn.Module):  # DPG means deterministic policy gradient
     def __init__(self, state_dim, action_dim, mid_dim):
         super().__init__()
         nn_dense = DenseNet(mid_dim // 2)
@@ -367,7 +375,9 @@ class SharedDPG(nn.Module):  # DPG means deterministic policy gradient
     @staticmethod
     def add_noise(a, noise_std):
         a_temp = torch.normal(a, noise_std)
-        mask = torch.tensor((a_temp < -1.0) + (a_temp > 1.0), dtype=torch.float32).cuda()
+
+        mask = torch.lt(a_temp, -1) + torch.gt(a_temp, 1)  # mask = (a_temp < -1.0) + (a_temp > 1.0)
+        mask = torch.tensor(mask, dtype=torch.float32).cuda()
 
         noise_uniform = torch.rand_like(a)
         a_noise = noise_uniform * mask + a_temp * (-mask + 1)
@@ -407,7 +417,7 @@ class SharedDPG(nn.Module):  # DPG means deterministic policy gradient
         return q_target, a
 
 
-class SharedSPG(nn.Module):  # SPG means stochastic policy gradient
+class ShareSPG(nn.Module):  # SPG means stochastic policy gradient
     def __init__(self, mid_dim, state_dim, action_dim):
         super().__init__()
         self.log_sqrt_2pi_sum = np.log(np.sqrt(2 * np.pi)) * action_dim
@@ -504,7 +514,7 @@ class SharedSPG(nn.Module):  # SPG means stochastic policy gradient
         return q1, q2
 
 
-class SharedPPO(nn.Module):  # Pixel-level state version
+class SharePPO(nn.Module):  # Pixel-level state version
     def __init__(self, state_dim, action_dim, mid_dim):
         super().__init__()
         if isinstance(state_dim, int):
@@ -675,7 +685,7 @@ def check_actor_network():
 
     if_check_actor_net = 0
     if if_check_actor_net:
-        net = ActorAdv(mid_dim, state_dim, action_dim)
+        net = ActorPPO(mid_dim, state_dim, action_dim)
 
         inp = torch.ones((batch_size, state_dim), dtype=torch.float32)
         out = net(inp)
@@ -690,7 +700,7 @@ def check_actor_network():
         state_dim = (img_size, img_size, img_channel)
         action_dim = 4
 
-        net = ActorAdv(mid_dim, state_dim, action_dim)
+        net = ActorPPO(mid_dim, state_dim, action_dim)
 
         inp = torch.ones((batch_size, img_size, img_size, img_channel), dtype=torch.int8)
         out = net(inp)

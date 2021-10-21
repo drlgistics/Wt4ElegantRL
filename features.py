@@ -1,6 +1,6 @@
 import numpy as np
 import talib as ta
-from reprocess import REPROCESS, ZSCORE
+from reprocess import REPROCESS
 from wtpy.StrategyDefs import CtaContext, HftContext
 
 
@@ -122,9 +122,9 @@ class Feature():
 
     @property
     def obs(self):
-        return self.__obs__.get(self.__time__).reshape(self.__flatten__)
+        return self.__obs__.get(self.__time__).reshape(self.__flatten__) * 0.0005
 
-    def volume(self, period: str, reprocess: REPROCESS = ZSCORE):
+    def volume(self, period: str, reprocess: REPROCESS = REPROCESS):
         def volume(context: CtaContext, code: str, period: str, args: dict):
             return np.diff(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).volumes)
 
@@ -152,7 +152,7 @@ class Indicator(Feature):
         self._callback_(space=1, period=period, acceleration=acceleration, maximum=maximum,
                         callback=sar, reprocess=reprocess)
 
-    def trange(self, period: str, reprocess: REPROCESS = ZSCORE):
+    def trange(self, period: str, reprocess: REPROCESS = REPROCESS):
         def trange(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
@@ -161,7 +161,7 @@ class Indicator(Feature):
         self._callback_(space=1, period=period,
                         callback=trange, reprocess=reprocess)
 
-    def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9, reprocess: REPROCESS = ZSCORE):
+    def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9, reprocess: REPROCESS = REPROCESS):
         def macd(context: CtaContext, code: str, period: str, args: dict):
             return ta.MACD(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes, **args)
 
@@ -184,13 +184,14 @@ class Indicator(Feature):
         def dx(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
+            return ta.DX(high=bars.highs, low=bars.lows, close=bars.closes, **args)#/100
             return ta.DX(high=bars.highs, low=bars.lows, close=bars.closes, **args)/100
 
         self._subscribe_(period=period, count=timeperiod+1+reprocess.n())
         self._callback_(space=1, period=period, callback=dx, reprocess=reprocess,
                         timeperiod=timeperiod)
 
-    def obv(self, period: str, reprocess: REPROCESS = ZSCORE):
+    def obv(self, period: str, reprocess: REPROCESS = REPROCESS):
         def obv(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
@@ -204,13 +205,14 @@ class Indicator(Feature):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
             k, d =  ta.STOCH (high=bars.highs, low=bars.lows, close=bars.closes, **args)
+            return k, d, (3*k-2*d)
             return k/100, d/100, (3*k-2*d)/100
         
         self._subscribe_(period=period, count=10 + 1 + reprocess.n())
         self._callback_(space=3, period=period, callback=kdj, reprocess=reprocess,
                         fastk_period=fastk_period, slowk_period=slowk_period)
 
-    # def weights(self, period: str, timeperiod:int=1, index:str='000300', reprocess:REPROCESS =ZSCORE):
+    # def weights(self, period: str, timeperiod:int=1, index:str='000300', reprocess:REPROCESS =REPROCESS):
     #     def example(context: CtaContext, code: str, period: str, args: dict):
     #         # 标的代码 code
     #         # 标的周期 period

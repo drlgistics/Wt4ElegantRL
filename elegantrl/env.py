@@ -57,6 +57,9 @@ def build_env(env, if_print=False, device_id=None, env_num=1):
             raise ValueError(f'| build_env_from_env_name: need register: {env_name}')
         return env
 
+    if env_name[:6]=='wt4rl-':
+        return gym.make(env_name)
+
     # elif env_name[:10] in {'StockDOW5', 'StockDOW30', 'StockNAS74', 'StockNAS89'}:
     #     if_eval = env_name.find('eval') != -1
     #     gamma = 0.993
@@ -67,9 +70,6 @@ def build_env(env, if_print=False, device_id=None, env_num=1):
     #                  'StockNAS89': StockEnvNAS89,
     #                  }[env_name[:10]]
     #     env = env_class(if_eval=if_eval, gamma=gamma)
-
-    if env_name[:6]=='wt4rl-':
-        env = gym.make(env_name)
 
     if env is None:
         raise ValueError("| build_env(): register your custom env in here.")
@@ -93,9 +93,12 @@ def build_eval_env(eval_env, env, eval_gpu_id, env_num):
 class PendulumEnv:  # [ElegantRL.2021.10.10]
     def __init__(self, env_name):
         assert env_name in {'Pendulum-v1', 'Pendulum-v0'}
-        # Pendulum-v1  gym.__version__ == 0.21.0
-        # Pendulum-v0  gym.__version__ == 0.17.0
-        self.env = gym.make(env_name)
+        try:
+            env_name = 'Pendulum-v0'  # gym.__version__ == 0.17.0
+            self.env = gym.make(env_name)
+        except KeyError:
+            env_name = 'Pendulum-v1'  # gym.__version__ == 0.21.0
+            self.env = gym.make(env_name)
         self.env_name = env_name  # assert isinstance(env_name, str)
 
         # from elegantrl.env import get_gym_env_info

@@ -1,5 +1,5 @@
 from click import command, group, option
-from elegantrl.agent import AgentSAC as Agent
+from elegantrl.agent import AgentModSAC as Agent
 from elegantrl.run import Arguments, train_and_evaluate_mp
 from envs_simple_cta import SimpleCTAEnv
 from gym import make, register
@@ -8,7 +8,7 @@ from numpy import inf
 
 class Wt4RLSimpleTrainer(SimpleCTAEnv):
     # env_num = 1
-    max_step = 8739
+    max_step = 26217
     if_discrete = False
 
     @property
@@ -21,7 +21,7 @@ class Wt4RLSimpleTrainer(SimpleCTAEnv):
 
 class Wt4RLSimpleEvaluator(SimpleCTAEnv):
     # env_num = 1
-    max_step = 5551
+    max_step = 16651
     if_discrete = False
 
     @property
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     @command()
     @option('--count', default=1)
     def debug(count):
-        env: SimpleCTAEnv = make('wt4rl-simplecta-trainer-v0')
+        env: SimpleCTAEnv = make('wt4rl-simplecta-evaluator-v0')
         print('状态空间', env.observation_space.shape)
         print('动作空间', env.action_space.shape)
         for i in range(1, int(count)+1):  # 模拟训练10次
@@ -70,10 +70,11 @@ if __name__ == '__main__':
         #args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 8739
-        args.state_dim = 1060
+        args.state_dim = 550
         args.action_dim = 10
         args.if_discrete = False
         args.target_return = 25  # inf
+        args.if_overwrite = True
 
 
         args.break_step = inf
@@ -81,7 +82,7 @@ if __name__ == '__main__':
 
 
         #
-        args.gamma = 0.99
+        args.gamma = 0.98
         args.learning_rate = 2 ** -15
         args.worker_num = 1 # 内存小的注意别爆内存
 
@@ -124,6 +125,7 @@ if __name__ == '__main__':
         args.batch_size = args.net_dim * 2
         args.repeat_times = 1.5
         args.learning_rate = 2 ** -15
+        args.if_per_or_gae = True
 
         args.eval_gap = 2 ** 9
         args.eval_times1 = 2 ** 2

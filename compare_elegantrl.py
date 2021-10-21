@@ -74,7 +74,7 @@ if __name__ == '__main__':
         args.action_dim = 10
         args.if_discrete = False
         args.target_return = 25  # inf
-        args.if_overwrite = True
+        # args.if_overwrite = False
 
 
         args.break_step = inf

@@ -34,7 +34,7 @@ class SimpleCTAEnv(WtEnv):
         feature.addSecurity(code='DCE.jd.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M5, feature.M15, feature.M30):
+        for period in (feature.M5, feature.M15):
             feature.volume(period)
             feature.bollinger(period)  # 标准差通道
             feature.sar(period)

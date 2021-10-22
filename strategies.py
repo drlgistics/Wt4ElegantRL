@@ -46,7 +46,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
 
     @staticmethod
     def Action(size: int) -> dict:
-        return dict(low=-1, high=1, shape=(size, ), dtype=int)
+        return dict(low=-3, high=3, shape=(size, ), dtype=int)
 
     def setAction(self, action):
         # print('setAction 1')

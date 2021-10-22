@@ -1,5 +1,5 @@
 from click import command, group, option
-from elegantrl.agent import AgentModSAC as Agent
+from elegantrl.agent import AgentPPO as Agent
 from elegantrl.run import Arguments, train_and_evaluate_mp
 from envs_simple_cta import SimpleCTAEnv
 from gym import make, register
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         args.state_dim = 380
         args.action_dim = 10
         args.if_discrete = False
-        args.target_return = 15  # inf
+        args.target_return = 56  # inf
         # args.if_overwrite = False
 
 
@@ -84,11 +84,11 @@ if __name__ == '__main__':
         #
         args.gamma = 0.96
         args.learning_rate = 2 ** -14
-        # args.if_per_or_gae = True
-        args.worker_num = 3 # 内存小的注意别爆内存
+        args.if_per_or_gae = True
+        args.worker_num = 1 # 内存小的注意别爆内存
 
         args.env_num = 1
-        args.target_step = args.max_step * 2
+        args.target_step = args.max_step #* 2
         args.learner_gpus = (0,)
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0

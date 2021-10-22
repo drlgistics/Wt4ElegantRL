@@ -1,5 +1,5 @@
 from click import command, group, option
-from elegantrl.agent import AgentSAC as Agent
+from elegantrl.agent import AgentPPO as Agent
 from elegantrl.run import Arguments, train_and_evaluate_mp
 from envs_simple_cta import SimpleCTAEnv
 from gym import make, register
@@ -83,9 +83,9 @@ if __name__ == '__main__':
 
         #
         args.gamma = 0.96
-        args.learning_rate = 2 ** -15
+        args.learning_rate = 2 ** -14
         args.if_per_or_gae = True
-        args.worker_num = 3 # 内存小的注意别爆内存
+        args.worker_num = 4 # 内存小的注意别爆内存
 
         args.env_num = 1
         args.target_step = args.max_step * 2

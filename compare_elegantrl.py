@@ -70,7 +70,7 @@ if __name__ == '__main__':
         #args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 26217
-        args.state_dim = 550
+        args.state_dim = 380
         args.action_dim = 10
         args.if_discrete = False
         args.target_return = 50  # inf
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0
         
-        args.net_dim = 2 ** 9
+        args.net_dim = 2 ** 8
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 21
         # args.repeat_times = 1.5

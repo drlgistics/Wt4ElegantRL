@@ -29,7 +29,7 @@ class Wt4RLSimpleEvaluator(SimpleCTAEnv):
         return self.observation_space.shape[0]
 
     def __init__(self):
-        super().__init__(time_start=201901011600, time_end=202001011600)
+        super().__init__(time_start=201901011600, time_end=202001011600, mode=1) # mode=3可以打开详细调试模式
 
 
 register('wt4rl-simplecta-trainer-v0', entry_point=Wt4RLSimpleTrainer)
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         args.state_dim = 550
         args.action_dim = 10
         args.if_discrete = False
-        args.target_return = 25  # inf
+        args.target_return = 50  # inf
         # args.if_overwrite = False
 
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
 
         #
-        args.gamma = 0.98
+        args.gamma = 0.96
         args.learning_rate = 2 ** -15
         args.if_per_or_gae = True
         args.worker_num = 3 # 内存小的注意别爆内存
@@ -93,9 +93,9 @@ if __name__ == '__main__':
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0
         
-        args.net_dim = 2 ** 8
+        args.net_dim = 2 ** 9
         args.batch_size = args.net_dim * 2
-        args.max_memo = 2 ** 20
+        args.max_memo = 2 ** 21
         # args.repeat_times = 1.5
 
         #args.net_dim = 2**9

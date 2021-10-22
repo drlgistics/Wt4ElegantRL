@@ -9,7 +9,9 @@ class SimpleCTAEnv(WtEnv):
     def __init__(self,
                  time_start: int = 202101031600,
                  time_end: int = 202107301600,
-                 id: int = 1):
+                 id: int = 1,
+                 mode: int = 1
+                 ):
         # 角色：数据研究人员、强化学习研究人员、策略研究人员
         # 原则：每个角色的分工模拟交易机构做隔离
 
@@ -60,8 +62,10 @@ class SimpleCTAEnv(WtEnv):
             assessment=assessment,
             time_start=time_start,
             time_end=time_end,
-            id=id
+            id=id,
+            mode=mode,
         )
+
 
 if __name__ == '__main__':
     env: WtEnv = SimpleCTAEnv(time_start=202109311600, time_end=202110131600)

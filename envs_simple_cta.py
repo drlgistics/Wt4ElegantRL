@@ -34,7 +34,7 @@ class SimpleCTAEnv(WtEnv):
         feature.addSecurity(code='DCE.jd.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M5, feature.M15, feature.M60):
+        for period in (feature.M5, feature.M15, feature.M30):
             feature.volume(period)
             feature.bollinger(period)  # 标准差通道
             feature.sar(period)
@@ -57,13 +57,13 @@ class SimpleCTAEnv(WtEnv):
         super().__init__(
             # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和评估，主要使用者是策略研究人员
             strategy=SimpleCTA,
-            stopper=stopper,  # 特征计算
-            feature=feature,  # 评估计算
-            assessment=assessment,
+            stopper=stopper,
+            feature=feature,  # 特征计算
+            assessment=assessment,  # 评估计算
             time_start=time_start,
             time_end=time_end,
             id=id,
-            mode=mode,
+            mode=mode,  # 1训练模式，2评估模式，3debug模式
         )
 
 

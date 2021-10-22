@@ -1,5 +1,5 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO as Agent
+from elegantrl.agent import AgentSAC as Agent
 from elegantrl.run import Arguments, train_and_evaluate_mp
 from envs_simple_cta import SimpleCTAEnv
 from gym import make, register

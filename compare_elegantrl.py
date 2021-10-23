@@ -1,5 +1,5 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO, AgentPPO as Agent
+from elegantrl.agent import AgentPPO as Agent
 from elegantrl.run import Arguments, train_and_evaluate_mp
 from envs_simple_cta import SimpleCTAEnv
 from gym import make, register
@@ -28,8 +28,8 @@ class Wt4RLSimpleEvaluator(SimpleCTAEnv):
     def state_dim(self):
         return self.observation_space.shape[0]
 
-    def __init__(self):
-        super().__init__(time_start=201901011600, time_end=202001011600, mode=1) # mode=3可以打开详细调试模式
+    def __init__(self, mode=1):# mode=3可以打开详细调试模式
+        super().__init__(time_start=201901011600, time_end=202001011600, mode=mode) 
 
 
 register('wt4rl-simplecta-trainer-v0', entry_point=Wt4RLSimpleTrainer)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         args = Arguments(
             env='wt4rl-simplecta-trainer-v0',
             # env='wt4rl-simplecta-evaluator-v0',
-            agent=AgentPPO()
+            agent=Agent()
         )
         
         #args必须设置的参数
@@ -74,6 +74,7 @@ if __name__ == '__main__':
         args.action_dim = 10
         args.if_discrete = False
         args.target_return = 56  # inf
+        # args.agent.if_use_cri_target = True
         # args.if_overwrite = False
 
 
@@ -117,54 +118,26 @@ if __name__ == '__main__':
 
     @command()
     def test():
-        args = Arguments(env=build_env('BipedalWalkerHardcore-v3'), agent=AgentModSAC())
-        # args.if_discrete = False
-        args.gamma = 0.98
-        args.net_dim = 2 ** 8
-        args.max_memo = 2 ** 22
-        args.break_step = int(80e6)
-        args.batch_size = args.net_dim * 2
-        args.repeat_times = 1.5
-        args.learning_rate = 2 ** -15
-        args.if_per_or_gae = True
+        env = Wt4RLSimpleEvaluator(mode=3)
+        agent = Agent()
+        
+        agent.init(net_dim=2 ** 8, state_dim=380, action_dim=10,
+             learning_rate=0.1 ** (1/12/8), if_per_or_gae=True, env_num=1, gpu_id=0)
+        agent.save_or_load_agent(cwd='./ppt-5/', if_save=False)
+        
 
-        args.eval_gap = 2 ** 9
-        args.eval_times1 = 2 ** 2
-        args.eval_times2 = 2 ** 5
-
-        args.worker_num = 1
-        args.target_step = args.env.max_step * 1
-        args.learner_gpus = (0, )  # single GPU
-        train_and_evaluate_mp(args)  # multiple process
-        # args = args(
-        #     env=build_env('BipedalWalkerHardcore-v3'),
-        #     # env='wt4rl-simplecta-evaluator-v0',
-        #     agent=AgentModSAC()
-        # )
-        # #args.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        # args.target_step = args.env.max_step
-        # args.gamma = 0.98
-        # args.net_dim = 2 ** 8
-        # args.batch_size = args.net_dim * 2
-        # args.learning_rate = 2 ** -15
-        # args.repeat_times = 1.5
-
-        # args.max_memo = 2 ** 22
-        # args.break_step = 2 ** 24
-
-        # args.eval_gap = 2 ** 8
-        # args.eval_times1 = 2 ** 2
-        # args.eval_times2 = 2 ** 5
-
-        # args.target_step = args.env.max_step * 1
-        # args.worker_num = 1
-
-        # args.learner_gpus = (0,)
-        # args.workers_gpus = args.learner_gpus
-        # args.visible_gpu = 0
-        # args.eval_gpu_id = 0
-
-        # train_and_evaluate_mp(args)
+        # for i in range(10):  # 模拟训练10次
+        #     obs = env.reset()
+        #     done = False
+        #     n = 0
+        #     while not done:
+        #         action = agent.select_action(obs)  # 模拟智能体产生动作
+        #         obs, reward, done, info = env.step(action)
+        #         n += 1
+        #         # print('action:', action, 'obs:', obs,
+        #         #     'reward:', reward, 'done:', done)
+        #     print('第%s次训练完成，执行%s步, 盈亏%s。' % (i+1, n, env.assets))
+        # env.close()
 
     run.add_command(debug)
     run.add_command(train)

@@ -1,46 +1,33 @@
 from ray import tune
-from ray.rllib.agents.ppo import PPOTrainer as Trainer
-# from ray.rllib.agents.sac import SACTrainer as Trainer
-from envs_simple_cta import SimpleTrainer, SimpleEvaluator
+# from ray.rllib.agents.ppo import PPOTrainer as Trainer
+from ray.rllib.agents.sac import SACTrainer as Trainer
+from envs_simple_cta import SimpleCTAEnv
 
 
-__TRAINER_START__ = 202105311600
-__TRAINER_END__ = 202108311600
-
-__EVALUATIR_STATR__ = 202103311600
-__EVALUATIR_END__ = 202105311600
-
-__BACKTEST_STATR__ = 202108311600
-__BACKTEST_END__ = 202110131600
-
-
-def SimpleTrainer_creator(env_config):
-    return SimpleTrainer(
-        time_start=__TRAINER_START__,
-        time_end=__TRAINER_END__,
-    )
-
-
-def SimpleEvaluator_creator(env_config):
-    return SimpleEvaluator(
-        time_start=__EVALUATIR_STATR__,
-        time_end=__EVALUATIR_END__,
-    )
-
-
-tune.register_env('SimpleTrainer', SimpleTrainer_creator)
-tune.register_env('SimpleEvaluator', SimpleEvaluator_creator)
+tune.register_env('SimpleCTAEnv',
+                  lambda env_config: SimpleCTAEnv(**env_config))
 
 
 config = {
-    'env': 'SimpleTrainer',
+    'env': 'SimpleCTAEnv',
+    'env_config': {'time_start': 202001011600, 'time_end': 202108311600, 'mode': 1},
+    'rollout_fragment_length': 26217,
     'framework': 'torch',
     'num_workers': 1,
-    'num_gpus': 0.4,
-    'num_gpus_per_worker': 0.5,
-    'gamma': 0.98,
-    'lr': 5e-6,
-    'train_batch_size': 3603,
+    'num_gpus': 0.3,
+    'num_gpus_per_worker': 0.3,
+    'gamma': 0.1 ** (1/12/8),
+    'lr': 2 ** -14,
+    'evaluation_interval': 10,
+    'evaluation_parallel_to_training': False,
+    'evaluation_num_workers': 1,
+
+    "evaluation_config": {
+        "env_config": {
+            'time_start': 201901011600, 'time_end': 202001011600, 'mode': 2
+        },
+    },
+    'train_batch_size': 26217,
 }
 
 
@@ -48,7 +35,7 @@ config = {
 analysis = tune.run(
     Trainer,
     stop={
-        "timesteps_total": 3603*10000,
+        "timesteps_total": 26217*10000,
         'episode_reward_mean': 250,
         'episode_reward_min': 50,
     },

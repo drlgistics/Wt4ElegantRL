@@ -1,5 +1,5 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO as Agent
+from elegantrl.agent import AgentPPO, AgentPPO as Agent
 from elegantrl.run import Arguments, train_and_evaluate_mp
 from envs_simple_cta import SimpleCTAEnv
 from gym import make, register
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         args = Arguments(
             env='wt4rl-simplecta-trainer-v0',
             # env='wt4rl-simplecta-evaluator-v0',
-            agent=Agent()
+            agent=AgentPPO()
         )
         
         #args必须设置的参数
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
 
         #
-        args.gamma = 0.96
+        args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
         args.learning_rate = 2 ** -14
         args.if_per_or_gae = True
         args.worker_num = 1 # 内存小的注意别爆内存

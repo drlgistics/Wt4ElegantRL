@@ -1,6 +1,8 @@
 from ray import tune
 # from ray.rllib.agents.ppo import PPOTrainer as Trainer
+# from ray.rllib.agents.ppo import APPOTrainer as Trainer
 from ray.rllib.agents.sac import SACTrainer as Trainer
+# from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 from envs_simple_cta import SimpleCTAEnv
 
 
@@ -18,6 +20,7 @@ config = {
     'num_gpus_per_worker': 0.3,
     # 'gamma': 0.1 ** (1/12/8),
     # 'lr': 2 ** -14,
+    'simple_optimizer': True,
     'evaluation_interval': 10,
     "evaluation_num_episodes": 5,
     'evaluation_parallel_to_training': False,

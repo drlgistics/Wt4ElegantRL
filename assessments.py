@@ -32,8 +32,12 @@ class Assessment():
 
     @property
     @abstractmethod
-    def assets(self) -> float:
+    def curr_assets(self) -> float:
         raise NotImplementedError
+
+    @property
+    def init_assets(self) -> float:
+        return self._init_assets_
 
 
 class SimpleAssessment(Assessment):  # 借鉴了neofinrl
@@ -49,8 +53,11 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             return
         self.__assets__.append(
             self._init_assets_+context.stra_get_fund_data(0))  # 账户实时的动态权益
+
+        returns = np.round(self.__assets__[-1]/self.__assets__[-2]-1, 5)
         self.__reward__.append(
-            np.round(self.__assets__[-1]/self.__assets__[-2]-1, 5))  # 以动态权益差分设计reward
+            returns if returns > 0 else returns*1.2,
+            )  # 以动态权益差分设计reward
 
         self.__done__ = False  # 此处可以根据控制任务结束状态
 
@@ -64,10 +71,12 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         # gamma = 0
         # for reward in self.__reward__:
         #     gamma = gamma*self.gamma + reward
-        
+
         # gamma = np.round(np.nanprod(np.array(self.__reward__)+1, axis=0)-1, 5)
         gamma = self.__assets__[-1]/self.__assets__[0]-1
-        self.__reward__.append(gamma)  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
+        self.__reward__.append(
+            gamma if gamma > 0 else gamma*1.2,
+            )  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
         self.__done__ = True
 
     @property
@@ -83,5 +92,5 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         return self.__done__
 
     @property
-    def assets(self) -> float:
-        return self.__assets__[-1]-self._init_assets_
+    def curr_assets(self) -> float:
+        return self.__assets__[-1]

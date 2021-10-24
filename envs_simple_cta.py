@@ -20,7 +20,7 @@ class SimpleCTAEnv(WtEnv):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='DCE.c.HOT', period=Indicator.M5, roll=1)  # 每一个特征工程必须指定一个主要标的
+            code='DCE.c.HOT', period=Indicator.M5, roll=2)  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
         feature.addSecurity(code='DCE.cs.HOT')
@@ -34,7 +34,7 @@ class SimpleCTAEnv(WtEnv):
         # feature.addSecurity(code='SHFE.ni.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M5, feature.M10):
+        for period in (feature.M5, feature.M10, feature.M15):
             feature.volume(period)
             feature.roc(period)
             feature.bollinger(period)  # 标准差通道
@@ -54,7 +54,7 @@ class SimpleCTAEnv(WtEnv):
 
         # 评估组件
         # 评估组件的主要使用者是强化学习研究人员定义reward
-        assessment: SimpleAssessment = SimpleAssessment(init_assets=1000000)
+        assessment: SimpleAssessment = SimpleAssessment(init_assets=500000)
         super().__init__(
             # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和评估，主要使用者是策略研究人员
             strategy=SimpleCTA,
@@ -69,11 +69,11 @@ class SimpleCTAEnv(WtEnv):
 
     def _debug_(self):
         print('%s: assets %s, reward %s, reward_sum %s' % (
-            self._name_(self._iter_), self._assessment_.assets, self._assessment_.reward, sum(self._assessment_.rewards)))
+            self._name_(self._iter_), self._assessment_.curr_assets-self._assessment_.init_assets, self._assessment_.reward, sum(self._assessment_.rewards)))
 
 
 if __name__ == '__main__':
-    env: WtEnv = SimpleCTAEnv(time_start=202109311600, time_end=202110131600)
+    env: WtEnv = SimpleCTAEnv(time_start=202109311600, time_end=202110131600, id=2, mode=2)
 
     for i in range(1):  # 模拟训练10次
         obs = env.reset()
@@ -87,5 +87,5 @@ if __name__ == '__main__':
                   'reward:', reward, 'done:', done)
             # break
         # break
-        print('第%s次训练完成，执行%s步, 盈亏%s。' % (i+1, n, env.assets))
+        print('第%s次训练完成，执行%s步, 市值%s。' % (i+1, n, env.assets))
     env.close()

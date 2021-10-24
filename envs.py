@@ -68,6 +68,8 @@ class WtEnv(Env):
             self._assessment_.finish()
             self._debug_()
             self.close()
+            # if self._dump_:
+            #     self.analyst(self._iter_)
 
     def close(self):
         if self._run_ and hasattr(self, '_engine_'):
@@ -138,18 +140,22 @@ class WtEnv(Env):
 
     @property
     def assets(self):
-        return self._assessment_.assets
+        return self._assessment_.curr_assets
 
-    def analysis(self):
+    def analyst(self, iter: int):
+        name = self._name_(iter)
+        analyst = WtBtAnalyst()
+        folder = "./outputs_bt/%s/" % name
+        analyst.add_strategy(
+            name, folder=folder, init_capital=self._assessment_._init_assets_, rf=0.02, annual_trading_days=240)
+        try:
+            analyst.run_new('%s/PnLAnalyzing.xlsx' % folder)
+        except:
+            analyst.run('%s/PnLAnalyzing.xlsx' % folder)
+
+    def analysts(self):
         for iter in range(1, self._iter_+1):
-            name = self._name_(iter)
-            analyst = WtBtAnalyst()
-            analyst.add_strategy(name, folder="./outputs_bt/%s/" %
-                                 name, init_capital=1000000, rf=0.02, annual_trading_days=240)
-            try:
-                analyst.run_new()
-            except:
-                analyst.run()
+            self.analysis(iter)
 
     def _name_(self, iter):
         return '%s%s_%s%s' % (self._mode_, self._id_, self.__strategy__.Name(), iter)

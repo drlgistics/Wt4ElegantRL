@@ -16,9 +16,10 @@ config = {
     'num_workers': 1,
     'num_gpus': 0.3,
     'num_gpus_per_worker': 0.3,
-    'gamma': 0.1 ** (1/12/8),
-    'lr': 2 ** -14,
+    # 'gamma': 0.1 ** (1/12/8),
+    # 'lr': 2 ** -14,
     'evaluation_interval': 10,
+    "evaluation_num_episodes": 5,
     'evaluation_parallel_to_training': False,
     'evaluation_num_workers': 1,
 
@@ -36,8 +37,8 @@ analysis = tune.run(
     Trainer,
     stop={
         "timesteps_total": 26217*10000,
-        'episode_reward_mean': 250,
-        'episode_reward_min': 50,
+        'episode_reward_mean': 2.,
+        # 'episode_reward_min': 50,
     },
     config=config,
     keep_checkpoints_num=5,

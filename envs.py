@@ -54,16 +54,25 @@ class WtEnv(Env):
         self.action_space: Box = Box(
             **self.__strategy__.Action(len(self.__feature__.securities)))
 
-        self.__assessment__: Assessment = assessment
+        self._assessment_: Assessment = assessment
 
         self.__time_start__ = time_start
         self.__time_end__ = time_end
 
+    def _debug_(self):
+        pass
+
     def __step__(self):
         finished = not self._cb_step_()
-        if self.__assessment__.done or finished:
-            self.__assessment__.finish()
+        if self._assessment_.done or finished:
+            self._assessment_.finish()
+            self._debug_()
             self.close()
+
+    def close(self):
+        if self._run_ and hasattr(self, '_engine_'):
+            self._engine_.stop_backtest()
+            self._run_ = False
 
     def reset(self):
         self.close()
@@ -93,14 +102,14 @@ class WtEnv(Env):
             self._engine_.commitBTConfig()
 
         # 重置奖励
-        self.__assessment__.reset()
+        self._assessment_.reset()
 
         # 创建一个策略并加入运行环境
         self._strategy_: StateTransfer = self.__strategy__(
             name=self._name_(self._iter_),
             feature=self.__feature__,
             stopper=self.__stopper__,
-            assessment=self.__assessment__,
+            assessment=self._assessment_,
         )
 
         # 设置策略的时候一定要安装钩子
@@ -125,16 +134,11 @@ class WtEnv(Env):
         self._cb_step_()
 
         self.__step__()
-        return self.__feature__.obs, self.__assessment__.reward, self.__assessment__.done, {}
-
-    def close(self):
-        if self._run_ and hasattr(self, '_engine_'):
-            self._engine_.stop_backtest()
-            self._run_ = False
+        return self.__feature__.obs, self._assessment_.reward, self._assessment_.done, {}
 
     @property
     def assets(self):
-        return self.__assessment__.assets
+        return self._assessment_.assets
 
     def analysis(self):
         for iter in range(1, self._iter_+1):

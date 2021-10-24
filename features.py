@@ -8,6 +8,7 @@ class Feature():
     M1 = 'm1'
     M3 = 'm3'
     M5 = 'm5'
+    M10 = 'm10'
     M15 = 'm15'
     M30 = 'm30'
     M60 = 'm60'
@@ -97,7 +98,8 @@ class Feature():
                             features = (features, )
                         for feature in features:  # 处理每一个返回值
                             # print(p.calculate(feature))
-                            obs[i][n:n +self._roll_] = p.calculate(feature)[-self._roll_:]
+                            # obs[i][n:n +self._roll_] = p.calculate(feature)[-self._roll_:]
+                            obs[i][n:n +self._roll_] = np.clip(p.calculate(feature)[-self._roll_:], -1, 1)
                             n += self._roll_
             self.__obs__[self.__time__] = obs
 
@@ -106,24 +108,24 @@ class Feature():
             context.stra_get_detail_profit(
                 stdCode=code, usertag='', flag=1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
                 )
-        self.__obs__[self.__time__][:, -4] *= 0.001
+
         # 开仓最大亏损
         self.__obs__[self.__time__][:, -3] = tuple(
             context.stra_get_detail_profit(
                 stdCode=code, usertag='', flag=-1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
                 )
-        self.__obs__[self.__time__][:, -3] *= 0.001
+
         # 开仓浮动盈亏
         self.__obs__[self.__time__][:, -2] = tuple(
             context.stra_get_detail_profit(
                 stdCode=code, usertag='', flag=0)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
                 )
-        self.__obs__[self.__time__][:, -2] *= 0.001
 
         # 持仓数
         self.__obs__[self.__time__][:, -1] = tuple(
-            context.stra_get_position(stdCode=code)*0.001 for code in self.securities)
-        self.__obs__[self.__time__][:, -1] *= 0.001
+            context.stra_get_position(stdCode=code) for code in self.securities)
+
+        np.clip(self.__obs__[self.__time__][:, -4:]*0.001, -1, 1, out=self.__obs__[self.__time__][:, -4:])
 
     @property
     def obs(self):
@@ -131,13 +133,20 @@ class Feature():
 
     def volume(self, period: str, reprocess: REPROCESS = ZFILTER):
         def volume(context: CtaContext, code: str, period: str, args: dict):
-            return np.diff(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).volumes)
+            return context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).volumes
 
         self._subscribe_(period=period, count=2+reprocess.n())
         self._callback_(space=1, period=period, callback=volume, reprocess=reprocess)
 
 
 class Indicator(Feature):
+    def roc(self, period: str, reprocess: REPROCESS = ZFILTER):
+        def roc(context: CtaContext, code: str, period: str, args: dict):
+            return np.diff(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes)
+
+        self._subscribe_(period=period, count=2+reprocess.n())
+        self._callback_(space=1, period=period, callback=roc, reprocess=reprocess)
+
     def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2, reprocess: REPROCESS = REPROCESS):
         def bollinger(context: CtaContext, code: str, period: str, args: dict):
             closes = context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes

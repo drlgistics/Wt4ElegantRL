@@ -9,7 +9,7 @@ class REPROCESS():
 
     @staticmethod
     def calculate(data: np.ndarray) -> np.ndarray:  # 计算方法
-        return np.clip(data, -1, 1)
+        return data
 
 
 class ZSCORE(REPROCESS):
@@ -19,7 +19,7 @@ class ZSCORE(REPROCESS):
 
     @staticmethod
     def calculate(data: np.ndarray) -> np.ndarray:
-        return np.clip((data-ta.MA(data, __class__.n()))/ta.STDDEV(data, __class__.n()), -1, 1)
+        return (data-ta.MA(data, __class__.n()))/ta.STDDEV(data, __class__.n())
 
 
 class ZFILTER(REPROCESS):
@@ -33,4 +33,4 @@ class ZFILTER(REPROCESS):
     @staticmethod
     def calculate(data: np.ndarray) -> np.ndarray:
         # 1e-8
-        return np.clip((data-ta.MA(data, __class__.n()))-(ta.STDDEV(data, __class__.n())+1e-5), -1, 1)
+        return (data-ta.MA(data, __class__.n()))/(ta.STDDEV(data, __class__.n())+1e-5)

@@ -68,10 +68,10 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             + closeprofit/max(self.__assets__[:-1])*0.382 \
             - 1
 
-        if closeprofit < 0:
-            reward -= 0.005
-        if positionprofit < 0:
-            reward -= 0.005
+        # if closeprofit < 0:
+        #     reward -= 0.001
+        # if positionprofit < 0:
+        #     reward -= 0.005
 
         self.__reward__.append(np.round(reward*0.01, 6))  # 以动态权益差分设计reward
         self.__done__ = False  # 此处可以根据控制任务结束状态

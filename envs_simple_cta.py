@@ -9,6 +9,7 @@ class SimpleCTAEnv(WtEnv):
     def __init__(self,
                  time_start: int = 202101031600,
                  time_end: int = 202107301600,
+                 slippage:int = 0,
                  id: int = 1,
                  mode: int = 1
                  ):
@@ -63,6 +64,7 @@ class SimpleCTAEnv(WtEnv):
             assessment=assessment,  # 评估计算
             time_start=time_start,
             time_end=time_end,
+            slippage=slippage,
             id=id,
             mode=mode,  # 1训练模式，2评估模式，3debug模式
         )
@@ -83,8 +85,12 @@ if __name__ == '__main__':
             action = env.action_space.sample()  # 模拟智能体产生动作
             obs, reward, done, info = env.step(action)
             n += 1
-            print('action:', action, 'obs:', obs,
-                  'reward:', reward, 'done:', done)
+            print(
+                # 'action:', action, 
+                # 'obs:', obs,
+                'reward:', reward, 
+                # 'done:', done
+                )
             # break
         # break
         print('第%s次训练完成，执行%s步, 市值%s。' % (i+1, n, env.assets))

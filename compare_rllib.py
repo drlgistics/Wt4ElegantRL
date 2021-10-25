@@ -1,26 +1,31 @@
 from ray import tune
 # from ray.rllib.agents.ppo import PPOTrainer as Trainer
 # from ray.rllib.agents.ppo import APPOTrainer as Trainer
-from ray.rllib.agents.sac import SACTrainer as Trainer
-# from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+# from ray.rllib.agents.sac import SACTrainer as Trainer
+from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 from envs_simple_cta import SimpleCTAEnv
 
 
 tune.register_env('SimpleCTAEnv',
                   lambda env_config: SimpleCTAEnv(**env_config))
 
-
+nums_subproc = 4
+nums_gpu = 0.92/(nums_subproc+2)
 config = {
     'env': 'SimpleCTAEnv',
-    'env_config': {'time_start': 202001011600, 'time_end': 202108311600, 'mode': 1},
+    'env_config': {
+        'time_start': 202001011600,
+        'time_end': 202108311600,
+        'slippage': 0,
+        'mode': 1
+    },
     'rollout_fragment_length': 26217,
     'framework': 'torch',
-    'num_workers': 1,
-    'num_gpus': 0.3,
-    'num_gpus_per_worker': 0.3,
-    # 'gamma': 0.1 ** (1/12/8),
-    # 'lr': 2 ** -14,
-    'simple_optimizer': True,
+    'num_workers': nums_subproc,
+    'num_gpus': nums_gpu,
+    'num_gpus_per_worker': nums_gpu,
+    'gamma': 0.1 ** (1/12/8),
+    # 'lr': 2 ** -15,
     'evaluation_interval': 10,
     "evaluation_num_episodes": 5,
     'evaluation_parallel_to_training': False,
@@ -28,7 +33,10 @@ config = {
 
     "evaluation_config": {
         "env_config": {
-            'time_start': 201901011600, 'time_end': 202001011600, 'mode': 2
+            'time_start': 201901011600,
+            'time_end': 202001011600,
+            'slippage': 0,
+            'mode': 2
         },
     },
     'train_batch_size': 26217,

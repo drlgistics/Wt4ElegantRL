@@ -51,14 +51,29 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
     def calculate(self, context: CtaContext):
         if self.__done__:
             return
-        self.__assets__.append(
-            self._init_assets_+context.stra_get_fund_data(0))  # 账户实时的动态权益
 
-        returns = np.round(self.__assets__[-1]/self.__assets__[-2]-1, 5)
-        self.__reward__.append(
-            returns if returns > 0 else returns*1.2,
-            )  # 以动态权益差分设计reward
+        # 动态权益
+        dynbalance = context.stra_get_fund_data(0)
+        # 总平仓盈亏
+        closeprofit = context.stra_get_fund_data(1)
+        # 总浮动盈亏
+        positionprofit = context.stra_get_fund_data(2)
+        # 总手续费
+        # fee = context.stra_get_fund_data(3)
 
+        self.__assets__.append(self._init_assets_+dynbalance)  # 账户实时的动态权益
+
+        # 相对于最高权益的收益率+浮动盈亏相对于动态权益
+        reward = self.__assets__[-1]/self.__assets__[-2]*0.618 \
+            + closeprofit/max(self.__assets__[:-1])*0.382 \
+            - 1
+
+        if closeprofit < 0:
+            reward -= 0.005
+        if positionprofit < 0:
+            reward -= 0.005
+
+        self.__reward__.append(np.round(reward*0.01, 6))  # 以动态权益差分设计reward
         self.__done__ = False  # 此处可以根据控制任务结束状态
 
     def finish(self):
@@ -70,13 +85,12 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
 
         # gamma = 0
         # for reward in self.__reward__:
-        #     gamma = gamma*self.gamma + reward
+        #     gamma *= self.gamma
+        #     gamma += reward
 
         # gamma = np.round(np.nanprod(np.array(self.__reward__)+1, axis=0)-1, 5)
-        gamma = self.__assets__[-1]/self.__assets__[0]-1
-        self.__reward__.append(
-            gamma if gamma > 0 else gamma*1.2,
-            )  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
+        gamma = self.__assets__[-1]/max(self.__assets__)-1
+        self.__reward__.append(gamma)  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
         self.__done__ = True
 
     @property

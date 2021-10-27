@@ -21,7 +21,7 @@ class SimpleCTAEnv(WtEnv):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='DCE.c.HOT', period=Indicator.M5, roll=2)  # 每一个特征工程必须指定一个主要标的
+            code='DCE.c.HOT', period=Indicator.M5, roll=1)  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
         feature.addSecurity(code='DCE.cs.HOT')
@@ -35,7 +35,7 @@ class SimpleCTAEnv(WtEnv):
         # feature.addSecurity(code='SHFE.ni.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M5, feature.M10, feature.M15):
+        for period in (feature.M5, feature.M10):
             feature.volume(period)
             feature.roc(period)
             feature.bollinger(period)  # 标准差通道
@@ -75,13 +75,16 @@ class SimpleCTAEnv(WtEnv):
 
 
 if __name__ == '__main__':
-    env: WtEnv = SimpleCTAEnv(time_start=202109311600, time_end=202110131600, id=2, mode=2)
+    env: WtEnv = SimpleCTAEnv(time_start=201901011600, time_end=202001011600, id=2, mode=2)
+
+    print(env.action_space.contains)
 
     for i in range(1):  # 模拟训练10次
         obs = env.reset()
         done = False
         n = 0
         while not done:
+            # box.contains of Box([-3. -3. -3. -3.], [3. 3. 3. 3.], (4,), float16)
             action = env.action_space.sample()  # 模拟智能体产生动作
             obs, reward, done, info = env.step(action)
             n += 1
@@ -91,7 +94,7 @@ if __name__ == '__main__':
                 'reward:', reward, 
                 # 'done:', done
                 )
-            # break
+        #     break
         # break
         print('第%s次训练完成，执行%s步, 市值%s。' % (i+1, n, env.assets))
     env.close()

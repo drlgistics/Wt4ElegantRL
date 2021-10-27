@@ -41,12 +41,13 @@ class Assessment():
 
 
 class SimpleAssessment(Assessment):  # 借鉴了neofinrl
-    gamma = 0.99
+    gamma = 0.1 ** (1/12/8)
 
     def reset(self):
         self.__assets__: list = [self._init_assets_]
         self.__reward__: list = [0]
         self.__done__: bool = False
+        self.__successive__: int = 1
 
     def calculate(self, context: CtaContext):
         if self.__done__:
@@ -55,25 +56,26 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         # 动态权益
         dynbalance = context.stra_get_fund_data(0)
         # 总平仓盈亏
-        closeprofit = context.stra_get_fund_data(1)
+        # closeprofit = context.stra_get_fund_data(1)
         # 总浮动盈亏
-        positionprofit = context.stra_get_fund_data(2)
+        # positionprofit = context.stra_get_fund_data(2)
         # 总手续费
         # fee = context.stra_get_fund_data(3)
 
         self.__assets__.append(self._init_assets_+dynbalance)  # 账户实时的动态权益
 
-        # 相对于最高权益的收益率+浮动盈亏相对于动态权益
-        reward = self.__assets__[-1]/self.__assets__[-2]*0.618 \
-            + closeprofit/max(self.__assets__[:-1])*0.382 \
-            - 1
+        if self.__assets__[-1] > self.__assets__[-2]:
+            self.__successive__ += 1
+        else:
+            self.__successive__ = 1
+        reward = (self.__assets__[-1] /
+                  self.__assets__[-2] - 1) * self.__successive__
+        max_assets = self.__assets__[-1]/max(self.__assets__[:-1])-1
+        reward += max_assets * (10 if max_assets > 0 else 1)
+        min_assets = self.__assets__[-1]/min(self.__assets__[:-1])-1
+        reward += min_assets * (10 if min_assets < 0 else 1)
 
-        # if closeprofit < 0:
-        #     reward -= 0.001
-        # if positionprofit < 0:
-        #     reward -= 0.005
-
-        self.__reward__.append(np.round(reward*0.01, 6))  # 以动态权益差分设计reward
+        self.__reward__.append(reward)  # 以动态权益差分设计reward
         self.__done__ = False  # 此处可以根据控制任务结束状态
 
     def finish(self):
@@ -84,18 +86,25 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         # np.subtract(returns, 1, out=returns)
 
         # gamma = 0
-        # for reward in self.__reward__:
+        # for reward in np.diff(np.log(self.__assets__)):
         #     gamma *= self.gamma
         #     gamma += reward
 
+        gamma = 0
+        for reward in self.__reward__:
+            gamma *= self.gamma
+            gamma += reward
+
         # gamma = np.round(np.nanprod(np.array(self.__reward__)+1, axis=0)-1, 5)
-        gamma = self.__assets__[-1]/max(self.__assets__)-1
+        # gamma = self.__assets__[-1]/max(self.__assets__)-1
+        # gamma = self.__assets__[-1]/self.init_assets-1
         self.__reward__.append(gamma)  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
         self.__done__ = True
 
     @property
     def reward(self) -> float:
-        return self.__reward__[-1]
+        # return self.__reward__[-1]
+        return float(np.round(self.__reward__[-1], 5))
 
     @property
     def rewards(self) -> float:

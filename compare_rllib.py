@@ -48,7 +48,7 @@ analysis = tune.run(
     Trainer,
     stop={
         "timesteps_total": 26217*10000,
-        'episode_reward_mean': 2.,
+        'episode_reward_mean': 2000.,
         # 'episode_reward_min': 50,
     },
     config=config,

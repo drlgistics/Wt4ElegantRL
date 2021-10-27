@@ -11,7 +11,7 @@ for i in tqdm(glob('./outputs_bt/*/funds.csv')):
     analyst.add_strategy(
         name, folder=folder, init_capital=500000, rf=0.04, annual_trading_days=240)
     try:
-        # analyst.run_new('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
-        analyst.run('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
+        analyst.run_new('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
+        # analyst.run('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
     except:
         analyst.run('%s/%s_PnLAnalyzing.xlsx' % (folder, name))

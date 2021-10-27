@@ -35,7 +35,7 @@ class SimpleCTAEnv(WtEnv):
         # feature.addSecurity(code='SHFE.ni.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M5, feature.M10):
+        for period in (feature.M5, feature.M10, feature.M15):
             feature.volume(period)
             feature.roc(period)
             feature.bollinger(period)  # 标准差通道
@@ -94,7 +94,7 @@ if __name__ == '__main__':
                 'reward:', reward, 
                 # 'done:', done
                 )
-        #     break
-        # break
+            break
+        break
         print('第%s次训练完成，执行%s步, 市值%s。' % (i+1, n, env.assets))
     env.close()

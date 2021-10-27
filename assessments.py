@@ -68,12 +68,14 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             self.__successive__ += 1
         else:
             self.__successive__ = 1
-        reward = (self.__assets__[-1] /
-                  self.__assets__[-2] - 1) * self.__successive__
-        max_assets = self.__assets__[-1]/max(self.__assets__[:-1])-1
-        reward += max_assets * (10 if max_assets > 0 else 1)
-        min_assets = self.__assets__[-1]/min(self.__assets__[:-1])-1
-        reward += min_assets * (10 if min_assets < 0 else 1)
+            
+        reward = -0.00001
+        reward += (self.__assets__[-1] /
+                  self.__assets__[-2] - 1) * 0.382 * self.__successive__
+        max_assets = (self.__assets__[-1]/max(self.__assets__[:-1])-1) * 0.382
+        reward += max_assets * (5 if max_assets > 0 else 1)
+        min_assets = (self.__assets__[-1]/min(self.__assets__[:-1])-1) * 0.382
+        reward += min_assets * (5 if min_assets < 0 else 1)
 
         self.__reward__.append(reward)  # 以动态权益差分设计reward
         self.__done__ = False  # 此处可以根据控制任务结束状态

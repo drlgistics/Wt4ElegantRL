@@ -57,9 +57,6 @@ def build_env(env, if_print=False, device_id=None, env_num=1):
             raise ValueError(f'| build_env_from_env_name: need register: {env_name}')
         return env
 
-    if env_name[:6]=='wt4rl-':
-        return gym.make(env_name)
-
     # elif env_name[:10] in {'StockDOW5', 'StockDOW30', 'StockNAS74', 'StockNAS89'}:
     #     if_eval = env_name.find('eval') != -1
     #     gamma = 0.993
@@ -71,8 +68,16 @@ def build_env(env, if_print=False, device_id=None, env_num=1):
     #                  }[env_name[:10]]
     #     env = env_class(if_eval=if_eval, gamma=gamma)
 
+    if env_name[:6]=='wt4rl-':
+        env = gym.make(env_name)
+
     if env is None:
-        raise ValueError("| build_env(): register your custom env in here.")
+        try:
+            env = deepcopy(env)
+            print(f"| build_env(): Warning. NOT suggest to use `deepcopy(env)`.")
+        except Exception as error:
+            print(f"| build_env(): Error. {error}")
+            raise ValueError("| build_env(): register your custom env in this function.")
     return env
 
 

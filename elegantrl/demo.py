@@ -87,9 +87,10 @@ def demo_continuous_action_off_policy():  # [ElegantRL.2021.10.10]
 
 def demo_continuous_action_on_policy():  # [ElegantRL.2021.10.13]
     env_name = ['Pendulum-v1', 'LunarLanderContinuous-v2',
-                'BipedalWalker-v3', 'BipedalWalkerHardcore-v3'][0]
+                'BipedalWalker-v3', 'BipedalWalkerHardcore-v3'][ENV_ID]
     agent_class = [AgentPPO, AgentA2C][0]
     args = Arguments(env=build_env(env_name), agent=agent_class())
+    # args.if_per_or_gae = True
 
     if env_name in {'Pendulum-v1', 'Pendulum-v0'}:
         """
@@ -111,10 +112,18 @@ def demo_continuous_action_on_policy():  # [ElegantRL.2021.10.13]
         args.worker_num = 2
         args.reward_scale = 2 ** -2
         args.target_step = 200 * 16  # max_step = 200
+
+        args.eval_gap = 2 ** 5
+
     if env_name in {'LunarLanderContinuous-v2', 'LunarLanderContinuous-v1'}:
         """
-        Step 40e4,  Reward 226,  UsedTime 1500s PPO
-        Step 80e4,  Reward 246,  UsedTime 3000s PPO
+        Step  9e5,  Reward 210,  UsedTime 1127s PPO
+        Step 13e5,  Reward 223,  UsedTime 1416s PPO
+        Step 15e5,  Reward 250,  UsedTime 1648s PPO
+        Step 19e5,  Reward 201,  UsedTime 1880s PPO
+        Step 43e5,  Reward 224,  UsedTime 3738s PPO
+        Step 14e5,  Reward 213,  UsedTime 1654s PPO GAE
+        Step 12e5,  Reward 216,  UsedTime 1710s PPO GAE
         """
         args.eval_times1 = 2 ** 4
         args.eval_times2 = 2 ** 6
@@ -122,8 +131,10 @@ def demo_continuous_action_on_policy():  # [ElegantRL.2021.10.13]
         args.target_step = args.env.max_step * 8
     if env_name in {'BipedalWalker-v3', 'BipedalWalker-v2'}:
         """
-        Step 57e5,  Reward 295,  UsedTime 17ks PPO
-        Step 70e5,  Reward 300,  UsedTime 21ks PPO
+        Step 51e5,  Reward 300,  UsedTime 2827s PPO
+        Step 78e5,  Reward 304,  UsedTime 4747s PPO
+        Step 61e5,  Reward 300,  UsedTime 3977s PPO GAE
+        Step 95e5,  Reward 291,  UsedTime 6193s PPO GAE
         """
         args.eval_times1 = 2 ** 3
         args.eval_times2 = 2 ** 5
@@ -150,7 +161,7 @@ def demo_continuous_action_on_policy():  # [ElegantRL.2021.10.13]
         args.worker_num = 4
         args.target_step = args.env.max_step * 16
 
-    # args.learner_gpus = (0, )  # single GPU
+    args.learner_gpus = (GPU_ID,)  # single GPU
     # args.learner_gpus = (0, 1)  # multiple GPUs
     # train_and_evaluate(args)  # single process
     train_and_evaluate_mp(args)  # multiple process
@@ -481,7 +492,7 @@ def demo_pybullet_on_policy():
 def demo_isaac_on_policy():
     env_name = ['IsaacVecEnvAnt', 'IsaacVecEnvHumanoid'][0]
     args = Arguments(env=env_name, agent=AgentPPO())
-    args.learner_gpus = (0, )
+    args.learner_gpus = (0,)
     args.eval_gpu_id = 1
 
     if env_name in {'IsaacVecEnvAnt', 'IsaacOneEnvAnt'}:
@@ -571,6 +582,8 @@ def demo_isaac_on_policy():
 '''train and watch'''
 
 if __name__ == '__main__':
+    GPU_ID = 0  # eval(sys.argv[1])
+    ENV_ID = 0  # eval(sys.argv[2])
     # demo_continuous_action_off_policy()
     # demo_continuous_action_on_policy()
     # demo_discrete_action_off_policy()

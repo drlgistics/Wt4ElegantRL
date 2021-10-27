@@ -24,7 +24,7 @@ if __name__ == '__main__':
             'env_config': {
                 'time_start': 202001011600,
                 'time_end': 202108311600,
-                'slippage': 1,
+                'slippage': 0,
                 'mode': 1
             },
             'rollout_fragment_length': 26217,
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                 "env_config": {
                     'time_start': 201901011600,
                     'time_end': 202001011600,
-                    'slippage': 1,
+                    'slippage': 0,
                     'mode': 2
                 },
             },
@@ -75,38 +75,55 @@ if __name__ == '__main__':
     @run.command()
     @click.option('--path', '-p', 'path')
     def test(path):
-        # import os
-        # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-        # init(local_mode=True, num_gpus=1 )
-        nums_subproc = 1
-        nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',
             'env_config': {
                 'time_start': 202001011600,
                 'time_end': 202108311600,
                 'slippage': 0,
-                'mode': 2
+                'mode': 1
             },
             'framework': 'torch',
-            'num_workers': nums_subproc,
-            'num_gpus': nums_gpu,
-            'num_gpus_per_worker': nums_gpu,
+            'num_workers': 1,
+            'num_gpus': 1,
+            'num_gpus_per_worker': 1,
         }
         agent = Trainer(config=config)
         agent.restore(path)
         print(f"Agent loaded from saved model at {path}")
 
-        # # inference
-        # env = gym.make(env_name)
-        # obs = env.reset()
-        # for i in range(1000):
-        #     action = agent.compute_single_action(obs)
-        #     obs, reward, done, info = env.step(action)
-        #     env.render()
-        #     if done:
-        #         print(f"Cart pole dropped after {i} steps.")
-        #         break
+        env = SimpleCTAEnv(**{
+            # 'time_start': 201701011600,
+            # 'time_end': 201901011600,
+            # 'time_start': 202001011600,
+            # 'time_end': 202108311600,
+            'time_start': 202108311600,
+            'time_end': 202110131600,
+            # 'time_end': 202110271600,
+            'slippage': 0,
+            'mode': 2
+        })
+
+        for i in range(10):  # 模拟训练10次
+            obs = env.reset()
+            done = False
+            n = 0
+            while not done:
+                action = env.action_space.sample()  # 模拟智能体产生动作
+                action = agent.compute_single_action(obs)
+                obs, reward, done, info = env.step(action)
+                n += 1
+                # print(
+                #     # 'action:', action, 
+                #     # 'obs:', obs,
+                #     'reward:', reward, 
+                #     # 'done:', done
+                #     )
+            #     break
+            # break
+            print('第%s次测试完成，执行%s步, 市值%s。' % (i+1, n, env.assets))
+        env.close()
+        del env
 
     run()

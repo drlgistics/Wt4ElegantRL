@@ -1,0 +1,41 @@
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python==3.8.12
+  - pip
+
+    # torch
+  - pytorch
+  - torchvision
+  - torchaudio
+  - cpuonly
+
+    # drl
+  - matplotlib
+  - gym
+  - stable-baselines3
+  - ray-rllib
+  - tensorboard
+  - gputil
+  - opencensus 
+  - prometheus_client 
+  - aiohttp-cors 
+  - aioredis==1.3.1
+
+    # wtpy
+  - pandas
+  - flask
+  - flask-compress
+  - xlsxwriter
+  - pyquery
+  - zstandard
+
+    # 
+  - bottleneck
+  - numexpr
+
+    # vscode
+  - IPython
+  - ipywidgets

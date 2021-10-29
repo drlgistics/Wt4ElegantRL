@@ -16,7 +16,7 @@ class Wt4RLSimpleTrainer(SimpleCTAEnv):
         return self.observation_space.shape[0]
 
     def __init__(self):
-        super().__init__(time_start=202001011600, time_end=202108311600)
+        super().__init__(time_start=201901011600, time_end=202101011600)
 
 
 class Wt4RLSimpleEvaluator(SimpleCTAEnv):
@@ -29,7 +29,7 @@ class Wt4RLSimpleEvaluator(SimpleCTAEnv):
         return self.observation_space.shape[0]
 
     def __init__(self, mode=1):# mode=3可以打开详细调试模式
-        super().__init__(time_start=201901011600, time_end=202001011600, mode=mode) 
+        super().__init__(time_start=201801011600, time_end=201901011600, mode=mode) 
 
 
 register('wt4rl-simplecta-trainer-v0', entry_point=Wt4RLSimpleTrainer)

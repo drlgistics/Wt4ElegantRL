@@ -1,0 +1,29 @@
+{
+  "env": "SimpleCTAEnv",
+  "env_config": {
+    "mode": 1,
+    "slippage": 0,
+    "time_end": 202108311600,
+    "time_start": 202001011600
+  },
+  "evaluation_config": {
+    "env_config": {
+      "mode": 2,
+      "slippage": 0,
+      "time_end": 202001011600,
+      "time_start": 201901011600
+    }
+  },
+  "evaluation_interval": 10,
+  "evaluation_num_episodes": 1,
+  "evaluation_num_workers": 1,
+  "evaluation_parallel_to_training": false,
+  "framework": "torch",
+  "gamma": 0.9763000989628074,
+  "lr": 0.000244140625,
+  "num_gpus": 0.184,
+  "num_gpus_per_worker": 0.184,
+  "num_workers": 3,
+  "rollout_fragment_length": 26217,
+  "train_batch_size": 26217
+}

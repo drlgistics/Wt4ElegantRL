@@ -35,7 +35,7 @@ if __name__ == '__main__':
             'gamma': 0.1 ** (1/12/8),
             'lr': 2 ** -12,
             'evaluation_interval': 10,
-            "evaluation_num_episodes": 5,
+            "evaluation_num_episodes": 1,
             'evaluation_parallel_to_training': False,
             'evaluation_num_workers': 1,
 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
             },
             config=config,
             keep_checkpoints_num=20,
-            checkpoint_freq=1,
+            checkpoint_freq=10,
             checkpoint_score_attr='episode_reward_mean',
             checkpoint_at_end=True,
             local_dir="./outputs_bt/rllib",
@@ -100,9 +100,10 @@ if __name__ == '__main__':
             # 'time_end': 202108311600,
             'time_start': 202108311600,
             'time_end': 202110131600,
-            # 'time_end': 202110271600,
+            # 'time_end': 202110281600,
             'slippage': 0,
-            'mode': 2
+            'mode': 2,
+            'id': 2,
         })
 
         for i in range(10):  # 模拟训练10次

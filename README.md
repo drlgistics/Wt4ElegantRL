@@ -35,7 +35,5 @@ python ./compare_rllib.py train
 ```
 
 ## ELEGANTRL
-train
-```
+~~train~~
 ~~python ./compare_elegantrl.py train~~
-```

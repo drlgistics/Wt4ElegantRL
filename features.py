@@ -82,12 +82,12 @@ class Feature():
                 for c in v.values())*self._roll_+4
         )
         self.__flatten__ = (self.__shape__[0]*self.__shape__[1],)
-        return dict(low=-np.inf, high=np.inf, shape=self.__flatten__, dtype=float)
+        return dict(low=-np.inf, high=np.inf, shape=self.__flatten__, dtype=np.float64)
 
     def calculate(self, context: CtaContext):
         self.__time__ = context.stra_get_date()*10000+context.stra_get_time()
         if self.__time__ not in self.__obs__:
-            obs = np.full(shape=self.__shape__, fill_value=np.nan, dtype=float)
+            obs = np.full(shape=self.__shape__, fill_value=np.nan, dtype=np.float64)
             for i, code in enumerate(self.securities):  # 处理每一个标的
                 n = 0
                 for period, v in self.__cb__.items():  # 处理每一个周期
@@ -131,7 +131,7 @@ class Feature():
 
     @property
     def obs(self):
-        return self.__obs__.get(self.__time__).reshape(self.__flatten__)
+        return self.__obs__.get(self.__time__).reshape(self.__flatten__)#.astype(np.float64)
 
     def volume(self, period: str, reprocess: REPROCESS = ZFILTER):
         def volume(context: CtaContext, code: str, period: str, args: dict):

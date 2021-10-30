@@ -6,6 +6,7 @@ from assessments import Assessment
 from wtpy.apps import WtBtAnalyst
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
+from multiprocessing import Pipe,  Process
 
 # 一个进程只能有一个env
 
@@ -26,6 +27,8 @@ class WtEnv(Env):
                  id: int = 1,
                  mode=1,
                  ):
+
+        self.reward_range
 
         if mode == 3:  # 调试模式
             self._log_: str = './config/03research/log_debugger.json'
@@ -163,3 +166,77 @@ class WtEnv(Env):
     def __del__(self):
         if hasattr(self, '_engine_'):
             self._engine_.release_backtest()
+
+
+def __sub_process_worker__(pipe: Pipe, _cmd_, _attr_, cli, kwargs):
+    env = cli(**kwargs)
+    while True:
+        cmd, kwargs = pipe.recv()
+        if cmd in _cmd_:
+            if cmd=='stop':
+                pipe.send(True)
+                pipe.close()
+                break
+            call = getattr(env, cmd)
+            if kwargs:
+                # print(cmd, kwargs)
+                pipe.send(call(**kwargs))
+            else:
+                pipe.send(call())
+        elif cmd in _attr_:
+            pipe.send(getattr(env, cmd))
+        else:
+            pipe.send('unknow %s' % cmd)
+
+
+class WtSubProcessEnv():
+    _cmd_ = ('reset', 'step', 'close', 'stop')
+    _attr_ = ('reward_range', 'metadata', 'observation_space', 'action_space', 'assets')
+
+    def __init__(self, cli, **kwargs):
+        self._pipe_, pipe = Pipe()
+        self._process_ = Process(
+            target=__sub_process_worker__,
+            args=(pipe, self._cmd_, self._attr_, cli, kwargs),
+            daemon=True
+        )
+        self._process_.start()
+
+    def __do__(self, cmd, **kwargs):
+        self._pipe_.send((cmd, kwargs))
+        return self._pipe_.recv()
+
+    @property
+    def metadata(self):
+        return self.__do__('metadata')
+
+    @property
+    def reward_range(self):
+        return self.__do__('reward_range')
+
+    @property
+    def observation_space(self):
+        return self.__do__('observation_space')
+
+    @property
+    def action_space(self):
+        return self.__do__('action_space')
+
+    @property
+    def assets(self):
+        return self.__do__('assets')
+
+    def reset(self):
+        return self.__do__('reset')
+
+    def step(self, action):
+        # print(type(action))
+        return self.__do__('step', action=action)
+
+    def close(self):
+        return self.__do__('close')
+
+    def __del__(self):
+        self.__do__('stop')
+        self._process_.join()
+        self._process_.close()

@@ -2,14 +2,14 @@ from features import Indicator
 from assessments import SimpleAssessment
 from stoppers import SimpleStopper
 from strategies import SimpleCTA
-from envs import WtEnv
+from envs import WtEnv, WtSubProcessEnv
 
 
 class SimpleCTAEnv(WtEnv):
     def __init__(self,
                  time_start: int = 202101031600,
                  time_end: int = 202107301600,
-                 slippage:int = 0,
+                 slippage: int = 0,
                  id: int = 1,
                  mode: int = 1
                  ):
@@ -74,8 +74,24 @@ class SimpleCTAEnv(WtEnv):
             self._name_(self._iter_), self._assessment_.curr_assets-self._assessment_.init_assets, self._assessment_.reward, sum(self._assessment_.rewards)))
 
 
+class SimpleCTASubProcessEnv(WtSubProcessEnv):
+    def __init__(self,
+                 time_start: int = 202101031600,
+                 time_end: int = 202107301600,
+                 slippage: int = 0,
+                 id: int = 1,
+                 mode: int = 1):
+        super().__init__(
+            cli=SimpleCTAEnv,
+            time_start=time_start,
+            time_end=time_end,
+            slippage=slippage,
+            id=id,
+            mode=mode)
+
 if __name__ == '__main__':
-    env: WtEnv = SimpleCTAEnv(time_start=201901011600, time_end=202001011600, id=2, mode=2)
+    env: WtEnv = SimpleCTASubProcessEnv(time_start=201901011600,
+                              time_end=202001011600, id=2, mode=2)
 
     print(env.action_space.contains)
 
@@ -89,12 +105,12 @@ if __name__ == '__main__':
             obs, reward, done, info = env.step(action)
             n += 1
             print(
-                # 'action:', action, 
+                # 'action:', action,
                 # 'obs:', obs,
-                'reward:', reward, 
+                'reward:', reward,
                 # 'done:', done
-                )
-            break
-        break
+            )
+        #     break
+        # break
         print('第%s次训练完成，执行%s步, 市值%s。' % (i+1, n, env.assets))
     env.close()

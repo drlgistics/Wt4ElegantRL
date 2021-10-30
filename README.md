@@ -33,17 +33,17 @@ python ./compare_rllib.py test -p ./trained/rllib/TD3_2021-10-29_11-21-37/TD3_Si
 train
 ```
 python ./compare_rllib.py train
+```
 
 ## SB3
 demo
 ```
-python ./compare_rllib.py test -p ./trained/rllib/TD3_2021-10-29_11-21-37/TD3_SimpleCTAEnv_536e7_00000_0_2021-10-29_11-21-37/checkpoint_000023/checkpoint-23
+python ./compare_sb3.py test -p ./trained/sb3/best_model
 ```
 
 train
 ```
-python ./compare_rllib.py train
-```
+python ./compare_sb3.py train
 ```
 
 ## ELEGANTRL

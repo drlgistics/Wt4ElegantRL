@@ -14,19 +14,6 @@ def run():
 
 @run.command()
 def debug():
-    # learner = SimpleCTASubProcessEnv(**{
-    #     'time_start': 202001011600,
-    #     'time_end': 202108311600,
-    #     'slippage': 0,
-    #     'mode': 1
-    # })
-
-    # evaluator = SimpleCTASubProcessEnv(**{
-    #     'time_start': 201901011600,
-    #     'time_end': 202001011600,
-    #     'slippage': 0,
-    #     'mode': 2
-    # })
     learner = SimpleCTASubProcessEnv(**{
         # 'time_start': 202108301600,
         # 'time_end': 202108311600,
@@ -63,13 +50,6 @@ def debug():
 
 @run.command()
 def train():
-    # learner = SubprocVecEnv([SimpleCTAEnv(**{
-    #     'time_start': 202001011600,
-    #     'time_end': 202108311600,
-    #     'slippage': 0,
-    #     'mode': 1,
-    #     'id': i,
-    # }) for i in range(3)])
     learner = SimpleCTASubProcessEnv(**{
         # 'time_start': 202108301600,
         # 'time_end': 202108311600,
@@ -99,22 +79,6 @@ def train():
         log_path='./outputs_bt/sb3/',
         best_model_save_path='./outputs_bt/sb3/',
         verbose=1)
-
-    # n = 69
-    # callback_on_best:StopTrainingOnRewardThreshold = StopTrainingOnRewardThreshold(
-    #     reward_threshold=250,
-    #     verbose=1)
-    # eval_callback:EvalCallback = EvalCallback(
-    #     env,
-    #     best_model_save_path='./outputs_bt/saved/',
-    #     log_path='./outputs_bt/saved/',
-    #     callback_on_new_best=callback_on_best,
-    #     verbose=1)
-    # checkpoint_callback: CheckpointCallback = CheckpointCallback(
-    #     save_freq=10,
-    #     save_path='./outputs_bt/sb3/',
-    #     name_prefix='SimpleTrainer'
-    # )
 
     model: Trainer = Trainer('MlpPolicy', learner,
                              #  learning_rate=0.1 ** (1/12/8),

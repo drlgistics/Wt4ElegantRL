@@ -189,7 +189,7 @@ def __sub_process_worker__(pipe: Pipe, _cmd_, _attr_, cli, kwargs):
             pipe.send('unknow %s' % cmd)
 
 
-class WtSubProcessEnv():
+class WtSubProcessEnv(Env):
     _cmd_ = ('reset', 'step', 'close', 'stop')
     _attr_ = ('reward_range', 'metadata', 'observation_space', 'action_space', 'assets')
 

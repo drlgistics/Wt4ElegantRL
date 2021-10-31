@@ -6,7 +6,6 @@ clone
 ```
 git clone https://github.com/drlgistics/Wt4ElegantRL.git
 cd Wt4ElegantRL
-conda create -n wt4elegantrl
 ```
 
 with cuda
@@ -14,7 +13,7 @@ with cuda
 conda env create -n wt4elegantrl --file ./requirements/full_with_cuda.yaml
 ```
 
-without cuda
+or without cuda
 ```
 conda env create -n wt4elegantrl --file ./requirements/full_without_cuda.yaml
 ```

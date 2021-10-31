@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     @run.command()
     def train():
-        nums_subproc = 5
+        nums_subproc = 3
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',

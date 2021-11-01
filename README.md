@@ -37,7 +37,7 @@ python ./compare_rllib.py train
 ## SB3
 demo
 ```
-python ./compare_sb3.py test -p ./trained/sb3/best_model
+python ./compare_sb3.py test -p ./trained/sb3/td3/best_model
 ```
 
 train
@@ -46,5 +46,7 @@ python ./compare_sb3.py train
 ```
 
 ## ELEGANTRL
-~~train~~
-~~python ./compare_elegantrl.py train~~
+train
+```
+python ./compare_elegantrl.py train
+```

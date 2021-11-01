@@ -24,13 +24,13 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
     def __init__(self):
         super().__init__(**{
-        # 'time_start': 202108301600,
-        # 'time_end': 202108311600,
-        'time_start': 202001011600,
-        'time_end': 202108311600,
-        'slippage': 0,
-        'mode': 1
-    })
+            # 'time_start': 202108301600,
+            # 'time_end': 202108311600,
+            'time_start': 202001011600,
+            'time_end': 202108311600,
+            'slippage': 0,
+            'mode': 1
+        })
 
 
 class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
@@ -46,15 +46,16 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
     def action_dim(self):
         return self.action_space.shape[0]
 
-    def __init__(self):# mode=3可以打开详细调试模式
+    def __init__(self):  # mode=3可以打开详细调试模式
         super().__init__(**{
-        # 'time_start': 202108291600,
-        # 'time_end': 202108301600,
-        'time_start': 201901011600,
-        'time_end': 202001011600,
-        'slippage': 0,
-        'mode': 2
-    }) 
+            # 'time_start': 202108291600,
+            # 'time_end': 202108301600,
+            'time_start': 201901011600,
+            'time_end': 202001011600,
+            'slippage': 0,
+            'mode': 2,
+            'id': 7,
+        })
 
 
 register('wt4rl-simplecta-trainer-v0', entry_point=Wt4RLSimpleTrainer)
@@ -91,39 +92,37 @@ if __name__ == '__main__':
             # env='wt4rl-simplecta-evaluator-v0',
             agent=Agent()
         )
-        
-        #args必须设置的参数
+
+        # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 26217
         args.state_dim = 232
         args.action_dim = 4
         args.if_discrete = False
-        args.if_per_or_gae = True
-        args.target_return = 250  # inf
+        # args.if_per_or_gae = True
+        args.target_return = 500  # inf
         # args.agent.if_use_cri_target = True
         # args.if_overwrite = False
-        args.eval_times1 = 1
-        args.eval_times2 = 3
-
+        args.eval_times1 = 1 # 待查明：为啥td3的评估器结果完全一致
+        args.eval_times2 = 2 # 待查明：为啥td3的评估器结果完全一致
 
         args.break_step = inf
         args.if_allow_break = True
 
-
         #
-        args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
+        # args.gamma = 0.98  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -14
-        # args.gamma = 0.98 # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
         args.learning_rate = 1e-4
         args.if_per_or_gae = True
-        args.worker_num = 1 # 内存小的注意别爆内存
+        args.worker_num = 1  # 内存小的注意别爆内存
 
         args.env_num = 1
-        args.target_step = args.max_step #* 2
+        args.target_step = args.max_step  # * 2
         args.learner_gpus = (0,)
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0
-        
+
         args.net_dim = 2 ** 8
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
@@ -133,7 +132,7 @@ if __name__ == '__main__':
         # args.net_dim = 2 ** 8
         #args.max_memo = 2 ** 22
         # args.break_step = args.max_step*1000
-        #args.batch_size = 2 ** 11  # args.net_dim * 2
+        # args.batch_size = 2 ** 11  # args.net_dim * 2
         # args.repeat_times = 1.5
 
         # args.eval_gap = 2 ** 9
@@ -150,11 +149,10 @@ if __name__ == '__main__':
     def test():
         env = Wt4RLSimpleEvaluator(mode=3)
         agent = Agent()
-        
+
         agent.init(net_dim=2 ** 8, state_dim=380, action_dim=10,
-             learning_rate=0.1 ** (1/12/8), if_per_or_gae=True, env_num=1, gpu_id=0)
+                   learning_rate=0.1 ** (1/12/8), if_per_or_gae=True, env_num=1, gpu_id=0)
         agent.save_or_load_agent(cwd='./ppt-5/', if_save=False)
-        
 
         # for i in range(10):  # 模拟训练10次
         #     obs = env.reset()

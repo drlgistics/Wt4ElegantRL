@@ -35,6 +35,7 @@ dependencies:
     # 
   - bottleneck
   - numexpr
+  - tqdm
 
     # vscode
   - IPython

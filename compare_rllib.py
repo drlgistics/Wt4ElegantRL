@@ -1,7 +1,12 @@
 from ray import tune, init
-# from ray.rllib.agents.ppo import PPOTrainer as Trainer
-# from ray.rllib.agents.ppo import APPOTrainer as Trainer
 # from ray.rllib.agents.sac import SACTrainer as Trainer
+# from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+
+# from ray.rllib.agents.a3c import A3CTrainer as Trainer
+# from ray.rllib.agents.ppo import PPOTrainer as Trainer
+# from ray.rllib.agents.marwil import MARWILTrainer as Trainer
+# from ray.rllib.agents.impala import ImpalaTrainer as Trainer
+# from ray.rllib.agents.pg import PGTrainer as Trainer
 from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 from envs_simple_cta import SimpleCTAEnv
 import click
@@ -33,7 +38,7 @@ if __name__ == '__main__':
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
             'gamma': 0.1 ** (1/12/8),
-            'lr': 2 ** -12,
+            'lr': 1e-4,
             'evaluation_interval': 10,
             "evaluation_num_episodes": 1,
             'evaluation_parallel_to_training': False,
@@ -44,7 +49,8 @@ if __name__ == '__main__':
                     'time_start': 201901011600,
                     'time_end': 202001011600,
                     'slippage': 0,
-                    'mode': 2
+                    'mode': 2,
+                    'id': 8,
                 },
             },
             'train_batch_size': 26217,
@@ -55,7 +61,7 @@ if __name__ == '__main__':
             Trainer,
             stop={
                 "timesteps_total": 26217*10000,
-                'episode_reward_mean': 1200.,
+                'episode_reward_mean': 2400.,
                 # 'episode_reward_min': 50,
             },
             config=config,
@@ -116,9 +122,9 @@ if __name__ == '__main__':
                 obs, reward, done, info = env.step(action)
                 n += 1
                 # print(
-                #     # 'action:', action, 
+                #     # 'action:', action,
                 #     # 'obs:', obs,
-                #     'reward:', reward, 
+                #     'reward:', reward,
                 #     # 'done:', done
                 #     )
             #     break

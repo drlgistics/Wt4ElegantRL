@@ -1,6 +1,9 @@
 # from stable_baselines3 import SAC as Trainer
 from stable_baselines3 import TD3 as Trainer
+
 # from stable_baselines3 import PPO as Trainer
+# from stable_baselines3 import A2C as Trainer
+
 from envs_simple_cta import SimpleCTASubProcessEnv, SimpleCTAEnv
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 from stable_baselines3.common.monitor import Monitor
@@ -29,7 +32,8 @@ def debug():
         'time_start': 201901011600,
         'time_end': 202001011600,
         'slippage': 0,
-        'mode': 2
+        'mode': 2,
+        'id': 9,
     })
 
     env = learner
@@ -81,10 +85,9 @@ def train():
         verbose=1)
 
     model: Trainer = Trainer('MlpPolicy', learner,
-                             #  learning_rate=0.1 ** (1/12/8),
-                             #  gamma=2 ** -12,
+                            #  learning_rate=2 ** -12,
                              learning_rate=1e-4,
-                             gamma=0.98,
+                             gamma=0.1 ** (1/12/8),
                              # learning_starts=100,
                              # batch_size=128,
                              # ent_coef='auto_0.1',

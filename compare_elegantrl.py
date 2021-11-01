@@ -111,10 +111,10 @@ if __name__ == '__main__':
 
 
         #
-        # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -14
-        args.gamma = 0.98 # 8小时会跨过一次隔夜风险，既96个bar
-        # args.learning_rate = 1e-4
+        # args.gamma = 0.98 # 8小时会跨过一次隔夜风险，既96个bar
+        args.learning_rate = 1e-4
         args.if_per_or_gae = True
         args.worker_num = 1 # 内存小的注意别爆内存
 

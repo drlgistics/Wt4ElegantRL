@@ -1,10 +1,11 @@
 from features import Feature
 from stoppers import Stopper
 from abc import abstractmethod
+from gym.spaces import Space, Box, MultiDiscrete
 from assessments import Assessment
 from wtpy.WtBtEngine import EngineType
 from wtpy.StrategyDefs import BaseCtaStrategy, CtaContext, BaseHftStrategy, HftContext
-from numpy import around, float32, float64
+from numpy import around, float32
 
 
 class StateTransfer():
@@ -45,12 +46,16 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         return EngineType.ET_CTA
 
     @staticmethod
-    def Action(size: int) -> dict:
-        return dict(low=-1., high=1., shape=(size, ), dtype=float32)
+    def Action(size: int) -> Space:
+        return Box(low=-1., high=1., shape=(size, ), dtype=float32)
+        # return MultiDiscrete([11]*size)
+        # return dict(low=-1., high=1., shape=(size, ), dtype=float32)
 
     def setAction(self, action):
         # print('setAction 1')
+        # action -= 5
         self._action_ = dict(zip(self._feature_.securities, around(action*5, 0)))
+        # print(self._action_)
         # try:
         #     self._action_ = dict(zip(self._feature_.securities, around(action, 0)))
         #     print(self.name(), action, type(action))

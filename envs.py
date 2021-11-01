@@ -1,5 +1,5 @@
 from gym import Env
-from gym.spaces import Box
+from gym.spaces import Box, Space
 from features import Feature
 from stoppers import Stopper
 from assessments import Assessment
@@ -54,8 +54,7 @@ class WtEnv(Env):
 
         self.__feature__: Feature = feature
         self.observation_space: Box = Box(**self.__feature__.observation)
-        self.action_space: Box = Box(
-            **self.__strategy__.Action(len(self.__feature__.securities)))
+        self.action_space: Space = self.__strategy__.Action(len(self.__feature__.securities))
 
         self._assessment_: Assessment = assessment
 

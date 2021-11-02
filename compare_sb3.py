@@ -86,20 +86,22 @@ def train():
         verbose=1)
 
     model: Trainer = Trainer('MlpPolicy', learner,
-                             learning_rate=2 ** -14, #15: 167, 14:
-                            #  learning_rate=1e-4,
-                             gamma=0.1 ** (1/12/8),
+                             #  gamma=0.1 ** (1/12/8),
+                             gamma=0.98,
+                             learning_rate=2 ** -14,  # 15: 167, 14:
+                             #  learning_rate=1e-4,
                              # learning_starts=100,
                              # batch_size=128,
                              # ent_coef='auto_0.1',
                              # policy_kwargs=dict(net_arch=[128, 128, 128]),
+                             tensorboard_log='./outputs_bt/sb3/',
                              verbose=1,
                              #  device='cpu',
                              )
     model.learn(
         total_timesteps=n*10000,
         callback=eval_callback,
-        log_interval=1
+        log_interval=3
     )
     model.save('SimpleTrainer')
 

@@ -175,6 +175,7 @@ def train_and_evaluate(args, learner_id=0):
     reward_scale = args.reward_scale
     if_allow_break = args.if_allow_break
     soft_update_tau = args.soft_update_tau
+    if_overwrite = args.if_overwrite
     del args
 
     '''init ReplayBuffer after training start'''
@@ -197,6 +198,11 @@ def train_and_evaluate(args, learner_id=0):
         with torch.no_grad():
             temp = evaluator.evaluate_and_save(agent.act, steps, r_exp, logging_tuple)
             if_reach_goal, if_save = temp
+
+            if if_save and if_overwrite:
+                agent.save_or_load_agent('%s/best_%08.2f/'%(cwd, evaluator.r_max), if_save=True)
+                buffer.save_or_load_history('%s/best_%08.2f/'%(cwd, evaluator.r_max), if_save=True) if agent.if_off_policy else None
+                
             if_train = not ((if_allow_break and if_reach_goal)
                             or evaluator.total_step > break_step
                             or os.path.exists(f'{cwd}/stop'))

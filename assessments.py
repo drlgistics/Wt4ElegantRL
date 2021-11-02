@@ -48,6 +48,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         self.__reward__: list = [0]
         self.__done__: bool = False
         self.__successive__: int = 1
+        self.__gamma__ = 1-self.gamma
 
     def calculate(self, context: CtaContext):
         if self.__done__:
@@ -64,6 +65,23 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
 
         self.__assets__.append(self._init_assets_+dynbalance)  # 账户实时的动态权益
 
+        reward = (self.__assets__[-1]-self.__assets__[-2]) \
+            / self._init_assets_ * 0.382
+        if (reward < 0 and self.__reward__[-1] < 0) or \
+                (reward > 0 and self.__reward__[-1] > 0):
+            reward *= self.__successive__
+            self.__successive__ += 1
+        else:
+            self.__successive__ = 1
+        reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+            / self._init_assets_ * 0.382
+        reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+            / self._init_assets_ * 0.382
+        reward -= 0.00001
+
+        '''
+        2021/11/01
+
         if self.__assets__[-1] > self.__assets__[-2]:
             self.__successive__ += 1
         else:
@@ -76,6 +94,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         reward += max_assets * (5 if max_assets > 0 else 1)
         min_assets = (self.__assets__[-1]/min(self.__assets__[:-1])-1) * 0.382
         reward += min_assets * (5 if min_assets < 0 else 1)
+        '''
 
         self.__reward__.append(reward)  # 以动态权益差分设计reward
         self.__done__ = False  # 此处可以根据控制任务结束状态
@@ -106,7 +125,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
     @property
     def reward(self) -> float:
         # return self.__reward__[-1]
-        return float(np.round(self.__reward__[-1], 5))
+        return float(self.__reward__[-1])
 
     @property
     def rewards(self) -> float:

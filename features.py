@@ -186,7 +186,7 @@ class Indicator(Feature):
 
     def macd(self, period: str, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9, reprocess: REPROCESS = ZFILTER):
         def macd(context: CtaContext, code: str, period: str, args: dict):
-            return ta.MACD(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes, **args)
+            return ta.MACD(np.log(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes), **args)
 
         self._subscribe_(period=period, count=slowperiod +
                          signalperiod+reprocess.n())

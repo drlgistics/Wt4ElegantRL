@@ -113,7 +113,7 @@ if __name__ == '__main__':
         # args.gamma = 0.98  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -14
         args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        args.learning_rate = 2 ** -13  # N15:294  Y14:292 
+        args.learning_rate = 2 ** -14  # N15:294  Y14:292 
         args.if_per_or_gae = True
         args.worker_num = 1  # 内存小的注意别爆内存
 
@@ -126,6 +126,7 @@ if __name__ == '__main__':
         args.net_dim = 2 ** 8
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
+        args.cwd = './outputs_bt/elegantrl/%s_%s'%(args.agent.__class__.__name__, args.learning_rate)
         # args.repeat_times = 1.5
 
         #args.net_dim = 2**9

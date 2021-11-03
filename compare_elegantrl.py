@@ -54,7 +54,7 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
             'time_end': 201801011600,
             'slippage': 0,
             'mode': 2,
-            'id': 71,
+            'id': 72,
         })
 
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
         args.if_allow_break = True
 
         #
-        args.gamma = 0.995  # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.98  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -14
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
         args.learning_rate = 2 ** -14  # N15:294  Y14:292 
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         args.net_dim = 2 ** 8
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
-        args.cwd = './outputs_bt/elegantrl/%s_%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate, 71)
+        args.cwd = './outputs_bt/elegantrl/%s_%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate, 72)
         # args.repeat_times = 1.5
 
         #args.net_dim = 2**9

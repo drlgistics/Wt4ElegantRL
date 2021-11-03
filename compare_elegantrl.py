@@ -96,17 +96,15 @@ if __name__ == '__main__':
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 41399
-        args.state_dim = 560
+        args.state_dim = 290
         args.action_dim = 5
         args.if_discrete = False
-        args.if_per_or_gae = True
         args.target_return = inf  # inf
-        args.agent.if_use_cri_target = True
-        # args.agent.if_use_dueling = True
         # args.if_overwrite = False
         args.eval_times1 = 1 # 待查明：为啥td3的评估器结果完全一致
         args.eval_times2 = 2 # 待查明：为啥td3的评估器结果完全一致
 
+        args.worker_num = 1  # 内存小的注意别爆内存
         args.break_step = inf
         args.if_allow_break = True
 
@@ -116,7 +114,8 @@ if __name__ == '__main__':
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
         args.learning_rate = 2 ** -14  # N15:294  Y14:292 
         args.if_per_or_gae = True
-        args.worker_num = 1  # 内存小的注意别爆内存
+        args.agent.if_use_cri_target = True
+        # args.agent.if_use_dueling = True
 
         args.env_num = 1
         args.target_step = args.max_step  # * 2

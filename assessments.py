@@ -66,17 +66,17 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         self.__assets__.append(self._init_assets_+dynbalance)  # 账户实时的动态权益
 
         reward = (self.__assets__[-1]-self.__assets__[-2]) \
-            / self._init_assets_ * 0.382
-        if (reward < 0 and self.__reward__[-1] < 0) or \
-                (reward > 0 and self.__reward__[-1] > 0):
-            reward *= self.__successive__
-            self.__successive__ += 1
-        else:
-            self.__successive__ = 1
-        reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
-            / self._init_assets_ * 0.382
-        reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
-            / self._init_assets_ * 0.382
+            / self._init_assets_
+        # if (reward < 0 and self.__reward__[-1] < 0) or \
+        #         (reward > 0 and self.__reward__[-1] > 0):
+        #     reward *= self.__successive__
+        #     self.__successive__ += 1
+        # else:
+        #     self.__successive__ = 1
+        # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+        #     / self._init_assets_ * 0.382
+        # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+        #     / self._init_assets_ * 0.382
         reward -= 0.00001
 
         '''
@@ -111,14 +111,14 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         #     gamma *= self.gamma
         #     gamma += reward
 
-        gamma = 0
-        for reward in self.__reward__:
-            gamma *= self.gamma
-            gamma += reward
+        # gamma = 0
+        # for reward in self.__reward__:
+        #     gamma *= self.gamma
+        #     gamma += reward
 
         # gamma = np.round(np.nanprod(np.array(self.__reward__)+1, axis=0)-1, 5)
         # gamma = self.__assets__[-1]/max(self.__assets__)-1
-        # gamma = self.__assets__[-1]/self.init_assets-1
+        gamma = self.__assets__[-1]/self.init_assets-1
         self.__reward__.append(gamma)  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
         self.__done__ = True
 

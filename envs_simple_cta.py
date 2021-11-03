@@ -26,7 +26,9 @@ class SimpleCTAEnv(WtEnv):
         # 按需添加其他标的
         feature.addSecurity(code='DCE.cs.HOT')
         feature.addSecurity(code='DCE.m.HOT')
-        feature.addSecurity(code='DCE.y.HOT')
+        feature.addSecurity(code='CZCE.RM.HOT')
+        # feature.addSecurity(code='CZCE.JR.HOT')
+        feature.addSecurity(code='CZCE.TA.HOT')
         # feature.addSecurity(code='DCE.jd.HOT')
         # feature.addSecurity(code='SHFE.rb.HOT')
         # feature.addSecurity(code='SHFE.hc.HOT')

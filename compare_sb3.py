@@ -87,7 +87,7 @@ def train():
 
     model: Trainer = Trainer('MlpPolicy', learner,
                              #  gamma=0.1 ** (1/12/8),
-                             gamma=0.98,
+                             gamma=0.99,
                              learning_rate=2 ** -14,  # 15: 167, 14:
                              #  learning_rate=1e-4,
                              # learning_starts=100,

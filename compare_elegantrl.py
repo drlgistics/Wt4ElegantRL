@@ -11,7 +11,7 @@ from numpy import inf
 
 class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 26217
+    max_step = 41399
     if_discrete = False
 
     @property
@@ -26,8 +26,8 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108301600,
             # 'time_end': 202108311600,
-            'time_start': 202001011600,
-            'time_end': 202108311600,
+            'time_start': 201801011600,
+            'time_end': 202101011600,
             'slippage': 0,
             'mode': 1
         })
@@ -35,7 +35,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
 class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 16651
+    max_step = 16560
     if_discrete = False
 
     @property
@@ -50,11 +50,11 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108291600,
             # 'time_end': 202108301600,
-            'time_start': 201901011600,
-            'time_end': 202001011600,
+            'time_start': 201606301600,
+            'time_end': 201801011600,
             'slippage': 0,
             'mode': 2,
-            'id': 8,
+            'id': 71,
         })
 
 
@@ -95,13 +95,14 @@ if __name__ == '__main__':
 
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        args.max_step = 26217
-        args.state_dim = 448
-        args.action_dim = 4
+        args.max_step = 41399
+        args.state_dim = 560
+        args.action_dim = 5
         args.if_discrete = False
-        # args.if_per_or_gae = True
-        args.target_return = 480  # inf
-        # args.agent.if_use_cri_target = True
+        args.if_per_or_gae = True
+        args.target_return = inf  # inf
+        args.agent.if_use_cri_target = True
+        # args.agent.if_use_dueling = True
         # args.if_overwrite = False
         args.eval_times1 = 1 # 待查明：为啥td3的评估器结果完全一致
         args.eval_times2 = 2 # 待查明：为啥td3的评估器结果完全一致
@@ -110,7 +111,7 @@ if __name__ == '__main__':
         args.if_allow_break = True
 
         #
-        args.gamma = 0.98  # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.995  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -14
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
         args.learning_rate = 2 ** -14  # N15:294  Y14:292 
@@ -126,7 +127,7 @@ if __name__ == '__main__':
         args.net_dim = 2 ** 8
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
-        args.cwd = './outputs_bt/elegantrl/%s_%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate, 8)
+        args.cwd = './outputs_bt/elegantrl/%s_%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate, 71)
         # args.repeat_times = 1.5
 
         #args.net_dim = 2**9

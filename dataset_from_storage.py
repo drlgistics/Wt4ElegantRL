@@ -62,23 +62,26 @@ securities: tuple = (
     'CFFEX.IH.HOT',
     'CFFEX.T.HOT',
     'CFFEX.TF.HOT',
+    'CZCE.RM.HOT',#
+    'CZCE.JR.HOT',#
     'CZCE.AP.HOT',
     'CZCE.CF.HOT',
     'CZCE.MA.HOT',
     'CZCE.SF.HOT',
     'CZCE.SR.HOT',
-    'CZCE.TA.HOT',
+    'CZCE.TA.HOT',#
     'CZCE.ZC.HOT',
     'DCE.a.HOT',
-    'DCE.c.HOT',
-    'DCE.cs.HOT',
+    'DCE.c.HOT',#
+    'DCE.cs.HOT',#
     'DCE.i.HOT',
     'DCE.jd.HOT',
     'DCE.l.HOT',
-    'DCE.m.HOT',
+    'DCE.m.HOT',#
     'DCE.p.HOT',
     'DCE.pp.HOT',
     'DCE.y.HOT',
+    'DCE.rr.HOT',#
     'INE.sc.HOT',
     'INE.lu.HOT',
     'SHFE.ag.HOT',

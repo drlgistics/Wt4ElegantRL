@@ -1,13 +1,13 @@
 from ray import tune, init
 # from ray.rllib.agents.sac import SACTrainer as Trainer
-# from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 
 # from ray.rllib.agents.a3c import A3CTrainer as Trainer
 # from ray.rllib.agents.ppo import PPOTrainer as Trainer
 # from ray.rllib.agents.marwil import MARWILTrainer as Trainer
 # from ray.rllib.agents.impala import ImpalaTrainer as Trainer
 # from ray.rllib.agents.pg import PGTrainer as Trainer
-from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+from ray.tune.schedulers.pb2 import PB2
 from envs_simple_cta import SimpleCTAEnv
 import click
 
@@ -22,6 +22,18 @@ if __name__ == '__main__':
 
     @run.command()
     def train():
+        pb2 = PB2(
+            time_attr="training_iteration",
+            metric="episode_reward_mean",
+            mode="max",
+            perturbation_interval=50000,
+            quantile_fraction=0.25,  # copy bottom % with top %
+            # Specifies the hyperparam search space
+            hyperparam_bounds={
+                "lr": [1e-3, 1e-5],
+                "gamma": [0.96, 0.99],
+            })
+
         nums_subproc = 6
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
@@ -37,9 +49,9 @@ if __name__ == '__main__':
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            'gamma': 0.99,
-            'lr': 2 ** -15,
-            'evaluation_interval': 5,
+            # 'gamma': 0.99,
+            # 'lr': 2 ** -15,
+            'evaluation_interval': 10,
             "evaluation_num_episodes": 1,
             'evaluation_parallel_to_training': False,
             'evaluation_num_workers': 1,
@@ -64,6 +76,8 @@ if __name__ == '__main__':
                 'episode_reward_mean': 5000.,
                 # 'episode_reward_min': 50,
             },
+            # scheduler=pb2,
+            # num_samples=nums_subproc,
             config=config,
             keep_checkpoints_num=20,
             checkpoint_freq=10,

@@ -1,6 +1,8 @@
 from ray import tune, init
 # from ray.rllib.agents.sac import SACTrainer as Trainer
 from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+# from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
+
 
 # from ray.rllib.agents.a3c import A3CTrainer as Trainer
 # from ray.rllib.agents.ppo import PPOTrainer as Trainer
@@ -34,7 +36,7 @@ if __name__ == '__main__':
                 "gamma": [0.96, 0.99],
             })
 
-        nums_subproc = 6
+        nums_subproc = 3
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',
@@ -44,7 +46,7 @@ if __name__ == '__main__':
                 'slippage': 0,
                 'mode': 1
             },
-            'rollout_fragment_length': 10156,
+            # 'rollout_fragment_length': 10156,
             'framework': 'torch',
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
@@ -65,7 +67,8 @@ if __name__ == '__main__':
                     'id': 8,
                 },
             },
-            'train_batch_size': 10156,
+            # 'train_batch_size': 10156,
+            "batch_mode": "complete_episodes",
         }
 
         # training and saving

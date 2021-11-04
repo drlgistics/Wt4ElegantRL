@@ -21,14 +21,14 @@ class SimpleCTAEnv(WtEnv):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='DCE.c.HOT', period=Indicator.M5, roll=1)  # 每一个特征工程必须指定一个主要标的
+            code='DCE.c.HOT', period=Indicator.M15, roll=1)  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
         feature.addSecurity(code='DCE.cs.HOT')
         feature.addSecurity(code='DCE.m.HOT')
-        feature.addSecurity(code='CZCE.RM.HOT')
+        # feature.addSecurity(code='CZCE.RM.HOT')
         # feature.addSecurity(code='CZCE.JR.HOT')
-        feature.addSecurity(code='CZCE.TA.HOT')
+        # feature.addSecurity(code='CZCE.TA.HOT')
         # feature.addSecurity(code='DCE.jd.HOT')
         # feature.addSecurity(code='SHFE.rb.HOT')
         # feature.addSecurity(code='SHFE.hc.HOT')
@@ -57,7 +57,7 @@ class SimpleCTAEnv(WtEnv):
 
         # 评估组件
         # 评估组件的主要使用者是强化学习研究人员定义reward
-        assessment: SimpleAssessment = SimpleAssessment(init_assets=500000)
+        assessment: SimpleAssessment = SimpleAssessment(init_assets=300000)
         super().__init__(
             # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和评估，主要使用者是策略研究人员
             strategy=SimpleCTA,

@@ -22,22 +22,22 @@ if __name__ == '__main__':
 
     @run.command()
     def train():
-        nums_subproc = 3
+        nums_subproc = 6
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',
             'env_config': {
-                'time_start': 202001011600,
-                'time_end': 202108311600,
+                'time_start': 201901011600,
+                'time_end': 202101011600,
                 'slippage': 0,
                 'mode': 1
             },
-            'rollout_fragment_length': 26217,
+            'rollout_fragment_length': 10156,
             'framework': 'torch',
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            'gamma': 0.1 ** (1/12/8),
+            'gamma': 0.99,
             'lr': 2 ** -15,
             'evaluation_interval': 5,
             "evaluation_num_episodes": 1,
@@ -46,22 +46,22 @@ if __name__ == '__main__':
 
             "evaluation_config": {
                 "env_config": {
-                    'time_start': 201901011600,
-                    'time_end': 202001011600,
+                    'time_start': 201701011600,
+                    'time_end': 201901011600,
                     'slippage': 0,
                     'mode': 2,
                     'id': 8,
                 },
             },
-            'train_batch_size': 26217,
+            'train_batch_size': 10156,
         }
 
         # training and saving
         analysis = tune.run(
             Trainer,
             stop={
-                "timesteps_total": 26217*10000,
-                'episode_reward_mean': 2400.,
+                "timesteps_total": 10156*10000,
+                'episode_reward_mean': 5000.,
                 # 'episode_reward_min': 50,
             },
             config=config,
@@ -85,7 +85,7 @@ if __name__ == '__main__':
         config = {
             'env': 'SimpleCTAEnv',
             'env_config': {
-                'time_start': 202001011600,
+                'time_start': 202101011600,
                 'time_end': 202108311600,
                 'slippage': 0,
                 'mode': 1
@@ -104,7 +104,7 @@ if __name__ == '__main__':
             # 'time_end': 201901011600,
             # 'time_start': 202001011600,
             # 'time_end': 202108311600,
-            'time_start': 202108311600,
+            'time_start': 202101011600,
             'time_end': 202110131600,
             # 'time_end': 202110281600,
             'slippage': 0,

@@ -11,7 +11,7 @@ from numpy import inf
 
 class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 41399
+    max_step = 10156
     if_discrete = False
 
     @property
@@ -26,7 +26,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108301600,
             # 'time_end': 202108311600,
-            'time_start': 201801011600,
+            'time_start': 201901011600,
             'time_end': 202101011600,
             'slippage': 0,
             'mode': 1
@@ -35,7 +35,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
 class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 16560
+    max_step = 10156
     if_discrete = False
 
     @property
@@ -50,11 +50,11 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108291600,
             # 'time_end': 202108301600,
-            'time_start': 201606301600,
-            'time_end': 201801011600,
+            'time_start': 201701011600,
+            'time_end': 201901011600,
             'slippage': 0,
             'mode': 2,
-            'id': 72,
+            'id': 74,
         })
 
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     @command()
     @option('--count', default=1)
     def debug(count):
-        env: SimpleCTASubProcessEnv = make('wt4rl-simplecta-evaluator-v0')
+        env: SimpleCTASubProcessEnv = make('wt4rl-simplecta-trainer-v0')
         print('状态空间', env.observation_space.shape)
         print('动作空间', env.action_space.shape)
         for i in range(1, int(count)+1):  # 模拟训练10次
@@ -95,9 +95,9 @@ if __name__ == '__main__':
 
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        args.max_step = 41399
-        args.state_dim = 290
-        args.action_dim = 5
+        args.max_step = 10156
+        args.state_dim = 336
+        args.action_dim = 3
         args.if_discrete = False
         args.target_return = inf  # inf
         # args.if_overwrite = False
@@ -109,10 +109,10 @@ if __name__ == '__main__':
         args.if_allow_break = True
 
         #
-        args.gamma = 0.98  # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.97  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -14
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        args.learning_rate = 2 ** -14  # N15:294  Y14:292 
+        args.learning_rate = 2 ** -12  # N15:294  Y14:292 
         args.if_per_or_gae = True
         args.agent.if_use_cri_target = True
         # args.agent.if_use_dueling = True
@@ -123,10 +123,10 @@ if __name__ == '__main__':
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0
 
-        args.net_dim = 2 ** 8
-        args.batch_size = args.net_dim * 2
+        # args.net_dim = 2 ** 9
+        # args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
-        args.cwd = './outputs_bt/elegantrl/%s_%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate, 72)
+        args.cwd = './outputs_bt/elegantrl/%s_%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate, 74)
         # args.repeat_times = 1.5
 
         #args.net_dim = 2**9

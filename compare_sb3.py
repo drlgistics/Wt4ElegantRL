@@ -20,8 +20,8 @@ def debug():
     learner = SimpleCTASubProcessEnv(**{
         # 'time_start': 202108301600,
         # 'time_end': 202108311600,
-        'time_start': 202001011600,
-        'time_end': 202108311600,
+        'time_start': 201901011600,
+        'time_end': 202101011600,
         'slippage': 0,
         'mode': 1
     })
@@ -29,11 +29,10 @@ def debug():
     evaluator = SimpleCTASubProcessEnv(**{
         # 'time_start': 202108291600,
         # 'time_end': 202108301600,
-        'time_start': 201901011600,
-        'time_end': 202001011600,
+        'time_start': 201701011600,
+        'time_end': 201901011600,
         'slippage': 0,
         'mode': 2,
-        'id': 9,
     })
 
     env = learner
@@ -57,23 +56,22 @@ def train():
     learner = SimpleCTASubProcessEnv(**{
         # 'time_start': 202108301600,
         # 'time_end': 202108311600,
-        'time_start': 202001011600,
-        'time_end': 202108311600,
+        'time_start': 201901011600,
+        'time_end': 202101011600,
         'slippage': 0,
         'mode': 1
     })
 
-    evaluator = SimpleCTAEnv(**{
+    evaluator = SimpleCTASubProcessEnv(**{
         # 'time_start': 202108291600,
         # 'time_end': 202108301600,
-        'time_start': 201901011600,
-        'time_end': 202001011600,
+        'time_start': 201701011600,
+        'time_end': 201901011600,
         'slippage': 0,
         'mode': 2,
-        'id': 9,
     })
 
-    n = 26217
+    n = 10156
 
     eval_callback = EvalCallback(
         eval_env=Monitor(evaluator),
@@ -88,8 +86,8 @@ def train():
     model: Trainer = Trainer('MlpPolicy', learner,
                              #  gamma=0.1 ** (1/12/8),
                              gamma=0.99,
-                             learning_rate=2 ** -14,  # 15: 167, 14:
-                             #  learning_rate=1e-4,
+                             #  learning_rate=2 ** -14,  # 15: 167, 14:
+                             learning_rate=2 ** -15,
                              # learning_starts=100,
                              # batch_size=128,
                              # ent_coef='auto_0.1',

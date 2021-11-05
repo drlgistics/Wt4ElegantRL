@@ -6,6 +6,7 @@ from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 
 # from ray.rllib.agents.a3c import A3CTrainer as Trainer
 # from ray.rllib.agents.ppo import PPOTrainer as Trainer
+# from ray.rllib.agents.ppo import APPOTrainer as Trainer
 # from ray.rllib.agents.marwil import MARWILTrainer as Trainer
 # from ray.rllib.agents.impala import ImpalaTrainer as Trainer
 # from ray.rllib.agents.pg import PGTrainer as Trainer
@@ -51,8 +52,8 @@ if __name__ == '__main__':
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            # 'gamma': 0.99,
-            # 'lr': 2 ** -15,
+            'gamma': 0.99,
+            'lr': 2 ** -15,
             'evaluation_interval': 10,
             "evaluation_num_episodes": 1,
             'evaluation_parallel_to_training': False,
@@ -64,7 +65,6 @@ if __name__ == '__main__':
                     'time_end': 201901011600,
                     'slippage': 0,
                     'mode': 2,
-                    'id': 8,
                 },
             },
             # 'train_batch_size': 10156,
@@ -126,7 +126,6 @@ if __name__ == '__main__':
             # 'time_end': 202110281600,
             'slippage': 0,
             'mode': 2,
-            'id': 2,
         })
 
         for i in range(10):  # 模拟训练10次

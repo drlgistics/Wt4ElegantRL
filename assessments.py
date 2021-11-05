@@ -41,7 +41,7 @@ class Assessment():
 
 
 class SimpleAssessment(Assessment):  # 借鉴了neofinrl
-    gamma = 0.1 ** (1/12/8)
+    gamma = 0.99
 
     def reset(self):
         self.__assets__: list = [self._init_assets_]
@@ -66,7 +66,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         self.__assets__.append(self._init_assets_+dynbalance)  # 账户实时的动态权益
 
         reward = (self.__assets__[-1]-self.__assets__[-2]) \
-            / self._init_assets_ * 0.382
+            / self._init_assets_
 
         if (reward < 0 and self.__reward__[-1] < 0) or \
                 (reward > 0 and self.__reward__[-1] > 0):
@@ -76,15 +76,15 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             
         reward *= self.__successive__
 
+        reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+            / self._init_assets_ * 0.05
+        reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+            / self._init_assets_ * 0.05
+
         if self.__assets__[-1] > self.__assets__[-2]: #
             reward += 0.0001*self.__successive__
         else:
             reward -= 0.0001*self.__successive__
-
-        reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
-            / self._init_assets_ * 0.382
-        reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
-            / self._init_assets_ * 0.382
 
         # reward = 0
 
@@ -166,14 +166,19 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         #     gamma *= self.gamma
         #     gamma += reward
 
-        # gamma = 0
-        # for reward in self.__reward__:
-        #     gamma *= self.gamma
-        #     gamma += reward
+        gamma = 0
+        for reward in self.__reward__:
+            gamma *= self.gamma
+            gamma += reward
+
+        # gamma = np.diff(np.array(self.__assets__))
+        # gamma = (np.where(gamma < 0, 0, gamma).sum()-1e-5) \
+        #     / abs(np.where(gamma > 0, 0, gamma).sum()+1e-5) \
+        #     - 1
 
         # gamma = np.round(np.nanprod(np.array(self.__reward__)+1, axis=0)-1, 5)
         # gamma = self.__assets__[-1]/max(self.__assets__)-1
-        gamma = self.__assets__[-1]/self.init_assets-1
+        # gamma = self.__assets__[-1]/self.init_assets-1
         self.__reward__.append(gamma)  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
         self.__done__ = True
 

@@ -7,6 +7,7 @@ from wtpy.apps import WtBtAnalyst
 from wtpy.WtBtEngine import WtBtEngine
 from strategies import StateTransfer, EngineType
 from multiprocessing import Pipe,  Process
+from os import getpid
 
 # 一个进程只能有一个env
 
@@ -24,7 +25,7 @@ class WtEnv(Env):
                  time_start: int,
                  time_end: int,
                  slippage: int = 0,
-                 id: int = 1,
+                 id: int = getpid(),
                  mode=1,
                  ):
 

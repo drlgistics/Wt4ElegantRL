@@ -7,6 +7,7 @@ from elegantrl.run import Arguments, train_and_evaluate
 from envs_simple_cta import SimpleCTASubProcessEnv
 from gym import make, register
 from numpy import inf
+from os import getpid
 
 
 class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
@@ -53,8 +54,7 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
             'time_start': 201701011600,
             'time_end': 201901011600,
             'slippage': 0,
-            'mode': 2,
-            'id': 74,
+            'mode': 2
         })
 
 
@@ -96,7 +96,8 @@ if __name__ == '__main__':
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 10156
-        args.state_dim = 336
+        # args.state_dim = 336
+        args.state_dim = 174
         args.action_dim = 3
         args.if_discrete = False
         args.target_return = inf  # inf
@@ -109,10 +110,10 @@ if __name__ == '__main__':
         args.if_allow_break = True
 
         #
-        args.gamma = 0.97  # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.99  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -14
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        args.learning_rate = 2 ** -12  # N15:294  Y14:292 
+        args.learning_rate = 2 ** -15  # N15:294  Y14:292 
         args.if_per_or_gae = True
         args.agent.if_use_cri_target = True
         # args.agent.if_use_dueling = True
@@ -123,10 +124,10 @@ if __name__ == '__main__':
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0
 
-        # args.net_dim = 2 ** 9
-        # args.batch_size = args.net_dim * 2
+        args.net_dim = 2 ** 8
+        args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
-        args.cwd = './outputs_bt/elegantrl/%s_%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate, 74)
+        args.cwd = './outputs_bt/elegantrl/%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate)
         # args.repeat_times = 1.5
 
         #args.net_dim = 2**9

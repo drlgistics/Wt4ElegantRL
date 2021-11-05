@@ -10,7 +10,6 @@ class SimpleCTAEnv(WtEnv):
                  time_start: int = 202101031600,
                  time_end: int = 202107301600,
                  slippage: int = 0,
-                 id: int = 1,
                  mode: int = 1
                  ):
         # 角色：数据研究人员、强化学习研究人员、策略研究人员
@@ -57,7 +56,7 @@ class SimpleCTAEnv(WtEnv):
 
         # 评估组件
         # 评估组件的主要使用者是强化学习研究人员定义reward
-        assessment: SimpleAssessment = SimpleAssessment(init_assets=300000)
+        assessment: SimpleAssessment = SimpleAssessment(init_assets=200000)
         super().__init__(
             # 策略只做跟交易模式相关的操作(如趋势策略、日内回转、配对交易、统计套利)，不参与特征生成和评估，主要使用者是策略研究人员
             strategy=SimpleCTA,
@@ -67,7 +66,6 @@ class SimpleCTAEnv(WtEnv):
             time_start=time_start,
             time_end=time_end,
             slippage=slippage,
-            id=id,
             mode=mode,  # 1训练模式，2评估模式，3debug模式
         )
 
@@ -81,19 +79,17 @@ class SimpleCTASubProcessEnv(WtSubProcessEnv):
                  time_start: int = 202101031600,
                  time_end: int = 202107301600,
                  slippage: int = 0,
-                 id: int = 1,
                  mode: int = 1):
         super().__init__(
             cli=SimpleCTAEnv,
             time_start=time_start,
             time_end=time_end,
             slippage=slippage,
-            id=id,
             mode=mode)
 
 if __name__ == '__main__':
     env: WtEnv = SimpleCTASubProcessEnv(time_start=201901011600,
-                              time_end=202001011600, id=2, mode=2)
+                              time_end=202001011600, mode=2)
 
     print(env.action_space.contains)
 

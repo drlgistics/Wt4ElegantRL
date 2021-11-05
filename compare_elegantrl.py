@@ -12,7 +12,7 @@ from os import getpid
 
 class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 5053
+    max_step = 10156
     if_discrete = False
 
     @property
@@ -27,7 +27,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108301600,
             # 'time_end': 202108311600,
-            'time_start': 202001011600,
+            'time_start': 201901011600,
             'time_end': 202101011600,
             'slippage': 0,
             'mode': 1
@@ -36,7 +36,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
 class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 5053
+    max_step = 1860
     if_discrete = False
 
     @property
@@ -51,8 +51,8 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108291600,
             # 'time_end': 202108301600,
-            'time_start': 201901011600,
-            'time_end': 202001011600,
+            'time_start': 201806301600,
+            'time_end': 201901011600,
             'slippage': 0,
             'mode': 2
         })
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     @command()
     @option('--count', default=1)
     def debug(count):
-        env: SimpleCTASubProcessEnv = make('wt4rl-simplecta-trainer-v0')
+        env: SimpleCTASubProcessEnv = make('wt4rl-simplecta-evaluator-v0')
         print('状态空间', env.observation_space.shape)
         print('动作空间', env.action_space.shape)
         for i in range(1, int(count)+1):  # 模拟训练10次
@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        args.max_step = 5053
+        args.max_step = 10156
         # args.state_dim = 336
         args.state_dim = 174
         args.action_dim = 3

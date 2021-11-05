@@ -74,12 +74,12 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         else:
             self.__successive__ = 1
             
-        # reward *= self.__successive__
+        reward *= self.__successive__
 
-        # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.05
-        # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.05
+        reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+            / self._init_assets_ * 0.1
+        reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+            / self._init_assets_ * 0.1
 
         if self.__assets__[-1] > self.__assets__[-2]: #
             reward += 0.0001*self.__successive__

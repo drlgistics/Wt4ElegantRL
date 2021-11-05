@@ -12,7 +12,7 @@ from os import getpid
 
 class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 10156
+    max_step = 5053
     if_discrete = False
 
     @property
@@ -27,7 +27,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108301600,
             # 'time_end': 202108311600,
-            'time_start': 201901011600,
+            'time_start': 202001011600,
             'time_end': 202101011600,
             'slippage': 0,
             'mode': 1
@@ -36,7 +36,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
 class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 10156
+    max_step = 5053
     if_discrete = False
 
     @property
@@ -51,8 +51,8 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108291600,
             # 'time_end': 202108301600,
-            'time_start': 201701011600,
-            'time_end': 201901011600,
+            'time_start': 201901011600,
+            'time_end': 202001011600,
             'slippage': 0,
             'mode': 2
         })
@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        args.max_step = 10156
+        args.max_step = 5053
         # args.state_dim = 336
         args.state_dim = 174
         args.action_dim = 3

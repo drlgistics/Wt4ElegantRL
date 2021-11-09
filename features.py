@@ -14,9 +14,10 @@ class Feature():
     M60 = 'm60'
     D1 = 'd1'
 
-    def __init__(self, code: str, period: str, roll: int) -> None:
+    def __init__(self, code: str, period: str, roll: int, assets: float = 1000000) -> None:
         self.__shape__: tuple = tuple()
         self._roll_: int = int(roll)
+        self._assets_: float = float(assets)
 
         self.__cb__: dict = {}
 
@@ -30,7 +31,7 @@ class Feature():
         self.__subscribies__: dict = {}
         self._subscribe_(period=period, count=1)
 
-        self.__comminfo__: dict = {}
+        # self.__comminfo__: dict = {}
 
     @property
     def securities(self):
@@ -52,8 +53,8 @@ class Feature():
         根据特征需求订阅数据
         '''
         for code in self.__securities__:
-            comminfo = context.stra_get_comminfo(code)  # 品种信息数据
-            self.__comminfo__[code] = (comminfo.pricetick, comminfo.volscale)
+            # comminfo = context.stra_get_comminfo(code)  # 品种信息数据
+            # self.__comminfo__[code] = (comminfo.pricetick, comminfo.volscale)
             for period, count in self.__subscribies__.items():
                 context.stra_get_bars(
                     stdCode=code,
@@ -87,7 +88,8 @@ class Feature():
     def calculate(self, context: CtaContext):
         self.__time__ = context.stra_get_date()*10000+context.stra_get_time()
         if self.__time__ not in self.__obs__:
-            obs = np.full(shape=self.__shape__, fill_value=np.nan, dtype=np.float64)
+            obs = np.full(shape=self.__shape__,
+                          fill_value=np.nan, dtype=np.float64)
             for i, code in enumerate(self.securities):  # 处理每一个标的
                 n = 0
                 for period, v in self.__cb__.items():  # 处理每一个周期
@@ -107,31 +109,36 @@ class Feature():
         # 开仓最大浮盈
         self.__obs__[self.__time__][:, -4] = tuple(
             context.stra_get_detail_profit(
-                stdCode=code, usertag='', flag=1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
-                )
+                # stdCode=code, usertag='', flag=1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
+                stdCode=code, usertag='', flag=1)/self._assets_ for code in self.securities
+        )
 
         # 开仓最大亏损
         self.__obs__[self.__time__][:, -3] = tuple(
             context.stra_get_detail_profit(
-                stdCode=code, usertag='', flag=-1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
-                )
+                # stdCode=code, usertag='', flag=-1)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
+                stdCode=code, usertag='', flag=-1)/self._assets_ for code in self.securities
+        )
 
         # 开仓浮动盈亏
         self.__obs__[self.__time__][:, -2] = tuple(
             context.stra_get_detail_profit(
-                stdCode=code, usertag='', flag=0)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
-                )
+                # stdCode=code, usertag='', flag=0)/self.__comminfo__[code][1]/self.__comminfo__[code][0] for code in self.securities
+                stdCode=code, usertag='', flag=0)/self._assets_ for code in self.securities
+        )
 
         # 持仓数
         self.__obs__[self.__time__][:, -1] = tuple(
             context.stra_get_position(stdCode=code) for code in self.securities)
 
-        np.clip(self.__obs__[self.__time__][:, -4:]*0.001, -
-                1, 1, out=self.__obs__[self.__time__][:, -4:])
+        np.clip(
+            self.__obs__[self.__time__][:, -4:], -1, 1,
+            out=self.__obs__[self.__time__][:, -4:])
 
     @property
     def obs(self):
-        return self.__obs__.get(self.__time__).reshape(self.__flatten__)#.astype(np.float64)
+        # .astype(np.float64)
+        return self.__obs__.get(self.__time__).reshape(self.__flatten__)
 
     def volume(self, period: str, reprocess: REPROCESS = ZFILTER):
         def volume(context: CtaContext, code: str, period: str, args: dict):
@@ -145,29 +152,30 @@ class Feature():
 class Indicator(Feature):
     def roc(self, period: str, reprocess: REPROCESS = REPROCESS):
         def roc(context: CtaContext, code: str, period: str, args: dict):
-            price = context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes
+            price = context.stra_get_bars(
+                stdCode=code, period=period, count=self.__subscribies__[period]).closes
             price = np.log(price)
             return (price[1:]/price[:-1]-1)
             return np.diff(context.stra_get_bars(stdCode=code, period=period, count=self.__subscribies__[period]).closes)
 
-        self._subscribe_(period = period, count = 2+reprocess.n())
-        self._callback_(space = 1, period = period,
-                        callback = roc, reprocess = reprocess)
+        self._subscribe_(period=period, count=2+reprocess.n())
+        self._callback_(space=1, period=period,
+                        callback=roc, reprocess=reprocess)
 
-    def bollinger(self, period: str, timeperiod = 5, nbdevup = 2, nbdevdn = 2, reprocess: REPROCESS = REPROCESS):
+    def bollinger(self, period: str, timeperiod=5, nbdevup=2, nbdevdn=2, reprocess: REPROCESS = REPROCESS):
         def bollinger(context: CtaContext, code: str, period: str, args: dict):
-            closes=context.stra_get_bars(
-                stdCode = code, period = period, count = self.__subscribies__[period]).closes
-            upperband, middleband, lowerband=ta.BBANDS(closes, **args)
+            closes = context.stra_get_bars(
+                stdCode=code, period=period, count=self.__subscribies__[period]).closes
+            upperband, middleband, lowerband = ta.BBANDS(closes, **args)
             return upperband/closes-1, middleband/closes-1, lowerband/closes-1
 
-        self._subscribe_(period = period, count = timeperiod+reprocess.n())
-        self._callback_(space = 3, period = period, callback = bollinger, reprocess = reprocess,
-                        timeperiod = timeperiod, nbdevup = nbdevup, nbdevdn = nbdevdn)
+        self._subscribe_(period=period, count=timeperiod+reprocess.n())
+        self._callback_(space=3, period=period, callback=bollinger, reprocess=reprocess,
+                        timeperiod=timeperiod, nbdevup=nbdevup, nbdevdn=nbdevdn)
 
-    def sar(self, period: str, acceleration = 0, maximum = 0, reprocess: REPROCESS = REPROCESS):
+    def sar(self, period: str, acceleration=0, maximum=0, reprocess: REPROCESS = REPROCESS):
         def sar(context: CtaContext, code: str, period: str, args: dict):
-            bars=context.stra_get_bars(
+            bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
             return ta.SAR(high=bars.highs, low=bars.lows, **args)/bars.closes-1
         self._subscribe_(period=period, count=10+reprocess.n())
@@ -193,7 +201,7 @@ class Indicator(Feature):
         self._callback_(space=3, period=period, callback=macd, reprocess=reprocess,
                         fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
 
-    def rsi(self, period: str, fastperiod: int = 6, midperiod:int = 12, slowperiod: int = 24, reprocess: REPROCESS = REPROCESS):
+    def rsi(self, period: str, fastperiod: int = 6, midperiod: int = 12, slowperiod: int = 24, reprocess: REPROCESS = REPROCESS):
         def rsi(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
@@ -220,15 +228,17 @@ class Indicator(Feature):
             return ta.OBV(bars.closes, bars.volumes, **args)
 
         self._subscribe_(period=period, count=10+reprocess.n())
-        self._callback_(space=1, period=period, callback=obv, reprocess=reprocess)
+        self._callback_(space=1, period=period,
+                        callback=obv, reprocess=reprocess)
 
     def kdj(self, period: str, fastk_period: int = 5, slowk_period: int = 3, reprocess: REPROCESS = REPROCESS):
         def kdj(context: CtaContext, code: str, period: str, args: dict):
             bars = context.stra_get_bars(
                 stdCode=code, period=period, count=self.__subscribies__[period])
-            k, d =  ta.STOCH (high=bars.highs, low=bars.lows, close=bars.closes, **args)
+            k, d = ta.STOCH(high=bars.highs, low=bars.lows,
+                            close=bars.closes, **args)
             return k/100, d/100, (3*k-2*d)/100
-        
+
         self._subscribe_(period=period, count=10 + 1 + reprocess.n())
         self._callback_(space=3, period=period, callback=kdj, reprocess=reprocess,
                         fastk_period=fastk_period, slowk_period=slowk_period)

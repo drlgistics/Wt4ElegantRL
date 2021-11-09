@@ -22,8 +22,7 @@ class WtEnv(Env):
                  stopper: Stopper,
                  feature: Feature,
                  assessment: Assessment,
-                 time_start: int,
-                 time_end: int,
+                 time_range: tuple,
                  slippage: int = 0,
                  id: int = getpid(),
                  mode=1,
@@ -55,12 +54,12 @@ class WtEnv(Env):
 
         self.__feature__: Feature = feature
         self.observation_space: Box = Box(**self.__feature__.observation)
-        self.action_space: Space = self.__strategy__.Action(len(self.__feature__.securities))
+        self.action_space: Space = self.__strategy__.Action(
+            len(self.__feature__.securities))
 
         self._assessment_: Assessment = assessment
 
-        self.__time_start__ = time_start
-        self.__time_end__ = time_end
+        self.__time_range__ = time_range
 
     def _debug_(self):
         pass
@@ -81,6 +80,7 @@ class WtEnv(Env):
 
     def reset(self):
         self.close()
+        time_start, time_end = self.__time_range__[self._iter_%len(self.__time_range__)]
         self._iter_ += 1
 
         if not hasattr(self, '_engine_'):
@@ -102,9 +102,10 @@ class WtEnv(Env):
             else:
                 raise AttributeError
 
-            self._engine_.configBacktest(
-                self.__time_start__, self.__time_end__)
+            self._engine_.configBacktest(time_start, time_end)
             self._engine_.commitBTConfig()
+        else:
+            self._engine_.set_time_range(time_start, time_end)
 
         # 重置奖励
         self._assessment_.reset()
@@ -161,7 +162,8 @@ class WtEnv(Env):
             self.analysis(iter)
 
     def _name_(self, iter):
-        return '%s%s_%s%s' % (self._mode_, self._id_, self.__strategy__.Name(), iter)
+        time_start, time_end = self.__time_range__[(iter-1)%len(self.__time_range__)]
+        return '%s%s_%s_%s_%s-%s' % (self._mode_, self._id_, self.__strategy__.Name(), iter, str(time_start)[:8], str(time_end)[:8])
 
     def __del__(self):
         if hasattr(self, '_engine_'):
@@ -173,7 +175,7 @@ def __sub_process_worker__(pipe: Pipe, _cmd_, _attr_, cli, kwargs):
     while True:
         cmd, kwargs = pipe.recv()
         if cmd in _cmd_:
-            if cmd=='stop':
+            if cmd == 'stop':
                 pipe.send(True)
                 pipe.close()
                 break
@@ -191,7 +193,8 @@ def __sub_process_worker__(pipe: Pipe, _cmd_, _attr_, cli, kwargs):
 
 class WtSubProcessEnv(Env):
     _cmd_ = ('reset', 'step', 'close', 'stop')
-    _attr_ = ('reward_range', 'metadata', 'observation_space', 'action_space', 'assets')
+    _attr_ = ('reward_range', 'metadata',
+              'observation_space', 'action_space', 'assets')
 
     def __init__(self, cli, **kwargs):
         self._pipe_, pipe = Pipe()

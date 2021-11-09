@@ -1,8 +1,8 @@
 from click import command, group, option
-# from elegantrl.agent import AgentPPO as Agent
+from elegantrl.agent import AgentPPO as Agent
 # from elegantrl.agent import AgentSAC as Agent
 # from elegantrl.agent import AgentModSAC as Agent
-from elegantrl.agent import AgentTD3 as Agent
+# from elegantrl.agent import AgentTD3 as Agent
 from elegantrl.run import Arguments, train_and_evaluate
 from envs_simple_cta import SimpleCTASubProcessEnv
 from gym import make, register
@@ -27,8 +27,9 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
         super().__init__(**{
             # 'time_start': 202108301600,
             # 'time_end': 202108311600,
-            'time_start': 201901011600,
-            'time_end': 202101011600,
+            'time_range': (
+                (201901011600, 202101011600),
+                ),
             'slippage': 0,
             'mode': 1
         })
@@ -36,7 +37,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
 class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 1860
+    max_step = 2674
     if_discrete = False
 
     @property
@@ -49,10 +50,13 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
 
     def __init__(self):  # mode=3可以打开详细调试模式
         super().__init__(**{
-            # 'time_start': 202108291600,
-            # 'time_end': 202108301600,
-            'time_start': 201806301600,
-            'time_end': 201901011600,
+            'time_range': (
+                (202101011600, 202106301600),
+                (201701011600, 201706301600),
+                (201706301600, 201801011600),
+                (201801011600, 201806301600),
+                (201806301600, 201901011600),
+                ),
             'slippage': 0,
             'mode': 2
         })
@@ -68,9 +72,9 @@ if __name__ == '__main__':
         pass
 
     @command()
-    @option('--count', default=1)
+    @option('--count', default=5)
     def debug(count):
-        env: SimpleCTASubProcessEnv = make('wt4rl-simplecta-evaluator-v0')
+        env: SimpleCTASubProcessEnv = make('wt4rl-simplecta-trainer-v0')
         print('状态空间', env.observation_space.shape)
         print('动作空间', env.action_space.shape)
         for i in range(1, int(count)+1):  # 模拟训练10次
@@ -97,23 +101,23 @@ if __name__ == '__main__':
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 10156
         # args.state_dim = 336
-        args.state_dim = 174
-        args.action_dim = 3
+        args.state_dim = 6
+        args.action_dim = 1
         args.if_discrete = False
-        args.target_return = inf  # inf
+        args.target_return = 1.2  # inf
         # args.if_overwrite = False
         args.eval_times1 = 1 # 待查明：为啥td3的评估器结果完全一致
-        args.eval_times2 = 2 # 待查明：为啥td3的评估器结果完全一致
+        args.eval_times2 = 5 # 待查明：为啥td3的评估器结果完全一致
 
         args.worker_num = 1  # 内存小的注意别爆内存
         args.break_step = inf
         args.if_allow_break = True
 
         #
-        args.gamma = 0.96  # 8小时会跨过一次隔夜风险，既96个bar
-        # args.learning_rate = 2 ** -14
+        args.gamma = 0.99  # 8小时会跨过一次隔夜风险，既96个bar
+        # args.learning_rate = 2 ** -15
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        args.learning_rate = 2 ** -14  # N15:294  Y14:292 
+        args.learning_rate = 1e-4  # N15:294  Y14:292 
         args.if_per_or_gae = True
         args.agent.if_use_cri_target = True
         # args.agent.if_use_dueling = True

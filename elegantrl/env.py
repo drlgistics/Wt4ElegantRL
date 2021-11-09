@@ -3,14 +3,14 @@ import gym  # not necessary
 import numpy as np
 from copy import deepcopy
 
-"""[ElegantRL.2021.10.10](https://github.com/AI4Finance-LLC/ElegantRL)"""
+"""[ElegantRL.2021.11.08](https://github.com/AI4Finance-Foundation/ElegantRL)"""
 
 gym.logger.set_level(40)  # Block warning
 
 """register your custom env here."""
 
 
-def build_env(env, if_print=False, device_id=None, env_num=1):
+def build_env(env, if_print=False, env_num=1, device_id=None, args=None, ):
     if isinstance(env, str):
         env_name = env
     else:
@@ -29,10 +29,14 @@ def build_env(env, if_print=False, device_id=None, env_num=1):
     if env_name in {'LunarLander-v2', 'LunarLanderContinuous-v2',
                     'BipedalWalker-v3', 'BipedalWalkerHardcore-v3', }:
         env = gym.make(env_name)
-        env = PreprocessEnv(env, if_print=if_print)
+        env = PreprocessEnv(env, if_print=if_print)  # todo plan to be elegant
     elif env_name == 'CarRacingFix':  # Box2D
         from envs.CarRacingFix import CarRacingFix
         env = CarRacingFix()
+        if if_print:  # todo plan to be elegant
+            print(f"\n| env_name:  {env.env_name}, action if_discrete: {env.if_discrete}"
+                  f"\n| state_dim: {env.state_dim}, action_dim: {env.action_dim}"
+                  f"\n| max_step:  {env.max_step:4}, target_return: {env.target_return}")
 
     '''PyBullet gym'''
     if env_name in {'ReacherBulletEnv-v0', 'AntBulletEnv-v0',
@@ -68,24 +72,35 @@ def build_env(env, if_print=False, device_id=None, env_num=1):
     #                  }[env_name[:10]]
     #     env = env_class(if_eval=if_eval, gamma=gamma)
 
+    if env_name in {'DownLinkEnv-v0', 'DownLinkEnv-v1'}:
+        if env_name == 'DownLinkEnv-v0':
+            from envs.DownLink import DownLinkEnv
+            env = DownLinkEnv(bs_n=4, ur_n=8, power=1.0, csi_noise_var=0.1, csi_clip=3.0)
+        elif env_name == 'DownLinkEnv-v1':
+            from envs.DownLink import DownLinkEnv1
+            env = DownLinkEnv1(bs_n=4, ur_n=8, power=1.0, csi_noise_var=0.1, csi_clip=3.0,
+                               env_cwd=getattr(args, 'cwd', '.'))
+        else:
+            raise ValueError("| env.py, build_env(), DownLinkEnv")
+            
     if env_name[:6]=='wt4rl-':
         env = gym.make(env_name)
 
     if env is None:
         try:
             env = deepcopy(env)
-            print(f"| build_env(): Warning. NOT suggest to use `deepcopy(env)`.")
+            print(f"| build_env(): Warning. NOT suggest to use `deepcopy(env)`. env_name: {env_name}")
         except Exception as error:
             print(f"| build_env(): Error. {error}")
             raise ValueError("| build_env(): register your custom env in this function.")
     return env
 
 
-def build_eval_env(eval_env, env, eval_gpu_id, env_num):
+def build_eval_env(eval_env, env, env_num, eval_gpu_id, args, ):
     if isinstance(eval_env, str):
-        eval_env = build_env(env=eval_env, if_print=False, device_id=eval_gpu_id, env_num=env_num)
+        eval_env = build_env(env=eval_env, if_print=False, env_num=env_num, device_id=eval_gpu_id, args=args, )
     elif eval_env is None:
-        eval_env = build_env(env=env, if_print=False, device_id=eval_gpu_id, env_num=env_num)
+        eval_env = build_env(env=env, if_print=False, env_num=env_num, device_id=eval_gpu_id, args=args, )
     else:
         assert hasattr(eval_env, 'reset')
         assert hasattr(eval_env, 'step')
@@ -224,7 +239,7 @@ def get_gym_env_info(env, if_print) -> (str, int, int, int, bool, float):  # [El
 
         if_discrete = isinstance(env.action_space, gym.spaces.Discrete)
         if if_discrete:  # make sure it is discrete action space
-            action_dim = env.action_space.n
+            action_dim = env.action_space.bs_n
         elif isinstance(env.action_space, gym.spaces.Box):  # make sure it is continuous action space
             action_dim = env.action_space.shape[0]
             assert not any(env.action_space.high - 1)

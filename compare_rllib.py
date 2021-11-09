@@ -1,7 +1,7 @@
 from ray import tune, init
-# from ray.rllib.agents.sac import SACTrainer as Trainer
+from ray.rllib.agents.sac import SACTrainer as Trainer
 # from ray.rllib.agents.ddpg import TD3Trainer as Trainer
-from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
+# from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
 
 
 # from ray.rllib.agents.a3c import A3CTrainer as Trainer
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            'gamma': 0.99,
+            'gamma': 0.98,
             'lr': 1e-4,
             'evaluation_interval': 5,
             "evaluation_num_episodes": 5,
@@ -92,7 +92,7 @@ if __name__ == '__main__':
             # num_samples=nums_subproc,
             config=config,
             keep_checkpoints_num=20,
-            checkpoint_freq=5,
+            checkpoint_freq=10,
             checkpoint_score_attr='episode_reward_mean',
             checkpoint_at_end=True,
             local_dir="./outputs_bt/rllib",

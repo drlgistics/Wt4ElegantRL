@@ -1,7 +1,7 @@
 from ray import tune, init
 # from ray.rllib.agents.sac import SACTrainer as Trainer
-from ray.rllib.agents.ddpg import TD3Trainer as Trainer
-# from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
+# from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
 
 
 # from ray.rllib.agents.a3c import A3CTrainer as Trainer
@@ -9,6 +9,9 @@ from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 # from ray.rllib.agents.ppo import APPOTrainer as Trainer
 # from ray.rllib.agents.marwil import MARWILTrainer as Trainer
 # from ray.rllib.agents.impala import ImpalaTrainer as Trainer
+
+# from ray.rllib.agents.mbmpo import MBMPOTrainer as Trainer
+# from ray.rllib.agents.dreamer import DREAMERTrainer as Trainer
 # from ray.rllib.agents.pg import PGTrainer as Trainer
 from ray.tune.schedulers.pb2 import PB2
 from envs_simple_cta import SimpleCTAEnv
@@ -37,13 +40,14 @@ if __name__ == '__main__':
                 "gamma": [0.96, 0.99],
             })
 
-        nums_subproc = 3
+        nums_subproc = 5
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',
             'env_config': {
-                'time_start': 201901011600,
-                'time_end': 202101011600,
+                'time_range': (
+                    (201901011600, 202101011600),
+                    ),
                 'slippage': 0,
                 'mode': 1
             },
@@ -53,16 +57,21 @@ if __name__ == '__main__':
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
             'gamma': 0.99,
-            'lr': 2 ** -15,
-            'evaluation_interval': 10,
-            "evaluation_num_episodes": 1,
+            'lr': 1e-4,
+            'evaluation_interval': 5,
+            "evaluation_num_episodes": 5,
             'evaluation_parallel_to_training': False,
             'evaluation_num_workers': 1,
 
             "evaluation_config": {
                 "env_config": {
-                    'time_start': 201701011600,
-                    'time_end': 201901011600,
+                    'time_range': (
+                        (202101011600, 202106301600),
+                        (201701011600, 201706301600),
+                        (201706301600, 201801011600),
+                        (201801011600, 201806301600),
+                        (201806301600, 201901011600),
+                        ),
                     'slippage': 0,
                     'mode': 2,
                 },
@@ -76,14 +85,14 @@ if __name__ == '__main__':
             Trainer,
             stop={
                 "timesteps_total": 10156*10000,
-                'episode_reward_mean': 5000.,
+                'episode_reward_mean': 1.,
                 # 'episode_reward_min': 50,
             },
             # scheduler=pb2,
             # num_samples=nums_subproc,
             config=config,
             keep_checkpoints_num=20,
-            checkpoint_freq=10,
+            checkpoint_freq=5,
             checkpoint_score_attr='episode_reward_mean',
             checkpoint_at_end=True,
             local_dir="./outputs_bt/rllib",

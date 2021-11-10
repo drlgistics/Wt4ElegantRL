@@ -1,7 +1,7 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO as Agent
+# from elegantrl.agent import AgentPPO as Agent
 # from elegantrl.agent import AgentSAC as Agent
-# from elegantrl.agent import AgentModSAC as Agent
+from elegantrl.agent import AgentModSAC as Agent
 # from elegantrl.agent import AgentTD3 as Agent
 from elegantrl.run import Arguments, train_and_evaluate
 from envs_simple_cta import SimpleCTASubProcessEnv
@@ -101,8 +101,8 @@ if __name__ == '__main__':
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 10156
         # args.state_dim = 336
-        args.state_dim = 6
-        args.action_dim = 1
+        args.state_dim = 18
+        args.action_dim = 3
         args.if_discrete = False
         args.target_return = 1.2  # inf
         # args.if_overwrite = False

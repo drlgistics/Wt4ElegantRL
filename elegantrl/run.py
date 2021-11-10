@@ -179,6 +179,7 @@ def train_and_evaluate(args, learner_id=0):
     repeat_times = args.repeat_times
     if_allow_break = args.if_allow_break
     soft_update_tau = args.soft_update_tau
+    if_overwrite = args.if_overwrite
     del args
 
     '''init ReplayBuffer after training start'''

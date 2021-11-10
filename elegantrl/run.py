@@ -105,6 +105,8 @@ class Arguments:  # [ElegantRL.2021.10.21]
         else:
             print(f"| Keep cwd: {self.cwd}")
         os.makedirs(self.cwd, exist_ok=True)
+        if not self.if_overwrite:
+            os.makedirs('%s/best/'%self.cwd, exist_ok=True)
 
 
 '''single processing training'''
@@ -199,6 +201,11 @@ def train_and_evaluate(args, learner_id=0):
         with torch.no_grad():
             temp = evaluator.evaluate_and_save(agent.act, steps, r_exp, logging_tuple)
             if_reach_goal, if_save = temp
+
+            if if_save and not if_overwrite:
+                agent.save_or_load_agent('%s/best/'%(cwd), if_save=True)
+                buffer.save_or_load_history('%s/best/'%(cwd), if_save=True) if agent.if_off_policy else None
+            
             if_train = not ((if_allow_break and if_reach_goal)
                             or evaluator.total_step > break_step
                             or os.path.exists(f'{cwd}/stop'))

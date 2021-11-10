@@ -1,8 +1,14 @@
 from click import command, group, option
 # from elegantrl.agent import AgentPPO as Agent
 # from elegantrl.agent import AgentSAC as Agent
-from elegantrl.agent import AgentModSAC as Agent
-# from elegantrl.agent import AgentTD3 as Agent
+# from elegantrl.agent import AgentModSAC as Agent
+from elegantrl.agent import AgentTD3 as Agent
+
+
+# from elegantrl.agent import AgentDoubleDQN as Agent
+# from elegantrl.agent import AgentDQN as Agent
+
+
 from elegantrl.run import Arguments, train_and_evaluate
 from envs_simple_cta import SimpleCTASubProcessEnv
 from gym import make, register
@@ -12,7 +18,7 @@ from os import getpid
 
 class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 10156
+    max_step = 3000
     if_discrete = False
 
     @property
@@ -21,6 +27,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
     @property
     def action_dim(self):
+        # if len(self.action_space.shape) > 0 else 10
         return self.action_space.shape[0]
 
     def __init__(self):
@@ -28,8 +35,11 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
             # 'time_start': 202108301600,
             # 'time_end': 202108311600,
             'time_range': (
-                (201901011600, 202101011600),
-                ),
+                (201901011600, 201906301600),
+                (201906301600, 202001011600),
+                (202001011600, 202006301600),
+                (202006301600, 202101011600),
+            ),
             'slippage': 0,
             'mode': 1
         })
@@ -37,7 +47,7 @@ class Wt4RLSimpleTrainer(SimpleCTASubProcessEnv):
 
 class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
     env_num = 1
-    max_step = 2674
+    max_step = 3000
     if_discrete = False
 
     @property
@@ -46,6 +56,7 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
 
     @property
     def action_dim(self):
+        # if len(self.action_space.shape) > 0 else 10
         return self.action_space.shape[0]
 
     def __init__(self):  # mode=3可以打开详细调试模式
@@ -56,7 +67,7 @@ class Wt4RLSimpleEvaluator(SimpleCTASubProcessEnv):
                 (201706301600, 201801011600),
                 (201801011600, 201806301600),
                 (201806301600, 201901011600),
-                ),
+            ),
             'slippage': 0,
             'mode': 2
         })
@@ -99,28 +110,29 @@ if __name__ == '__main__':
 
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
-        args.max_step = 10156
+        args.max_step = 3000
         # args.state_dim = 336
-        args.state_dim = 18
-        args.action_dim = 3
+        args.state_dim = 40
+        args.action_dim = 1
         args.if_discrete = False
         args.target_return = 1.2  # inf
-        # args.if_overwrite = False
-        args.eval_times1 = 1 # 待查明：为啥td3的评估器结果完全一致
-        args.eval_times2 = 5 # 待查明：为啥td3的评估器结果完全一致
+        args.if_overwrite = False
+        args.eval_gap = 2**9
+        args.eval_times1 = 3  # 待查明：为啥td3的评估器结果完全一致
+        args.eval_times2 = 5  # 待查明：为啥td3的评估器结果完全一致
 
         args.worker_num = 1  # 内存小的注意别爆内存
         args.break_step = inf
         args.if_allow_break = True
 
         #
-        args.gamma = 0.99  # 8小时会跨过一次隔夜风险，既96个bar
+        # args.gamma = 0.99  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -15
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        args.learning_rate = 1e-4  # N15:294  Y14:292 
+        # args.learning_rate = 1e-4  # N15:294  Y14:292
         args.if_per_or_gae = True
         args.agent.if_use_cri_target = True
-        # args.agent.if_use_dueling = True
+        args.agent.if_use_dueling = True
 
         args.env_num = 1
         args.target_step = args.max_step  # * 2
@@ -131,7 +143,8 @@ if __name__ == '__main__':
         args.net_dim = 2 ** 8
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
-        args.cwd = './outputs_bt/elegantrl/%s_%s_%s'%(args.agent.__class__.__name__, args.gamma, args.learning_rate)
+        args.cwd = './outputs_bt/elegantrl/%s_%s_%s' % (
+            args.agent.__class__.__name__, args.gamma, args.learning_rate)
         # args.repeat_times = 1.5
 
         #args.net_dim = 2**9
@@ -158,8 +171,8 @@ if __name__ == '__main__':
 
         agent.init(net_dim=2 ** 8, state_dim=380, action_dim=10,
                    learning_rate=0.1 ** (1/12/8), if_per_or_gae=True, env_num=1, gpu_id=0)
-        agent.save_or_load_agent(cwd='./outputs_bt/elegantrl/AgentTD3_6.103515625e-05_8', if_save=False)
-
+        agent.save_or_load_agent(
+            cwd='./outputs_bt/elegantrl/AgentTD3_6.103515625e-05_8', if_save=False)
 
         # for i in range(10):  # 模拟训练10次
         #     obs = env.reset()

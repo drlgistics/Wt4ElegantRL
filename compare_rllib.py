@@ -1,5 +1,5 @@
 from ray import tune, init
-from ray.rllib.agents.sac import SACTrainer as Trainer
+# from ray.rllib.agents.sac import SACTrainer as Trainer
 # from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 # from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
 
@@ -13,6 +13,13 @@ from ray.rllib.agents.sac import SACTrainer as Trainer
 # from ray.rllib.agents.mbmpo import MBMPOTrainer as Trainer
 # from ray.rllib.agents.dreamer import DREAMERTrainer as Trainer
 # from ray.rllib.agents.pg import PGTrainer as Trainer
+
+
+# from ray.rllib.agents.pg import PGTrainer as Trainer
+# from ray.rllib.agents.dqn import R2D2Trainer as Trainer
+from ray.rllib.agents.dqn import ApexTrainer as Trainer
+
+
 from ray.tune.schedulers.pb2 import PB2
 from envs_simple_cta import SimpleCTAEnv
 import click
@@ -46,8 +53,11 @@ if __name__ == '__main__':
             'env': 'SimpleCTAEnv',
             'env_config': {
                 'time_range': (
-                    (201901011600, 202101011600),
-                    ),
+                    (201901011600, 201906301600),
+                    (201906301600, 202001011600),
+                    (202001011600, 202006301600),
+                    (202006301600, 202101011600),
+                ),
                 'slippage': 0,
                 'mode': 1
             },
@@ -56,8 +66,15 @@ if __name__ == '__main__':
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            'gamma': 0.98,
-            'lr': 1e-4,
+            # 'gamma': 0.98,
+            # 'lr': 1e-4,
+            # 'model': {
+            #     'use_lstm': True,
+            #     # 'fcnet_hiddens': [64],
+            #     # 'fcnet_activation': 'linear',
+            #     # 'lstm_cell_size': 64,
+            #     # 'max_seq_len': 2,
+            # },
             'evaluation_interval': 5,
             "evaluation_num_episodes": 5,
             'evaluation_parallel_to_training': False,
@@ -71,7 +88,7 @@ if __name__ == '__main__':
                         (201706301600, 201801011600),
                         (201801011600, 201806301600),
                         (201806301600, 201901011600),
-                        ),
+                    ),
                     'slippage': 0,
                     'mode': 2,
                 },

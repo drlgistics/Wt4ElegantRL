@@ -1,7 +1,7 @@
 from features import Feature
 from stoppers import Stopper
 from abc import abstractmethod
-from gym.spaces import Space, Box, MultiDiscrete
+from gym.spaces import Space, Box, Discrete, MultiDiscrete
 from assessments import Assessment
 from wtpy.WtBtEngine import EngineType
 from wtpy.StrategyDefs import BaseCtaStrategy, CtaContext, BaseHftStrategy, HftContext
@@ -47,6 +47,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
 
     @staticmethod
     def Action(size: int) -> Space:
+        # return Discrete(10)
         return Box(low=-1., high=1., shape=(size, ), dtype=float32)
         # return MultiDiscrete([11]*size)
         # return dict(low=-1., high=1., shape=(size, ), dtype=float32)
@@ -54,6 +55,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
     def setAction(self, action):
         # print('setAction 1')
         # action -= 5
+        # self._action_ = dict(zip(self._feature_.securities, [action-5]))
         self._action_ = dict(zip(self._feature_.securities, around(action*5, 0)))
         # print(self._action_)
         # try:

@@ -96,6 +96,8 @@ if __name__ == '__main__':
                 action = env.action_space.sample()  # 模拟智能体产生动作
                 obs, reward, done, info = env.step(action)
                 n += 1
+                break
+            break
                 # print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
             print('第%s次训练完成，执行%s步, 奖励%s, 盈亏%s。' % (i, n, reward, env.assets))
         env.close()
@@ -112,12 +114,12 @@ if __name__ == '__main__':
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 3000
         # args.state_dim = 336
-        args.state_dim = 40
-        args.action_dim = 1
+        args.state_dim = 69
+        args.action_dim = 3
         args.if_discrete = False
-        args.target_return = 1.2  # inf
+        args.target_return = 0.1  # inf
         args.if_overwrite = False
-        args.eval_gap = 2**9
+        args.eval_gap = 2**8
         args.eval_times1 = 3  # 待查明：为啥td3的评估器结果完全一致
         args.eval_times2 = 5  # 待查明：为啥td3的评估器结果完全一致
 
@@ -126,21 +128,21 @@ if __name__ == '__main__':
         args.if_allow_break = True
 
         #
-        # args.gamma = 0.99  # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.97  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -15
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        # args.learning_rate = 1e-4  # N15:294  Y14:292
+        args.learning_rate = 1e-4  # N15:294  Y14:292
         args.if_per_or_gae = True
         args.agent.if_use_cri_target = True
         args.agent.if_use_dueling = True
 
         args.env_num = 1
-        args.target_step = args.max_step  # * 2
+        args.target_step = args.max_step  * 2
         args.learner_gpus = (0,)
         args.workers_gpus = args.learner_gpus
         args.eval_gpu_id = 0
 
-        args.net_dim = 2 ** 8
+        args.net_dim = 2 ** 6
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
         args.cwd = './outputs_bt/elegantrl/%s_%s_%s' % (

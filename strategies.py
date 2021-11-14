@@ -56,7 +56,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         # print('setAction 1')
         # action -= 5
         # self._action_ = dict(zip(self._feature_.securities, [action-5]))
-        self._action_ = dict(zip(self._feature_.securities, around(action*5, 0)))
+        self._action_ = dict(zip(self._feature_.securities, around(action*3, 0)))
         # print(self._action_)
         # try:
         #     self._action_ = dict(zip(self._feature_.securities, around(action, 0)))

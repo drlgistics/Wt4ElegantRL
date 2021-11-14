@@ -11,7 +11,7 @@ class SimpleCTAEnv(WtEnv):
                  slippage: int = 0,
                  mode: int = 1
                  ):
-        assets = 100000
+        assets = 180000
 
         # 角色：数据研究人员、强化学习研究人员、策略研究人员
         # 原则：每个角色的分工模拟交易机构做隔离
@@ -21,11 +21,11 @@ class SimpleCTAEnv(WtEnv):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='DCE.c.HOT', period=Indicator.M15, roll=2, assets=assets)  # 每一个特征工程必须指定一个主要标的
+            code='DCE.c.HOT', period=Indicator.M15, roll=1, assets=assets)  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
-        # feature.addSecurity(code='DCE.cs.HOT')
-        # feature.addSecurity(code='DCE.m.HOT')
+        feature.addSecurity(code='DCE.cs.HOT')
+        feature.addSecurity(code='DCE.m.HOT')
         # feature.addSecurity(code='CZCE.RM.HOT')
         # feature.addSecurity(code='CZCE.JR.HOT')
         # feature.addSecurity(code='CZCE.TA.HOT')
@@ -37,7 +37,8 @@ class SimpleCTAEnv(WtEnv):
         # feature.addSecurity(code='SHFE.ni.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M15, ):  # feature.M5, feature.M10, 
+        for period in (feature.M15, ):  # feature.M5, feature.M10,
+            feature.price(period)
             feature.volume(period)
             feature.roc(period)
             feature.bollinger(period)  # 标准差通道

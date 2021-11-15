@@ -1,8 +1,8 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO as Agent
+# from elegantrl.agent import AgentPPO as Agent
 # from elegantrl.agent import AgentSAC as Agent
 # from elegantrl.agent import AgentModSAC as Agent
-# from elegantrl.agent import AgentTD3 as Agent
+from elegantrl.agent import AgentTD3 as Agent
 
 
 # from elegantrl.agent import AgentDoubleDQN as Agent
@@ -173,7 +173,7 @@ if __name__ == '__main__':
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 3000
-        args.state_dim = 60
+        args.state_dim = 57
         args.action_dim = 3
         args.if_discrete = False
         args.target_return = 0.1  # inf

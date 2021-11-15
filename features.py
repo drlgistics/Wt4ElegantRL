@@ -72,8 +72,8 @@ class Feature():
         self.__cb__[period][callback.__name__] = (
             space, callback, reprocess, kwargs)
 
-    def sigmoid(self, value):
-        return 1 / (1 + np.exp(-value * np.e)) - 0.5
+    def sigmoid(self, value, thresh=30):
+        return (1 / (1 + np.exp(-(value/thresh) * np.e)) - 0.5)*thresh
 
     @property
     def observation(self) -> dict:
@@ -108,7 +108,8 @@ class Feature():
                             #np.clip(p.calculate(feature)[-self._roll_:], -1, 1)
                             n += self._roll_
             # self.__obs__[self.__time__] = obs
-            self.__obs__[self.__time__] = self.sigmoid(obs)
+            # self.__obs__[self.__time__] = self.sigmoid(obs)
+            self.__obs__[self.__time__] = obs
 
         # 开仓最大浮盈
         self.__obs__[self.__time__][:, -4] = tuple(

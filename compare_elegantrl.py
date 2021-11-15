@@ -1,8 +1,8 @@
 from click import command, group, option
-from elegantrl.agent import AgentPPO as Agent
+# from elegantrl.agent import AgentPPO as Agent
 # from elegantrl.agent import AgentSAC as Agent
 # from elegantrl.agent import AgentModSAC as Agent
-# from elegantrl.agent import AgentTD3 as Agent
+from elegantrl.agent import AgentTD3 as Agent
 
 
 # from elegantrl.agent import AgentDoubleDQN as Agent
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         args.state_dim = 69
         args.action_dim = 3
         args.if_discrete = False
-        args.target_return = 0.1  # inf
+        args.target_return = 0.05  # inf
         args.if_overwrite = False
         args.eval_times1 = 12  # 待查明：为啥td3的评估器结果完全一致
         args.eval_times2 = 30  # 待查明：为啥td3的评估器结果完全一致
@@ -196,7 +196,7 @@ if __name__ == '__main__':
         args.max_memo = 2 ** 20
         args.target_step = args.max_step * 2
         args.if_per_or_gae = True
-        args.agent.if_use_cri_target = True
+        # args.agent.if_use_cri_target = True
         # args.agent.if_use_dueling = True
 
         args.env_num = 1

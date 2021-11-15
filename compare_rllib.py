@@ -1,5 +1,5 @@
 from ray import tune, init
-# from ray.rllib.agents.sac import SACTrainer as Trainer
+from ray.rllib.agents.sac import SACTrainer as Trainer
 # from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 # from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
 
@@ -17,7 +17,7 @@ from ray import tune, init
 
 # from ray.rllib.agents.pg import PGTrainer as Trainer
 # from ray.rllib.agents.dqn import R2D2Trainer as Trainer
-from ray.rllib.agents.dqn import ApexTrainer as Trainer
+# from ray.rllib.agents.dqn import ApexTrainer as Trainer
 
 
 from ray.tune.schedulers.pb2 import PB2
@@ -35,28 +35,58 @@ if __name__ == '__main__':
 
     @run.command()
     def train():
-        pb2 = PB2(
-            time_attr="training_iteration",
-            metric="episode_reward_mean",
-            mode="max",
-            perturbation_interval=50000,
-            quantile_fraction=0.25,  # copy bottom % with top %
-            # Specifies the hyperparam search space
-            hyperparam_bounds={
-                "lr": [1e-3, 1e-5],
-                "gamma": [0.96, 0.99],
-            })
+        # pb2 = PB2(
+        #     time_attr="training_iteration",
+        #     metric="episode_reward_mean",
+        #     mode="max",
+        #     perturbation_interval=50000,
+        #     quantile_fraction=0.25,  # copy bottom % with top %
+        #     # Specifies the hyperparam search space
+        #     hyperparam_bounds={
+        #         "lr": [1e-3, 1e-5],
+        #         "gamma": [0.96, 0.99],
+        #     })
 
         nums_subproc = 5
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',
             'env_config': {
+                # 'time_start': 202108301600,
+                # 'time_end': 202108311600,
                 'time_range': (
-                    (201901011600, 201906301600),
-                    (201906301600, 202001011600),
-                    (202001011600, 202006301600),
-                    (202006301600, 202101011600),
+                    # (201901011600, 202101011600),
+
+                    # (201901011600, 201906301600),
+                    # (201906301600, 202001011600),
+                    # (202001011600, 202006301600),
+                    # (202006301600, 202101011600),
+
+                    (201812311600, 201901311600),
+                    (201901311600, 201902311600),
+                    (201902311600, 201903311600),
+                    (201903311600, 201904311600),
+                    (201904311600, 201905311600),
+                    (201905311600, 201906311600),
+                    (201906311600, 201907311600),
+                    (201907311600, 201908311600),
+                    (201908311600, 201909311600),
+                    (201909311600, 201910311600),
+                    (201910311600, 201911311600),
+                    (201911311600, 201912311600),
+
+                    (201912311600, 202001311600),
+                    (202001311600, 202002311600),
+                    (202002311600, 202003311600),
+                    (202003311600, 202004311600),
+                    (202004311600, 202005311600),
+                    (202005311600, 202006311600),
+                    (202006311600, 202007311600),
+                    (202007311600, 202008311600),
+                    (202008311600, 202009311600),
+                    (202009311600, 202010311600),
+                    (202010311600, 202011311600),
+                    (202011311600, 202012311600),
                 ),
                 'slippage': 0,
                 'mode': 1
@@ -66,8 +96,8 @@ if __name__ == '__main__':
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            # 'gamma': 0.98,
-            # 'lr': 1e-4,
+            'gamma': 0.99,
+            'lr': 1e-5,
             # 'model': {
             #     'use_lstm': True,
             #     # 'fcnet_hiddens': [64],
@@ -75,22 +105,56 @@ if __name__ == '__main__':
             #     # 'lstm_cell_size': 64,
             #     # 'max_seq_len': 2,
             # },
-            'evaluation_interval': 5,
-            "evaluation_num_episodes": 5,
+            'evaluation_interval': 24*2,
+            "evaluation_num_episodes": 30,
             'evaluation_parallel_to_training': False,
             'evaluation_num_workers': 1,
 
             "evaluation_config": {
                 "env_config": {
                     'time_range': (
-                        (202101011600, 202106301600),
-                        (201701011600, 201706301600),
-                        (201706301600, 201801011600),
-                        (201801011600, 201806301600),
-                        (201806301600, 201901011600),
+                        # (202101011600, 202106301600),
+                        # (201701011600, 201706301600),
+                        # (201706301600, 201801011600),
+                        # (201801011600, 201806301600),
+                        # (201806301600, 201901011600),
+
+
+                        (202012311600, 202101311600),
+                        (202101311600, 202102311600),
+                        (202102311600, 202103311600),
+                        (202103311600, 202104311600),
+                        (202104311600, 202105311600),
+                        (202105311600, 202106311600),
+
+                        (201612311600, 201701311600),
+                        (201701311600, 201702311600),
+                        (201702311600, 201703311600),
+                        (201703311600, 201704311600),
+                        (201704311600, 201705311600),
+                        (201705311600, 201706311600),
+                        (201706311600, 201707311600),
+                        (201707311600, 201708311600),
+                        (201708311600, 201709311600),
+                        (201709311600, 201710311600),
+                        (201710311600, 201711311600),
+                        (201711311600, 201712311600),
+
+                        (201712311600, 201801311600),
+                        (201801311600, 201802311600),
+                        (201802311600, 201803311600),
+                        (201803311600, 201804311600),
+                        (201804311600, 201805311600),
+                        (201805311600, 201806311600),
+                        (201806311600, 201807311600),
+                        (201807311600, 201808311600),
+                        (201808311600, 201809311600),
+                        (201809311600, 201810311600),
+                        (201810311600, 201811311600),
+                        (201811311600, 201812311600),
                     ),
                     'slippage': 0,
-                    'mode': 2,
+                    'mode': 1
                 },
             },
             # 'train_batch_size': 10156,
@@ -101,15 +165,15 @@ if __name__ == '__main__':
         analysis = tune.run(
             Trainer,
             stop={
-                "timesteps_total": 10156*10000,
-                'episode_reward_mean': 1.,
+                "timesteps_total": 1500*24*10000,
+                'episode_reward_mean': 0.06,
                 # 'episode_reward_min': 50,
             },
             # scheduler=pb2,
             # num_samples=nums_subproc,
             config=config,
             keep_checkpoints_num=20,
-            checkpoint_freq=10,
+            checkpoint_freq=24*10,
             checkpoint_score_attr='episode_reward_mean',
             checkpoint_at_end=True,
             local_dir="./outputs_bt/rllib",

@@ -1,6 +1,6 @@
 from ray import tune, init
-from ray.rllib.agents.sac import SACTrainer as Trainer
-# from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+# from ray.rllib.agents.sac import SACTrainer as Trainer
+from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 # from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
 
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
             'gamma': 0.99,
-            'lr': 1e-5,
+            'lr': 1e-3,
             # 'model': {
             #     'use_lstm': True,
             #     # 'fcnet_hiddens': [64],
@@ -105,7 +105,7 @@ if __name__ == '__main__':
             #     # 'lstm_cell_size': 64,
             #     # 'max_seq_len': 2,
             # },
-            'evaluation_interval': 24*2,
+            'evaluation_interval': 24,
             "evaluation_num_episodes": 30,
             'evaluation_parallel_to_training': False,
             'evaluation_num_workers': 1,
@@ -165,15 +165,15 @@ if __name__ == '__main__':
         analysis = tune.run(
             Trainer,
             stop={
-                "timesteps_total": 1500*24*10000,
-                'episode_reward_mean': 0.06,
+                "timesteps_total": 1e+10,
+                'episode_reward_mean': 0.03,
                 # 'episode_reward_min': 50,
             },
             # scheduler=pb2,
             # num_samples=nums_subproc,
             config=config,
             keep_checkpoints_num=20,
-            checkpoint_freq=24*10,
+            checkpoint_freq=24*5,
             checkpoint_score_attr='episode_reward_mean',
             checkpoint_at_end=True,
             local_dir="./outputs_bt/rllib",

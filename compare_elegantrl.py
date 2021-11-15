@@ -189,7 +189,7 @@ if __name__ == '__main__':
         args.gamma = 0.99  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -15
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        args.learning_rate = 1e-5  # N15:294  Y14:292
+        args.learning_rate = 1e-3  # N15:294  Y14:292
         args.eval_gap = 2 ** 8
         args.net_dim = 2 ** 5
         args.batch_size = args.net_dim * 2

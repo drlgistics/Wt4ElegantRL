@@ -1,8 +1,8 @@
 from click import command, group, option
-# from elegantrl.agent import AgentPPO as Agent
+from elegantrl.agent import AgentPPO as Agent
 # from elegantrl.agent import AgentSAC as Agent
 # from elegantrl.agent import AgentModSAC as Agent
-from elegantrl.agent import AgentTD3 as Agent
+# from elegantrl.agent import AgentTD3 as Agent
 
 
 # from elegantrl.agent import AgentDoubleDQN as Agent
@@ -173,7 +173,7 @@ if __name__ == '__main__':
         # args必须设置的参数
         args.eval_env = 'wt4rl-simplecta-evaluator-v0'
         args.max_step = 3000
-        args.state_dim = 57
+        args.state_dim = 69
         args.action_dim = 3
         args.if_discrete = False
         args.target_return = 0.1  # inf
@@ -186,12 +186,12 @@ if __name__ == '__main__':
         args.if_allow_break = True
 
         #
-        args.gamma = 0.98  # 8小时会跨过一次隔夜风险，既96个bar
+        args.gamma = 0.99  # 8小时会跨过一次隔夜风险，既96个bar
         # args.learning_rate = 2 ** -15
         # args.gamma = 0.1 ** (1/12/8) # 8小时会跨过一次隔夜风险，既96个bar
-        args.learning_rate = 1e-4  # N15:294  Y14:292
+        args.learning_rate = 1e-5  # N15:294  Y14:292
         args.eval_gap = 2 ** 8
-        args.net_dim = 2 ** 9
+        args.net_dim = 2 ** 5
         args.batch_size = args.net_dim * 2
         args.max_memo = 2 ** 20
         args.target_step = args.max_step * 2

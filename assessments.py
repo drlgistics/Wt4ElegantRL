@@ -47,7 +47,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         self.__assets__: list = [self._init_assets_]
         self.__reward__: list = [0]
         self.__done__: bool = False
-        self.__successive__: int = 1
+        # self.__successive__: int = 1
         # self.__gamma__ = 1-self.gamma
 
     def calculate(self, context: CtaContext):
@@ -64,92 +64,96 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         # fee = context.stra_get_fund_data(3)
 
         self.__assets__.append(self._init_assets_+dynbalance)  # 账户实时的动态权益
+        
+        
+        if len(self.__reward__) > 1:
+            reward = (self.__assets__[-1]-self.__assets__[-2]) \
+                / self._init_assets_
 
-        reward = (self.__assets__[-1]-self.__assets__[-2]) \
-            / self._init_assets_
+            # if (reward < 0 and self.__reward__[-1] < 0) or \
+            #         (reward > 0 and self.__reward__[-1] > 0):
+            #     self.__successive__ += 1
+            # else:
+            #     self.__successive__ = 1
+                
+            # reward *= self.__successive__
 
-        # if (reward < 0 and self.__reward__[-1] < 0) or \
-        #         (reward > 0 and self.__reward__[-1] > 0):
-        #     self.__successive__ += 1
-        # else:
-        #     self.__successive__ = 1
-            
-        # reward *= self.__successive__
+            # if self.__assets__[-1] > self.__assets__[-2]: #
+            #     reward += 0.0001*self.__successive__
+            # else:
+            #     reward -= 0.0001*self.__successive__
 
-        # if self.__assets__[-1] > self.__assets__[-2]: #
-        #     reward += 0.0001*self.__successive__
-        # else:
-        #     reward -= 0.0001*self.__successive__
+            # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+            #     / self._init_assets_ * 0.1
+            # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+            #     / self._init_assets_ * 0.1
 
-        # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.1
-        # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.1
+            # reward = 0
 
-        # reward = 0
+            # returns = np.diff(np.array(self.__assets__))
+            # reward = (np.where(returns < 0, 0, returns).sum()-1e-5) \
+            #     / abs(np.where(returns > 0, 0, returns).sum()+1e-5) \
+            #     - 1
+            # reward *= 0.1
 
-        # returns = np.diff(np.array(self.__assets__))
-        # reward = (np.where(returns < 0, 0, returns).sum()-1e-5) \
-        #     / abs(np.where(returns > 0, 0, returns).sum()+1e-5) \
-        #     - 1
-        # reward *= 0.1
+            # print(np.where(returns < 0, 0, returns).sum(), np.where(returns > 0, 0, returns).sum(), dynbalance, reward)
 
-        # print(np.where(returns < 0, 0, returns).sum(), np.where(returns > 0, 0, returns).sum(), dynbalance, reward)
+            # 情绪奖励
+            # if (reward < 0 and self.__reward__[-1] < 0) or \
+            #         (reward > 0 and self.__reward__[-1] > 0):
+            #     self.__successive__ += 1
+            # else:
+            #     self.__successive__ = 1
 
-        # 情绪奖励
-        # if (reward < 0 and self.__reward__[-1] < 0) or \
-        #         (reward > 0 and self.__reward__[-1] > 0):
-        #     self.__successive__ += 1
-        # else:
-        #     self.__successive__ = 1
+            # #资金成本
+            # if self.__assets__[-1] > self.__assets__[-2]: #
+            #     reward += 0.0001*self.__successive__
+            # else:
+            #     reward -= 0.0001*self.__successive__
 
-        # #资金成本
-        # if self.__assets__[-1] > self.__assets__[-2]: #
-        #     reward += 0.0001*self.__successive__
-        # else:
-        #     reward -= 0.0001*self.__successive__
+            # reward *= 0.01
 
-        # reward *= 0.01
+            # #近期奖励
+            # if self.__assets__[-1] > max(self.__assets__[:-1]):
+            #     reward += 0.02
+            # if self.__assets__[-1] < min(self.__assets__[:-1]):
+            #     reward -= 0.01
 
-        # #近期奖励
-        # if self.__assets__[-1] > max(self.__assets__[:-1]):
-        #     reward += 0.02
-        # if self.__assets__[-1] < min(self.__assets__[:-1]):
-        #     reward -= 0.01
+            # 长期奖励
+            # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+            #     / self._init_assets_ * 0.1
+            # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+            #     / self._init_assets_ * 0.1
 
-        # 长期奖励
-        # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.1
-        # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.1
+            # if (reward < 0 and self.__reward__[-1] < 0) or \
+            #         (reward > 0 and self.__reward__[-1] > 0):
+            #     reward *= self.__successive__
+            #     self.__successive__ += 1
+            # else:
+            #     self.__successive__ = 1
+            # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+            #     / self._init_assets_ * 0.382
+            # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+            #     / self._init_assets_ * 0.382
 
-        # if (reward < 0 and self.__reward__[-1] < 0) or \
-        #         (reward > 0 and self.__reward__[-1] > 0):
-        #     reward *= self.__successive__
-        #     self.__successive__ += 1
-        # else:
-        #     self.__successive__ = 1
-        # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.382
-        # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
-        #     / self._init_assets_ * 0.382
+            '''
+            2021/11/01
 
-        '''
-        2021/11/01
-
-        if self.__assets__[-1] > self.__assets__[-2]:
-            self.__successive__ += 1
+            if self.__assets__[-1] > self.__assets__[-2]:
+                self.__successive__ += 1
+            else:
+                self.__successive__ = 1
+                
+            reward = -0.00001
+            reward += (self.__assets__[-1] /
+                    self.__assets__[-2] - 1) * 0.382 * self.__successive__
+            max_assets = (self.__assets__[-1]/max(self.__assets__[:-1])-1) * 0.382
+            reward += max_assets * (5 if max_assets > 0 else 1)
+            min_assets = (self.__assets__[-1]/min(self.__assets__[:-1])-1) * 0.382
+            reward += min_assets * (5 if min_assets < 0 else 1)
+            '''
         else:
-            self.__successive__ = 1
-            
-        reward = -0.00001
-        reward += (self.__assets__[-1] /
-                  self.__assets__[-2] - 1) * 0.382 * self.__successive__
-        max_assets = (self.__assets__[-1]/max(self.__assets__[:-1])-1) * 0.382
-        reward += max_assets * (5 if max_assets > 0 else 1)
-        min_assets = (self.__assets__[-1]/min(self.__assets__[:-1])-1) * 0.382
-        reward += min_assets * (5 if min_assets < 0 else 1)
-        '''
+            reward = 0.01
 
         self.__reward__.append(reward)  # 以动态权益差分设计reward
         self.__done__ = False  # 此处可以根据控制任务结束状态

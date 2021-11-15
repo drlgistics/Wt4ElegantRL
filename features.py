@@ -136,7 +136,7 @@ class Feature():
         self.__obs__[self.__time__][:, -1] = tuple(
             context.stra_get_position(stdCode=code) for code in self.securities)
 
-        self.__obs__[self.__time__][:, -4:] = self.sigmoid(self.__obs__[self.__time__][:, -4:])
+        # self.__obs__[self.__time__][:, -4:] = self.sigmoid(self.__obs__[self.__time__][:, -4:])
         # np.clip(
         #     self.__obs__[self.__time__][:, -4:], -1, 1,
         #     out=self.__obs__[self.__time__][:, -4:])

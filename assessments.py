@@ -153,7 +153,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             reward += min_assets * (5 if min_assets < 0 else 1)
             '''
         else:
-            reward = 0.01
+            reward = -0.01
 
         self.__reward__.append(reward)  # 以动态权益差分设计reward
         self.__done__ = False  # 此处可以根据控制任务结束状态

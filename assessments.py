@@ -47,7 +47,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         self.__assets__: list = [self._init_assets_]
         self.__reward__: list = [0]
         self.__done__: bool = False
-        # self.__successive__: int = 1
+        self.__successive__: int = 1
         # self.__gamma__ = 1-self.gamma
 
     def calculate(self, context: CtaContext):
@@ -68,15 +68,15 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         
         if len(self.__reward__) > 1:
             reward = (self.__assets__[-1]-self.__assets__[-2]) \
-                / self._init_assets_
+                / self._init_assets_ * 0.382
 
-            # if (reward < 0 and self.__reward__[-1] < 0) or \
-            #         (reward > 0 and self.__reward__[-1] > 0):
-            #     self.__successive__ += 1
-            # else:
-            #     self.__successive__ = 1
+            if (reward < 0 and self.__reward__[-1] < 0) or \
+                    (reward > 0 and self.__reward__[-1] > 0):
+                self.__successive__ += 1
+            else:
+                self.__successive__ = 1
                 
-            # reward *= self.__successive__
+            reward *= self.__successive__
 
             # if self.__assets__[-1] > self.__assets__[-2]: #
             #     reward += 0.0001*self.__successive__
@@ -120,10 +120,10 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             #     reward -= 0.01
 
             # 长期奖励
-            # reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
-            #     / self._init_assets_ * 0.1
-            # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
-            #     / self._init_assets_ * 0.1
+            reward += (self.__assets__[-1]-max(self.__assets__[:-1])) \
+                / self._init_assets_ * self.__successive__ * 0.382
+            reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
+                / self._init_assets_ * self.__successive__ * 0.382
 
             # if (reward < 0 and self.__reward__[-1] < 0) or \
             #         (reward > 0 and self.__reward__[-1] > 0):

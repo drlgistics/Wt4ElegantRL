@@ -97,7 +97,7 @@ if __name__ == '__main__':
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
             'gamma': 0.99,
-            'lr': 1e-3,
+            'lr': 1e-5,
             # 'model': {
             #     'use_lstm': True,
             #     # 'fcnet_hiddens': [64],
@@ -105,7 +105,7 @@ if __name__ == '__main__':
             #     # 'lstm_cell_size': 64,
             #     # 'max_seq_len': 2,
             # },
-            'evaluation_interval': 24,
+            'evaluation_interval': 24*2,
             "evaluation_num_episodes": 30,
             'evaluation_parallel_to_training': False,
             'evaluation_num_workers': 1,
@@ -166,7 +166,7 @@ if __name__ == '__main__':
             Trainer,
             stop={
                 "timesteps_total": 1e+10,
-                'episode_reward_mean': 0.03,
+                'episode_reward_mean': 1000.,
                 # 'episode_reward_min': 50,
             },
             # scheduler=pb2,

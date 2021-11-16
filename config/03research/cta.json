@@ -3,7 +3,7 @@
         "mode":"bin",
         "path":"./dataset/",
         "path1":"D:/Github/test/Storage",
-        "tick":true,
+        "tick":false,
         "basefiles":{
             "session":"./config/01commom/sessions.json",
             "commodity":"./config/01commom/commodities.json",

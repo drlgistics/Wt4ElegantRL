@@ -47,7 +47,7 @@ if __name__ == '__main__':
         #         "gamma": [0.96, 0.99],
         #     })
 
-        nums_subproc = 5
+        nums_subproc = 8
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',
@@ -96,8 +96,11 @@ if __name__ == '__main__':
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            'gamma': 0.99,
+            'gamma': 0.96,
             'lr': 1e-5,
+            "actor_lr": 1e-4,
+            "critic_lr": 1e-4,
+            # "l2_reg": 1e-6,
             # 'model': {
             #     'use_lstm': True,
             #     # 'fcnet_hiddens': [64],
@@ -105,7 +108,7 @@ if __name__ == '__main__':
             #     # 'lstm_cell_size': 64,
             #     # 'max_seq_len': 2,
             # },
-            'evaluation_interval': 24*2,
+            'evaluation_interval': 24,
             "evaluation_num_episodes": 30,
             'evaluation_parallel_to_training': False,
             'evaluation_num_workers': 1,
@@ -166,7 +169,7 @@ if __name__ == '__main__':
             Trainer,
             stop={
                 "timesteps_total": 1e+10,
-                'episode_reward_mean': 1000.,
+                'episode_reward_mean': 15.,
                 # 'episode_reward_min': 50,
             },
             # scheduler=pb2,
@@ -192,10 +195,16 @@ if __name__ == '__main__':
         config = {
             'env': 'SimpleCTAEnv',
             'env_config': {
-                'time_start': 202101011600,
-                'time_end': 202108311600,
+                'time_range': (
+                    (202106311600, 202107311600),
+                    (202107311600, 202108311600),
+                    (202108311600, 202109311600),
+                    (202109311600, 202110311600),
+                    (202110311600, 202111311600),
+                    (202106311600, 202111311600),
+                ),
                 'slippage': 0,
-                'mode': 1
+                'mode': 2
             },
             'framework': 'torch',
             'num_workers': 1,
@@ -206,24 +215,14 @@ if __name__ == '__main__':
         agent.restore(path)
         print(f"Agent loaded from saved model at {path}")
 
-        env = SimpleCTAEnv(**{
-            # 'time_start': 201701011600,
-            # 'time_end': 201901011600,
-            # 'time_start': 202001011600,
-            # 'time_end': 202108311600,
-            'time_start': 202101011600,
-            'time_end': 202110131600,
-            # 'time_end': 202110281600,
-            'slippage': 0,
-            'mode': 2,
-        })
+        env = SimpleCTAEnv(**config['env_config'])
 
-        for i in range(10):  # 模拟训练10次
+        for i in range(len(config['env_config']['time_range'])*10):  # 模拟训练10次
             obs = env.reset()
             done = False
             n = 0
             while not done:
-                action = env.action_space.sample()  # 模拟智能体产生动作
+                # action = env.action_space.sample()  # 模拟智能体产生动作
                 action = agent.compute_single_action(obs)
                 obs, reward, done, info = env.step(action)
                 n += 1

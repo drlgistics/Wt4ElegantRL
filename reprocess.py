@@ -37,9 +37,6 @@ class ZFILTER(REPROCESS):
 
 
 class MAXMIN(REPROCESS):
-    '''
-    https://github.com/zhangchuheng123/Reinforcement-Implementation/blob/master/code/ppo.py
-    '''
     @staticmethod
     def n() -> int:
         return 120

@@ -20,7 +20,7 @@ from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 # from ray.rllib.agents.dqn import ApexTrainer as Trainer
 
 
-from ray.tune.schedulers.pb2 import PB2
+# from ray.tune.schedulers.pb2 import PB2
 from envs_simple_cta import SimpleCTAEnv
 import click
 

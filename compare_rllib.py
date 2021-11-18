@@ -1,11 +1,11 @@
 from ray import tune, init
 # from ray.rllib.agents.sac import SACTrainer as Trainer
-from ray.rllib.agents.ddpg import TD3Trainer as Trainer
+# from ray.rllib.agents.ddpg import TD3Trainer as Trainer
 # from ray.rllib.agents.ddpg import ApexDDPGTrainer as Trainer
 
 
 # from ray.rllib.agents.a3c import A3CTrainer as Trainer
-# from ray.rllib.agents.ppo import PPOTrainer as Trainer
+from ray.rllib.agents.ppo import PPOTrainer as Trainer
 # from ray.rllib.agents.ppo import APPOTrainer as Trainer
 # from ray.rllib.agents.marwil import MARWILTrainer as Trainer
 # from ray.rllib.agents.impala import ImpalaTrainer as Trainer
@@ -96,10 +96,10 @@ if __name__ == '__main__':
             'num_workers': nums_subproc,
             'num_gpus': nums_gpu,
             'num_gpus_per_worker': nums_gpu,
-            'gamma': 0.96,
+            'gamma': 0.99,
             'lr': 1e-5,
-            "actor_lr": 1e-4,
-            "critic_lr": 1e-4,
+            # "actor_lr": 1e-5,
+            # "critic_lr": 1e-5,
             # "l2_reg": 1e-6,
             # 'model': {
             #     'use_lstm': True,
@@ -168,15 +168,15 @@ if __name__ == '__main__':
         analysis = tune.run(
             Trainer,
             stop={
-                "timesteps_total": 1e+10,
-                'episode_reward_mean': 15.,
+                "timesteps_total": 1e10,
+                'episode_reward_mean': 0.24,
                 # 'episode_reward_min': 50,
             },
             # scheduler=pb2,
             # num_samples=nums_subproc,
             config=config,
-            keep_checkpoints_num=20,
-            checkpoint_freq=24*5,
+            keep_checkpoints_num=10,
+            checkpoint_freq=24,
             checkpoint_score_attr='episode_reward_mean',
             checkpoint_at_end=True,
             local_dir="./outputs_bt/rllib",

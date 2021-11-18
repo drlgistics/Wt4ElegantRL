@@ -15,7 +15,7 @@ class REPROCESS():
 class ZSCORE(REPROCESS):
     @staticmethod
     def n() -> int:
-        return 120
+        return 1200
 
     @staticmethod
     def calculate(data: np.ndarray) -> np.ndarray:
@@ -28,7 +28,7 @@ class ZFILTER(REPROCESS):
     '''
     @staticmethod
     def n() -> int:
-        return 120
+        return 1200
 
     @staticmethod
     def calculate(data: np.ndarray) -> np.ndarray:
@@ -39,7 +39,7 @@ class ZFILTER(REPROCESS):
 class MAXMIN(REPROCESS):
     @staticmethod
     def n() -> int:
-        return 120
+        return 1200
 
     @staticmethod
     def calculate(data: np.ndarray) -> np.ndarray:

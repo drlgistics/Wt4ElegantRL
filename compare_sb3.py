@@ -202,7 +202,7 @@ def train():
             (201811311600, 201812311600),
         ),
         'slippage': 0,
-        'mode': 1
+        'mode': 2
     })
 
     n = 1500
@@ -210,7 +210,7 @@ def train():
     eval_callback = EvalCallback(
         eval_env=Monitor(evaluator),
         callback_on_new_best=StopTrainingOnRewardThreshold(
-            reward_threshold=0.03, verbose=1),
+            reward_threshold=5, verbose=1),
         n_eval_episodes=30,
         eval_freq=24,
         log_path='./outputs_bt/sb3/%s'%Trainer.__name__,
@@ -219,21 +219,21 @@ def train():
 
     model: Trainer = Trainer('MlpPolicy', learner,
                              #  gamma=0.1 ** (1/12/8),
-                             gamma=0.99,
+                             gamma=0.96,
                              #  learning_rate=2 ** -14,  # 15: 167, 14:
-                             learning_rate=1e-3,
+                             learning_rate=1e-5,
                              # learning_starts=100,
                              # batch_size=128,
-                             # ent_coef='auto_0.1',
+                            #  ent_coef='auto_0.1',
                              # policy_kwargs=dict(net_arch=[128, 128, 128]),
                              tensorboard_log='./outputs_bt/sb3/%s'%Trainer.__name__,
                              verbose=1,
                              #  device='cpu',
                              )
     model.learn(
-        total_timesteps=1e+10,
+        total_timesteps=10000,
         callback=eval_callback,
-        log_interval=24
+        log_interval=1
     )
     model.save('SimpleTrainer')
 

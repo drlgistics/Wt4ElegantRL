@@ -38,16 +38,16 @@ class SimpleCTAEnv(WtEnv):
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
         for period in (feature.M5, ):  # feature.M5, feature.M10,
-            feature.price(period)
-            feature.volume(period)
-            feature.roc(period)
+            # feature.price(period)
+            # feature.volume(period)
+            # feature.roc(period)
             feature.bollinger(period)  # 标准差通道
-            feature.sar(period)
-            feature.trange(period)  # 波动率
+            # feature.sar(period)
+            # feature.trange(period)  # 波动率
             feature.macd(period)  # 双均线强度
-            feature.rsi(period)
-            feature.dx(period)
-            feature.obv(period)
+            # feature.rsi(period)
+            # feature.dx(period)
+            # feature.obv(period)
             feature.kdj(period)
 
         # 除上述特征，特征工程组件会自动加上 "开仓的最大浮盈、开仓的最大亏损、开仓的浮动盈亏、当前持仓数"4列，如果没有持仓则全部为0

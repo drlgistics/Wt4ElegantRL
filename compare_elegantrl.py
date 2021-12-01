@@ -1,8 +1,8 @@
 from click import command, group, option
-# from elegantrl.agent import AgentPPO as Agent
+from elegantrl.agent import AgentPPO as Agent
 # from elegantrl.agent import AgentSAC as Agent
 # from elegantrl.agent import AgentModSAC as Agent
-from elegantrl.agent import AgentTD3 as Agent
+# from elegantrl.agent import AgentTD3 as Agent
 
 
 # from elegantrl.agent import AgentDoubleDQN as Agent
@@ -150,6 +150,7 @@ if __name__ == '__main__':
         env: SimpleCTASubProcessEnv = make('wt4rl-simplecta-trainer-v0')
         print('状态空间', env.observation_space.shape)
         print('动作空间', env.action_space.shape)
+        a = 0
         for i in range(1, int(count)+1):  # 模拟训练10次
             obs = env.reset()
             done = False
@@ -158,9 +159,11 @@ if __name__ == '__main__':
                 action = env.action_space.sample()  # 模拟智能体产生动作
                 obs, reward, done, info = env.step(action)
                 n += 1
+                a += 1
                 # print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
             print('第%s次训练完成，执行%s步, 奖励%s, 盈亏%s。' % (i, n, reward, env.assets))
         env.close()
+        print(a)
 
     @command()
     def train():

@@ -47,7 +47,7 @@ if __name__ == '__main__':
         #         "gamma": [0.96, 0.99],
         #     })
 
-        nums_subproc = 8
+        nums_subproc = 5
         nums_gpu = 0.92/(nums_subproc+2)
         config = {
             'env': 'SimpleCTAEnv',
@@ -98,6 +98,7 @@ if __name__ == '__main__':
             'num_gpus_per_worker': nums_gpu,
             'gamma': 0.99,
             'lr': 1e-5,
+            'train_batch_size': 30465,
             # "actor_lr": 1e-5,
             # "critic_lr": 1e-5,
             # "l2_reg": 1e-6,
@@ -169,7 +170,7 @@ if __name__ == '__main__':
             Trainer,
             stop={
                 "timesteps_total": 1e10,
-                'episode_reward_mean': 0.24,
+                'episode_reward_mean': 0.48,
                 # 'episode_reward_min': 50,
             },
             # scheduler=pb2,

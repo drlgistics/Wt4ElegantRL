@@ -38,8 +38,8 @@ class SimpleCTAEnv(WtEnv):
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
         for period in (feature.M5, ):  # feature.M5, feature.M10,
-            # feature.price(period)
-            # feature.volume(period)
+            feature.price(period)
+            feature.volume(period)
             # feature.roc(period)
             feature.bollinger(period)  # 标准差通道
             # feature.sar(period)

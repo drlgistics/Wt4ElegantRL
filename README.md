@@ -1,6 +1,9 @@
 # Wt4ElegantRL
 Wt4ElegantRL = [WonderTrader](https://github.com/wondertrader/wtpy) + [ElegantRL](https://github.com/AI4Finance-Foundation/ElegantRL)
 
+# Document by panyunan
+https://gitee.com/panyunan/wt4elegantrl-doc
+
 ## INSTALL
 clone
 ```
